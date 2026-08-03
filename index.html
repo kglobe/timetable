@@ -8,28 +8,28 @@
 <script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('preanim')</script>
 <style>
   :root{
-    --paper:#efebe5; --card:#f8f6f2; --ink:#4b4641; --muted:#968f86;
-    --line:#e4dfd7; --rail:#d9d3c9; --accent:#a9766e; --accent-weak:#efe2df;
-    --holiday:#b58a5c; --holiday-weak:#f0e7d9;
-    /* 莫蘭迪科目色 */
-    --c-lang:#b58f8c; --c-lang-w:#efe4e2; /* 煙燻粉 · 語文/社會 */
-    --c-math:#8fa3b3; --c-math-w:#e7edf1; /* 燕麥灰藍 · 數理 */
-    --c-nat:#94a889;  --c-nat-w:#e8eee3;  /* 鼠尾草綠 · 自然/體育 */
-    --c-art:#c0a983;  --c-art-w:#f1e9db;  /* 奶茶色 · 藝術 */
-    --shadow:0 1px 2px rgba(75,70,65,.04),0 8px 22px rgba(75,70,65,.06);
-    --shadow-lift:0 2px 8px rgba(169,118,110,.14),0 14px 30px rgba(75,70,65,.12);
+    --paper:#fbf7f0; --card:#ffffff; --ink:#413b34; --muted:#9a9188;
+    --line:#ece5db; --rail:#ddd5c9; --accent:#405B55; --accent-weak:#e3ede9;
+    --holiday:#e0a13f; --holiday-weak:#fbf0d8;
+    /* 明亮童趣科目色 */
+    --c-lang:#d76d80; --c-lang-w:#fce6ea; /* 草莓粉 · 語文/社會 */
+    --c-math:#4f95cf; --c-math-w:#e3f0fb; /* 天空藍 · 數理 */
+    --c-nat:#5aa864;  --c-nat-w:#e5f4e7;  /* 草綠 · 自然/體育 */
+    --c-art:#e0982f;  --c-art-w:#fbecd2;  /* 陽光橘 · 藝術 */
+    --shadow:0 1px 2px rgba(75,70,65,.04),0 8px 22px rgba(75,70,65,.07);
+    --shadow-lift:0 2px 8px rgba(64,91,85,.18),0 14px 30px rgba(75,70,65,.13);
   }
   @media (prefers-color-scheme:dark){
     :root{
-      --paper:#26231f; --card:#2e2a25; --ink:#e4ded4; --muted:#a79e91;
-      --line:#3a352e; --rail:#463f37; --accent:#c99a91; --accent-weak:#3a2c28;
-      --holiday:#cca878; --holiday-weak:#332a1d;
-      --c-lang:#c99e9a; --c-lang-w:#3a2d2b;
-      --c-math:#a3bac9; --c-math-w:#29323a;
-      --c-nat:#a7bd9a;  --c-nat-w:#2b3327;
-      --c-art:#d4bd93;  --c-art-w:#362f22;
+      --paper:#24211d; --card:#2c2823; --ink:#ece5d9; --muted:#a89f92;
+      --line:#39332c; --rail:#463f37; --accent:#86b0a5; --accent-weak:#2b3733;
+      --holiday:#e6b25c; --holiday-weak:#352a1a;
+      --c-lang:#e88a99; --c-lang-w:#3a2a2d;
+      --c-math:#79b3e0; --c-math-w:#24303a;
+      --c-nat:#82c187;  --c-nat-w:#263320;
+      --c-art:#eab662;  --c-art-w:#362d1c;
       --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.32);
-      --shadow-lift:0 2px 8px rgba(201,154,145,.16),0 14px 30px rgba(0,0,0,.4);
+      --shadow-lift:0 2px 8px rgba(134,176,165,.16),0 14px 30px rgba(0,0,0,.4);
     }
   }
   *{box-sizing:border-box}
@@ -152,6 +152,24 @@
 
   footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
     color:var(--muted);font-size:12px;line-height:1.7}
+  /* ---- 進度條 · 剩餘時間 ---- */
+  .status .bar{height:5px;border-radius:999px;background:var(--accent-weak);margin-top:11px;overflow:hidden}
+  .status .bar i{display:block;height:100%;border-radius:999px;background:var(--accent);transform-origin:left center}
+  .status .rem{color:var(--muted);font-size:12.5px;margin-top:8px}
+  .status .rem b{color:var(--accent);font-weight:700}
+  .node.now .card{position:relative}
+  .node.now .prog{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--accent-weak);
+    border-radius:0 0 8px 8px;overflow:hidden}
+  .node.now .prog i{display:block;height:100%;background:var(--accent);transform-origin:left center}
+
+  /* ---- now-line 呼吸光暈 ---- */
+  .nl-rail span{position:relative}
+  .nl-rail span b{position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--accent);opacity:0;pointer-events:none}
+
+  /* ---- 行事曆捲動進場 ---- */
+  .io-hidden{opacity:0;transform:translateY(16px)}
+  .io-in{opacity:1;transform:none;transition:opacity .55s ease,transform .55s ease}
+
   :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
   @media (max-width:360px){h1{font-size:24px}.wrap{padding:22px 14px 48px}}
 </style>
@@ -231,6 +249,8 @@ const COURSE_CAT = {
   "團隊活動":"lang",
   "愛塗鴉":"art","影片欣賞":"art","創意 DIY":"art","唱跳音符":"art","角落活動":"art",
 };
+// 與語文同色、但 chip 標籤要另外顯示的科目
+const SUBJECT = {"團隊活動":"社會","品格生活":"社會","生活知能":"社會","安全教育":"社會"};
 const catOf = n => COURSE_CAT[n.replace("＊","")] || null;
 const catStyle = c => c ? `--c:var(--c-${c});--cw:var(--c-${c}-w)` : "";
 // ---- 行事曆（115 學年=2026；1 月屬 2027）----
@@ -272,6 +292,8 @@ const now = new Date();
 const dow = now.getDay();
 const nowMin = now.getHours()*60 + now.getMinutes();
 const isWeekday = dow>=1 && dow<=5;
+const root = document.documentElement;
+const canAnim = !!window.gsap && matchMedia("(prefers-reduced-motion: no-preference)").matches;
 
 document.getElementById("today").textContent =
   `${now.getFullYear()} / ${pad(now.getMonth()+1)} / ${pad(now.getDate())}　週${WL[dow]}`;
@@ -298,8 +320,10 @@ if(!isWeekday){
   const inSession = nowMin>=dayStart && nowMin<dayEnd;
   const insertBefore = items.findIndex(it=> range(it.t)[0] > nowMin);
 
+  const pct = (s,e)=> Math.min(100,Math.max(0,(nowMin-s)/(e-s)*100));
+
   const nowLineHTML = `<div class="nowline reveal" id="nowline">
-    <div class="nl-rail"><span></span></div>
+    <div class="nl-rail"><span><b></b></span></div>
     <div class="nl-body"><span class="nl-time num">${pad(now.getHours())}:${pad(now.getMinutes())}</span>
     <span class="nl-label">現在</span><span class="nl-rule" id="nlrule"></span></div></div>`;
 
@@ -310,12 +334,14 @@ if(!isWeekday){
     const on = current===it;
     const cat = it.fixed ? null : catOf(it.a);
     const name = it.a.replace("＊",'<span class="star">＊</span>');
-    const chip = cat ? `<span class="chip">${CAT[cat]}</span>` : "";
+    const chip = cat ? `<span class="chip">${SUBJECT[it.a.replace("＊","")]||CAT[cat]}</span>` : "";
+    const [cs,ce]=range(it.t);
+    const prog = on ? `<div class="prog"><i style="width:${pct(cs,ce)}%"></i></div>` : "";
     out += `<div class="node reveal ${it.fixed?'fixed':''} ${on?'now':''}" style="${catStyle(cat)}">
       <div class="rail"><span class="dot"></span></div>
       <div class="card">
         <div class="time num">${start}<span class="sub">${end}</span></div>
-        <div class="name">${name}</div>${chip}
+        <div class="name">${name}</div>${chip}${prog}
       </div></div>`;
   });
   if(inSession && insertBefore===-1) out += nowLineHTML;
@@ -323,18 +349,32 @@ if(!isWeekday){
 
   liveWrap.hidden = !inSession;
   if(current){
+    const [cs,ce]=range(current.t);
     statusEl.innerHTML = `<div class="k">現在進行</div>
-      <div class="v">${current.a.replace("＊","")}</div><div class="t num">${current.t}</div>`;
+      <div class="v">${current.a.replace("＊","")}</div><div class="t num">${current.t}</div>
+      <div class="bar"><i style="width:${pct(cs,ce)}%"></i></div>
+      <div class="rem">還有 <b class="num">${ce-nowMin}</b> 分鐘下課</div>`;
+    // 每 30 秒更新剩餘時間與進度條（ponytail: 跨節不即時重繪，換節靠下次載入）
+    setInterval(()=>{
+      const d=new Date(), m=d.getHours()*60+d.getMinutes();
+      if(m<cs||m>=ce) return;
+      const p=Math.min(100,Math.max(0,(m-cs)/(ce-cs)*100));
+      const sb=statusEl.querySelector(".bar i"); if(sb) sb.style.width=p+"%";
+      const rb=statusEl.querySelector(".rem b"); if(rb) rb.textContent=ce-m;
+      const cb=document.querySelector(".node.now .prog i"); if(cb) cb.style.width=p+"%";
+    },30000);
   }else if(nowMin < dayStart){
     statusEl.innerHTML = `<div class="k">今天還沒開始</div>
-      <div class="v">${items[0].a.replace("＊","")}</div><div class="t num">第一節 ${items[0].t}</div>`;
+      <div class="v">${items[0].a.replace("＊","")}</div><div class="t num">第一節 ${items[0].t}</div>
+      <div class="rem">再 <b class="num">${dayStart-nowMin}</b> 分鐘開始</div>`;
   }else if(nowMin >= dayEnd){
     statusEl.className = "status rest reveal";
     statusEl.innerHTML = `<div class="k">今天</div><div class="v">課程都結束囉</div>`;
   }else{
     const up = items.find(it=> range(it.t)[0] > nowMin);
     statusEl.innerHTML = `<div class="k">休息中</div>
-      <div class="v">${up.a.replace("＊","")}</div><div class="t num">下一節 ${up.t}</div>`;
+      <div class="v">${up.a.replace("＊","")}</div><div class="t num">下一節 ${up.t}</div>
+      <div class="rem">再 <b class="num">${range(up.t)[0]-nowMin}</b> 分鐘開始</div>`;
   }
 }
 
@@ -360,7 +400,7 @@ const within = EVENTS.filter(ev=>{ const s=parse(ev[0]),e=ev[1]?parse(ev[1]):s; 
 function evRow(ev){
   const s=parse(ev[0]), holiday=ev[3];
   const rng = ev[1] ? `${md(s)}–${md(parse(ev[1]))}` : "";
-  return `<div class="ev reveal ${holiday?'holiday':''}">
+  return `<div class="ev ${holiday?'holiday':''}">
     <div class="d"><div class="dd num">${s.getDate()}</div><div class="wl">週${WL[s.getDay()]}</div>
       ${rng?`<div class="rng2 num">${rng}</div>`:""}</div>
     <div class="txt">${ev[2]}${holiday?'<span class="tag">放假</span>':""}</div></div>`;
@@ -374,8 +414,6 @@ if(within.length){
 }
 
 // ---- 動畫（GSAP 失敗或偏好減少動態時，內容照樣完整顯示）----
-const root = document.documentElement;
-const canAnim = !!window.gsap && matchMedia("(prefers-reduced-motion: no-preference)").matches;
 if(canAnim){
   gsap.set(".reveal",{autoAlpha:0,y:14});
   gsap.set("#nowline",{autoAlpha:0,y:0});
@@ -384,7 +422,7 @@ if(canAnim){
    .to(".status, .legend",{autoAlpha:1,y:0,duration:.5,stagger:.08},"-=.25")
    .to(".node",{autoAlpha:1,y:0,duration:.45,stagger:.045},"-=.1")
    .to("#nowline",{autoAlpha:1,duration:.3},"-=.45")
-   .to(".more, .cal, .cal .ev, .cal .next",{autoAlpha:1,y:0,duration:.5,stagger:.06},"-=.2")
+   .to(".more, .cal, .cal .next",{autoAlpha:1,y:0,duration:.5,stagger:.06},"-=.2")
    .set(".reveal, #nowline",{autoAlpha:1,y:0}); // 保底：任何漏網 reveal 都顯示
   const rule = document.getElementById("nlrule");
   if(rule){
@@ -392,7 +430,21 @@ if(canAnim){
      .from(rule,{scaleX:0,duration:.7,ease:"power3.out"},"-=.5");
   }
   gsap.fromTo(".node.now .card",{scale:.985},{scale:1,duration:.6,delay:.5,ease:"power2.out"});
+  gsap.from(".status .bar i, .node.now .prog i",{scaleX:0,duration:.9,delay:.55,ease:"power2.out"});
   gsap.to(".live .ring b",{scale:2.4,autoAlpha:0,duration:1.6,ease:"sine.out",repeat:-1,repeatDelay:.2});
+  // now-line 呼吸光暈
+  gsap.fromTo(".nl-rail span b",{scale:.6,autoAlpha:.5},
+    {scale:2.4,autoAlpha:0,duration:1.8,ease:"sine.out",repeat:-1,repeatDelay:.3,delay:.6});
+  // 行事曆捲動進場
+  if("IntersectionObserver" in window){
+    const evs=document.querySelectorAll(".cal .ev");
+    evs.forEach(el=>el.classList.add("io-hidden"));
+    const io=new IntersectionObserver((ents)=>{
+      ents.forEach(e=>{ if(e.isIntersecting){ e.target.classList.remove("io-hidden");
+        e.target.classList.add("io-in"); io.unobserve(e.target); } });
+    },{rootMargin:"0px 0px -8% 0px"});
+    evs.forEach(el=>io.observe(el));
+  }
 }
 root.classList.remove("preanim");
 </script>
