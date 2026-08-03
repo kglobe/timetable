@@ -98,9 +98,6 @@
   .node.now .dot{background:var(--accent);box-shadow:0 0 0 4px var(--paper),0 0 0 6px var(--accent-weak)}
   .node.now .card{box-shadow:inset 3px 0 0 var(--accent),var(--shadow-lift)}
   .node.now .time,.node.now .name{color:var(--accent)}
-  .node.now .name::after{content:"進行中";margin-left:10px;font-size:12px;font-weight:600;
-    color:#fff;background:var(--accent);padding:2px 8px;border-radius:999px;position:relative;top:-2px}
-
   /* now line */
   .nowline{position:relative;display:grid;grid-template-columns:26px 1fr;gap:14px;
     align-items:center;padding:9px 0;margin:1px 0}
@@ -112,6 +109,9 @@
   .nl-label{font-size:12px;font-weight:600;letter-spacing:.14em;color:var(--accent)}
   .nl-rule{flex:1;height:2px;background:linear-gradient(90deg,var(--accent),transparent);
     transform-origin:left center}
+  /* 活線：正上課時，串起「進行中」卡片與「現在」節點 */
+  .nl-connect{position:absolute;left:50%;margin-left:-4px;bottom:50%;
+    width:8px;height:42px;overflow:visible;pointer-events:none}
 
   /* ---- weekly grid ---- */
   .more{margin-top:26px;border-top:1px solid var(--line);padding-top:6px}
@@ -160,9 +160,18 @@
   .status .rem{color:var(--muted);font-size:13.5px;margin-top:8px}
   .status .rem b{color:var(--accent);font-weight:700}
   .node.now .card{position:relative}
-  .node.now .prog{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--accent-weak);
+  .node.now .prog{position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--accent-weak);
     border-radius:0 0 8px 8px;overflow:hidden}
-  .node.now .prog i{display:block;height:100%;background:var(--accent);transform-origin:left center}
+  .node.now .prog i{position:relative;display:block;height:100%;background:var(--accent);
+    transform-origin:left center;overflow:hidden}
+  .node.now .prog i u{position:absolute;top:0;bottom:0;left:0;width:38%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent)}
+  .node.now .nowglow{position:absolute;inset:0;border-radius:8px;pointer-events:none;
+    box-shadow:0 0 0 3px var(--accent-weak);opacity:0}
+  @media (prefers-reduced-motion:no-preference){
+    .node.now .nowglow{animation:nowbreath 3.4s ease-in-out infinite}
+  }
+  @keyframes nowbreath{0%,100%{opacity:0}50%{opacity:1}}
 
   /* ---- now-line 呼吸光暈 ---- */
   .nl-rail span{position:relative}
@@ -297,102 +306,123 @@ const isWeekday = dow>=1 && dow<=5;
 const root = document.documentElement;
 const canAnim = !!window.gsap && matchMedia("(prefers-reduced-motion: no-preference)").matches;
 
+// 平日 19:00 前顯示當天（即時狀態）；之後或週末改預覽下個上課日
+const PREVIEW_AFTER = 19*60;
+const live = isWeekday && nowMin < PREVIEW_AFTER;
+const disp = new Date(now);
+if(!live){ do{ disp.setDate(disp.getDate()+1); }while(disp.getDay()===0||disp.getDay()===6); }
+const dispDow = disp.getDay();
+const hd = live ? now : disp;
+
 document.getElementById("today").textContent =
-  `${now.getFullYear()} / ${pad(now.getMonth()+1)} / ${pad(now.getDate())}　週${WL[dow]}`;
+  `${hd.getFullYear()} / ${pad(hd.getMonth()+1)} / ${pad(hd.getDate())}　週${WL[hd.getDay()]}${live?'':'　·　預覽'}`;
 
 // ---- 今日課表 ----
 const tl = document.getElementById("timeline");
 const statusEl = document.getElementById("status");
 const liveWrap = document.getElementById("livewrap");
 
-if(!isWeekday){
-  statusEl.className = "status rest reveal";
-  statusEl.innerHTML = `<div class="k">今天</div><div class="v">週末休息，好好放鬆</div>`;
-  tl.innerHTML = `<div class="card" style="margin-left:2px">
-    <div class="name" style="color:var(--muted);font-weight:500">週六、週日沒有課後班課程。</div></div>`;
-}else{
-  const col = dow-1;
-  let items = FIXED.map(f=>({t:f[0],a:f[1],fixed:true}));
-  COURSE_TIMES.forEach((t,i)=> items.push({t,a:COURSES[i][col],fixed:false}));
-  items.sort((x,y)=> range(x.t)[0]-range(y.t)[0]);
+const col = dispDow-1;
+let items = FIXED.map(f=>({t:f[0],a:f[1],fixed:true}));
+COURSE_TIMES.forEach((t,i)=> items.push({t,a:COURSES[i][col],fixed:false}));
+items.sort((x,y)=> range(x.t)[0]-range(y.t)[0]);
 
-  const current = items.find(it=>{ const [s,e]=range(it.t); return nowMin>=s && nowMin<e; });
-  const dayStart = range(items[0].t)[0];
-  const dayEnd = range(items[items.length-1].t)[1];
-  const inSession = nowMin>=dayStart && nowMin<dayEnd;
-  const insertBefore = items.findIndex(it=> range(it.t)[0] > nowMin);
+const current = live ? items.find(it=>{ const [s,e]=range(it.t); return nowMin>=s && nowMin<e; }) : null;
+const dayStart = range(items[0].t)[0];
+const dayEnd = range(items[items.length-1].t)[1];
+const inSession = live && nowMin>=dayStart && nowMin<dayEnd;
+const insertBefore = items.findIndex(it=> range(it.t)[0] > nowMin);
 
-  const pct = (s,e)=> Math.min(100,Math.max(0,(nowMin-s)/(e-s)*100));
+const pct = (s,e)=> Math.min(100,Math.max(0,(nowMin-s)/(e-s)*100));
 
-  const nowLineHTML = `<div class="nowline reveal" id="nowline">
-    <div class="nl-rail"><span><b></b></span></div>
-    <div class="nl-body"><span class="nl-time num">${pad(now.getHours())}:${pad(now.getMinutes())}</span>
-    <span class="nl-label">現在</span><span class="nl-rule" id="nlrule"></span></div></div>`;
+const connectHTML = current
+  ? `<svg class="nl-connect" viewBox="0 0 8 42" preserveAspectRatio="none" aria-hidden="true">
+      <line x1="4" y1="0" x2="4" y2="42" stroke="var(--accent)" stroke-width="2"
+        stroke-linecap="round" stroke-dasharray="3 6"/></svg>`
+  : "";
+const nowLineHTML = `<div class="nowline reveal" id="nowline">
+  <div class="nl-rail">${connectHTML}<span><b></b></span></div>
+  <div class="nl-body"><span class="nl-time num">${pad(now.getHours())}:${pad(now.getMinutes())}</span>
+  <span class="nl-label">現在</span><span class="nl-rule" id="nlrule"></span></div></div>`;
 
-  let out = "";
-  items.forEach((it,idx)=>{
-    if(inSession && idx===insertBefore) out += nowLineHTML;
-    const [start,end]=it.t.split("–");
-    const on = current===it;
-    const cat = it.fixed ? null : catOf(it.a);
-    const name = it.a.replace("＊",'<span class="star">＊</span>');
-    const chip = cat ? `<span class="chip">${SUBJECT[it.a.replace("＊","")]||CAT[cat]}</span>` : "";
-    const [cs,ce]=range(it.t);
-    const prog = on ? `<div class="prog"><i style="width:${pct(cs,ce)}%"></i></div>` : "";
-    out += `<div class="node reveal ${it.fixed?'fixed':''} ${on?'now':''}" style="${catStyle(cat)}">
-      <div class="rail"><span class="dot"></span></div>
-      <div class="card">
-        <div class="time num">${start}<span class="sub">${end}</span></div>
-        <div class="name">${name}</div>${chip}${prog}
-      </div></div>`;
-  });
-  if(inSession && insertBefore===-1) out += nowLineHTML;
-  tl.innerHTML = out;
+let out = "";
+items.forEach((it,idx)=>{
+  if(inSession && idx===insertBefore) out += nowLineHTML;
+  const [start,end]=it.t.split("–");
+  const on = current===it;
+  const cat = it.fixed ? null : catOf(it.a);
+  const name = it.a.replace("＊",'<span class="star">＊</span>');
+  const chip = cat ? `<span class="chip">${SUBJECT[it.a.replace("＊","")]||CAT[cat]}</span>` : "";
+  const [cs,ce]=range(it.t);
+  const prog = on ? `<div class="prog"><i style="width:${pct(cs,ce)}%"><u></u></i></div><span class="nowglow"></span>` : "";
+  out += `<div class="node reveal ${it.fixed?'fixed':''} ${on?'now':''}" style="${catStyle(cat)}">
+    <div class="rail"><span class="dot"></span></div>
+    <div class="card">
+      <div class="time num">${start}<span class="sub">${end}</span></div>
+      <div class="name">${name}</div>${chip}${prog}
+    </div></div>`;
+});
+if(inSession && insertBefore===-1) out += nowLineHTML;
+tl.innerHTML = out;
 
-  liveWrap.hidden = !inSession;
-  if(current){
-    const [cs,ce]=range(current.t);
-    statusEl.innerHTML = `<div class="k">現在進行</div>
-      <div class="v">${current.a.replace("＊","")}</div><div class="t num">${current.t}</div>
-      <div class="bar"><i style="width:${pct(cs,ce)}%"></i></div>
-      <div class="rem">還有 <b class="num">${ce-nowMin}</b> 分鐘下課</div>`;
-    // 每 30 秒更新剩餘時間與進度條（ponytail: 跨節不即時重繪，換節靠下次載入）
-    setInterval(()=>{
-      const d=new Date(), m=d.getHours()*60+d.getMinutes();
-      if(m<cs||m>=ce) return;
-      const p=Math.min(100,Math.max(0,(m-cs)/(ce-cs)*100));
-      const sb=statusEl.querySelector(".bar i"); if(sb) sb.style.width=p+"%";
-      const rb=statusEl.querySelector(".rem b"); if(rb) rb.textContent=ce-m;
-      const cb=document.querySelector(".node.now .prog i"); if(cb) cb.style.width=p+"%";
-    },30000);
-  }else if(nowMin < dayStart){
-    statusEl.innerHTML = `<div class="k">今天還沒開始</div>
-      <div class="v">${items[0].a.replace("＊","")}</div><div class="t num">第一節 ${items[0].t}</div>
-      <div class="rem">再 <b class="num">${dayStart-nowMin}</b> 分鐘開始</div>`;
-  }else if(nowMin >= dayEnd){
-    statusEl.className = "status rest reveal";
-    statusEl.innerHTML = `<div class="k">今天</div><div class="v">課程都結束囉</div>`;
-  }else{
-    const up = items.find(it=> range(it.t)[0] > nowMin);
-    statusEl.className = "status rest reveal";
-    statusEl.innerHTML = `<div class="k">下課休息中</div>
-      <div class="v"><span class="next-lbl">下一節</span>${up.a.replace("＊","")}</div><div class="t num">${up.t}</div>
-      <div class="rem">再 <b class="num">${range(up.t)[0]-nowMin}</b> 分鐘開始</div>`;
-  }
-
-  // 每分鐘偵測換節：階段變了就重載切狀態，同階段只更新休息/未開始的倒數
-  // ponytail: 換節用 reload 最省事（每 20~40 分才觸發一次），同階段內就地改數字不重繪
-  const phase = m => { const c=items.find(it=>{const[s,e]=range(it.t);return m>=s&&m<e;});
-    return c?c.t:(m<dayStart?'before':m>=dayEnd?'after':'break'); };
-  const sig0 = phase(nowMin);
+liveWrap.hidden = !inSession;
+if(current){
+  const [cs,ce]=range(current.t);
+  statusEl.innerHTML = `<div class="k">現在進行</div>
+    <div class="v">${current.a.replace("＊","")}</div><div class="t num">${current.t}</div>
+    <div class="bar"><i style="width:${pct(cs,ce)}%"></i></div>
+    <div class="rem">還有 <b class="num">${ce-nowMin}</b> 分鐘下課</div>`;
+  // 每 30 秒更新剩餘時間與進度條（ponytail: 跨節不即時重繪，換節靠下次載入）
   setInterval(()=>{
     const d=new Date(), m=d.getHours()*60+d.getMinutes();
-    if(phase(m)!==sig0){ location.reload(); return; }
-    const rb=statusEl.querySelector(".rem b"); if(!rb) return;
-    if(sig0==='before') rb.textContent=dayStart-m;
-    else if(sig0==='break'){ const up=items.find(it=>range(it.t)[0]>m); if(up) rb.textContent=range(up.t)[0]-m; }
-  },60000);
+    if(m<cs||m>=ce) return;
+    const p=Math.min(100,Math.max(0,(m-cs)/(ce-cs)*100));
+    const sb=statusEl.querySelector(".bar i"); if(sb) sb.style.width=p+"%";
+    const rb=statusEl.querySelector(".rem b"); if(rb) rb.textContent=ce-m;
+    const cb=document.querySelector(".node.now .prog i"); if(cb) cb.style.width=p+"%";
+  },30000);
+}else if(!live){
+  const diff = Math.round((new Date(disp.getFullYear(),disp.getMonth(),disp.getDate())
+    - new Date(now.getFullYear(),now.getMonth(),now.getDate()))/86400000);
+  statusEl.className = "status rest reveal";
+  statusEl.innerHTML = `<div class="k">${diff===1?'明天課表':'週'+WL[dispDow]+'課表'}</div>
+    <div class="v">${items[0].a.replace("＊","")}</div><div class="t num">第一節 ${items[0].t}</div>`;
+}else if(nowMin < dayStart){
+  statusEl.innerHTML = `<div class="k">今天還沒開始</div>
+    <div class="v">${items[0].a.replace("＊","")}</div><div class="t num">第一節 ${items[0].t}</div>
+    <div class="rem">再 <b class="num">${dayStart-nowMin}</b> 分鐘開始</div>`;
+}else if(nowMin >= dayEnd){
+  statusEl.className = "status rest reveal";
+  statusEl.innerHTML = `<div class="k">今天</div><div class="v">課程都結束囉</div>`;
+}else{
+  const up = items.find(it=> range(it.t)[0] > nowMin);
+  statusEl.className = "status rest reveal";
+  statusEl.innerHTML = `<div class="k">下課休息中</div>
+    <div class="v"><span class="next-lbl">下一節</span>${up.a.replace("＊","")}</div><div class="t num">${up.t}</div>
+    <div class="rem">再 <b class="num">${range(up.t)[0]-nowMin}</b> 分鐘開始</div>`;
 }
+
+// 每分鐘偵測狀態變化：跨節／過 19:00 切預覽／隔日切回即時 → reload；同狀態就地更新倒數
+// ponytail: reload 最省事（一天觸發沒幾次），同狀態內就地改數字不重繪
+const schedKey = m => { const c=items.find(it=>{const[s,e]=range(it.t);return m>=s&&m<e;});
+  return c?c.t:(m<dayStart?'before':m>=dayEnd?'after':'break'); };
+function stateKey(){
+  const d=new Date(), dw=d.getDay(), m=d.getHours()*60+d.getMinutes();
+  const lv = dw>=1&&dw<=5 && m<PREVIEW_AFTER;
+  if(!lv){ const t=new Date(d); do{t.setDate(t.getDate()+1);}while(t.getDay()===0||t.getDay()===6);
+    return 'P'+t.getFullYear()+pad(t.getMonth()+1)+pad(t.getDate()); }
+  return 'L'+dw+':'+schedKey(m);
+}
+const sig0 = stateKey();
+setInterval(()=>{
+  const d=new Date(), m=d.getHours()*60+d.getMinutes();
+  if(stateKey()!==sig0){ location.reload(); return; }
+  const nt=document.querySelector(".nl-time"); if(nt) nt.textContent=pad(d.getHours())+":"+pad(d.getMinutes());
+  if(!live || current) return;
+  const rb=statusEl.querySelector(".rem b"); if(!rb) return;
+  if(m<dayStart) rb.textContent=dayStart-m;
+  else { const up=items.find(it=>range(it.t)[0]>m); if(up) rb.textContent=range(up.t)[0]-m; }
+},60000);
 
 // ---- 完整週課表 ----
 let g = "<tr><th></th>" + WEEK.map((w,i)=>
@@ -451,6 +481,15 @@ if(canAnim){
   // now-line 呼吸光暈
   gsap.fromTo(".nl-rail span b",{scale:.6,autoAlpha:.5},
     {scale:2.4,autoAlpha:0,duration:1.8,ease:"sine.out",repeat:-1,repeatDelay:.3,delay:.6});
+  // 進度流光（ambient 層，reduced-motion 時不啟用）
+  gsap.fromTo(".node.now .prog i u",{xPercent:-120},
+    {xPercent:340,duration:2.4,ease:"sine.inOut",repeat:-1,repeatDelay:.5,delay:.8});
+  // 活線：自繪一次（scaleY 由卡片端往下畫）＋ 虛線持續流動
+  const cnx = document.querySelector(".nl-connect");
+  if(cnx){
+    gsap.from(cnx,{scaleY:0,transformOrigin:"50% 0%",duration:.55,ease:"power2.out",delay:.7});
+    gsap.to(cnx.querySelector("line"),{strokeDashoffset:-9,duration:1.1,ease:"none",repeat:-1});
+  }
   // 行事曆捲動進場
   if("IntersectionObserver" in window){
     const evs=document.querySelectorAll(".cal .ev");
