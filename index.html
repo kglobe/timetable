@@ -109,9 +109,14 @@
   .nl-label{font-size:12px;font-weight:600;letter-spacing:.14em;color:var(--accent)}
   .nl-rule{flex:1;height:2px;background:linear-gradient(90deg,var(--accent),transparent);
     transform-origin:left center}
-  /* 活線：正上課時，串起「進行中」卡片與「現在」節點 */
-  .nl-connect{position:absolute;left:50%;margin-left:-4px;bottom:50%;
-    width:8px;height:42px;overflow:visible;pointer-events:none}
+  /* 跑步的馬尾小女孩：站在進度條尖端＝「現在」，頭上小膠囊顯示現在時間 */
+  .node.now .nowrunner{position:absolute;bottom:1px;margin-left:-12px;z-index:3;pointer-events:none}
+  .node.now .nowrunner .runner{display:block;width:24px;height:auto;overflow:visible;
+    filter:drop-shadow(0 1px 1.5px rgba(59,121,96,.28))}
+  .node.now .rtime{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
+    margin-bottom:2px;white-space:nowrap;font-size:10.5px;font-weight:700;color:var(--accent);
+    background:var(--card);padding:1px 6px;border-radius:999px;
+    box-shadow:0 1px 5px rgba(59,121,96,.28),0 0 0 1px var(--accent-weak)}
 
   /* ---- weekly grid ---- */
   .more{margin-top:26px;border-top:1px solid var(--line);padding-top:6px}
@@ -335,26 +340,30 @@ const insertBefore = items.findIndex(it=> range(it.t)[0] > nowMin);
 
 const pct = (s,e)=> Math.min(100,Math.max(0,(nowMin-s)/(e-s)*100));
 
-const connectHTML = current
-  ? `<svg class="nl-connect" viewBox="0 0 8 42" preserveAspectRatio="none" aria-hidden="true">
-      <line x1="4" y1="0" x2="4" y2="42" stroke="var(--accent)" stroke-width="2"
-        stroke-linecap="round" stroke-dasharray="3 6"/></svg>`
-  : "";
 const nowLineHTML = `<div class="nowline reveal" id="nowline">
-  <div class="nl-rail">${connectHTML}<span><b></b></span></div>
+  <div class="nl-rail"><span><b></b></span></div>
   <div class="nl-body"><span class="nl-time num">${pad(now.getHours())}:${pad(now.getMinutes())}</span>
   <span class="nl-label">現在</span><span class="nl-rule" id="nlrule"></span></div></div>`;
 
 let out = "";
 items.forEach((it,idx)=>{
-  if(inSession && idx===insertBefore) out += nowLineHTML;
+  if(inSession && !current && idx===insertBefore) out += nowLineHTML;
   const [start,end]=it.t.split("–");
   const on = current===it;
   const cat = it.fixed ? null : catOf(it.a);
   const name = it.a.replace("＊",'<span class="star">＊</span>');
   const chip = cat ? `<span class="chip">${SUBJECT[it.a.replace("＊","")]||CAT[cat]}</span>` : "";
   const [cs,ce]=range(it.t);
-  const prog = on ? `<div class="prog"><i style="width:${pct(cs,ce)}%"><u></u></i></div><span class="nowglow"></span>` : "";
+  const runner = on ? `<div class="nowrunner" style="left:${pct(cs,ce)}%">
+      <span class="rtime num">${pad(now.getHours())}:${pad(now.getMinutes())}</span>
+      <svg class="runner" viewBox="0 0 40 44" fill="none" stroke="var(--accent)"
+      stroke-width="4.6" stroke-linecap="round" aria-hidden="true">
+      <path class="pony" d="M16 8 C 6 5,2 14,8 20"/>
+      <path class="leg-b" d="M19 29 L12 41"/><path class="arm-b" d="M20 18 L12 23"/>
+      <line class="body" x1="21" y1="14" x2="19" y2="29"/>
+      <circle class="head" cx="21" cy="9" r="6.4" fill="var(--accent)" stroke="none"/>
+      <path class="arm-f" d="M20 18 L28 22"/><path class="leg-f" d="M19 29 L27 40"/></svg></div>` : "";
+  const prog = on ? `<div class="prog"><i style="width:${pct(cs,ce)}%"><u></u></i></div><span class="nowglow"></span>${runner}` : "";
   out += `<div class="node reveal ${it.fixed?'fixed':''} ${on?'now':''}" style="${catStyle(cat)}">
     <div class="rail"><span class="dot"></span></div>
     <div class="card">
@@ -362,7 +371,7 @@ items.forEach((it,idx)=>{
       <div class="name">${name}</div>${chip}${prog}
     </div></div>`;
 });
-if(inSession && insertBefore===-1) out += nowLineHTML;
+if(inSession && !current && insertBefore===-1) out += nowLineHTML;
 tl.innerHTML = out;
 
 liveWrap.hidden = !inSession;
@@ -380,6 +389,7 @@ if(current){
     const sb=statusEl.querySelector(".bar i"); if(sb) sb.style.width=p+"%";
     const rb=statusEl.querySelector(".rem b"); if(rb) rb.textContent=ce-m;
     const cb=document.querySelector(".node.now .prog i"); if(cb) cb.style.width=p+"%";
+    const rn=document.querySelector(".node.now .nowrunner"); if(rn) rn.style.left=p+"%";
   },30000);
 }else if(!live){
   const diff = Math.round((new Date(disp.getFullYear(),disp.getMonth(),disp.getDate())
@@ -417,7 +427,9 @@ const sig0 = stateKey();
 setInterval(()=>{
   const d=new Date(), m=d.getHours()*60+d.getMinutes();
   if(stateKey()!==sig0){ location.reload(); return; }
-  const nt=document.querySelector(".nl-time"); if(nt) nt.textContent=pad(d.getHours())+":"+pad(d.getMinutes());
+  const tstr=pad(d.getHours())+":"+pad(d.getMinutes());
+  const nt=document.querySelector(".nl-time"); if(nt) nt.textContent=tstr;
+  const rt2=document.querySelector(".node.now .rtime"); if(rt2) rt2.textContent=tstr;
   if(!live || current) return;
   const rb=statusEl.querySelector(".rem b"); if(!rb) return;
   if(m<dayStart) rb.textContent=dayStart-m;
@@ -484,11 +496,16 @@ if(canAnim){
   // 進度流光（ambient 層，reduced-motion 時不啟用）
   gsap.fromTo(".node.now .prog i u",{xPercent:-120},
     {xPercent:340,duration:2.4,ease:"sine.inOut",repeat:-1,repeatDelay:.5,delay:.8});
-  // 活線：自繪一次（scaleY 由卡片端往下畫）＋ 虛線持續流動
-  const cnx = document.querySelector(".nl-connect");
-  if(cnx){
-    gsap.from(cnx,{scaleY:0,transformOrigin:"50% 0%",duration:.55,ease:"power2.out",delay:.7});
-    gsap.to(cnx.querySelector("line"),{strokeDashoffset:-9,duration:1.1,ease:"none",repeat:-1});
+  // 跑步的馬尾小女孩：入場彈跳＋四肢反相擺動＋身體上下彈＋馬尾甩動
+  const runner = document.querySelector(".node.now .nowrunner");
+  if(runner){
+    gsap.from(runner,{autoAlpha:0,scale:0,transformOrigin:"50% 100%",duration:.5,delay:.75,ease:"back.out(1.7)"});
+    gsap.fromTo(".runner .leg-f",{rotation:-24},{rotation:20,svgOrigin:"19 29",duration:.26,ease:"sine.inOut",repeat:-1,yoyo:true});
+    gsap.fromTo(".runner .leg-b",{rotation:20},{rotation:-24,svgOrigin:"19 29",duration:.26,ease:"sine.inOut",repeat:-1,yoyo:true});
+    gsap.fromTo(".runner .arm-f",{rotation:26},{rotation:-26,svgOrigin:"20 18",duration:.26,ease:"sine.inOut",repeat:-1,yoyo:true});
+    gsap.fromTo(".runner .arm-b",{rotation:-26},{rotation:26,svgOrigin:"20 18",duration:.26,ease:"sine.inOut",repeat:-1,yoyo:true});
+    gsap.to(".runner",{y:-2.5,duration:.26,ease:"sine.inOut",repeat:-1,yoyo:true});
+    gsap.fromTo(".runner .pony",{rotation:-10},{rotation:18,svgOrigin:"15 8",duration:.34,ease:"sine.inOut",repeat:-1,yoyo:true});
   }
   // 行事曆捲動進場
   if("IntersectionObserver" in window){
