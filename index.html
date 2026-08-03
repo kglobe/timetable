@@ -12,10 +12,10 @@
     --line:#ece5db; --rail:#ddd5c9; --accent:#405B55; --accent-weak:#e3ede9;
     --holiday:#e0a13f; --holiday-weak:#fbf0d8;
     /* 明亮童趣科目色 */
-    --c-lang:#d76d80; --c-lang-w:#fce6ea; /* 草莓粉 · 語文/社會 */
-    --c-math:#4f95cf; --c-math-w:#e3f0fb; /* 天空藍 · 數理 */
-    --c-nat:#5aa864;  --c-nat-w:#e5f4e7;  /* 草綠 · 自然/體育 */
-    --c-art:#e0982f;  --c-art-w:#fbecd2;  /* 陽光橘 · 藝術 */
+    --c-lang:#d0576b; --c-lang-w:#f7e4e7; /* 今様色 · 語文/社會 */
+    --c-math:#2c82be; --c-math-w:#e1eef8; /* 縹色 · 數理 */
+    --c-nat:#4ea47b;  --c-nat-w:#e1f0e9;  /* 若竹色 · 自然/體育 */
+    --c-art:#e0902d;  --c-art-w:#fbecd2;  /* 柑子色 · 藝術 */
     --shadow:0 1px 2px rgba(75,70,65,.04),0 8px 22px rgba(75,70,65,.07);
     --shadow-lift:0 2px 8px rgba(64,91,85,.18),0 14px 30px rgba(75,70,65,.13);
   }
@@ -62,6 +62,8 @@
   .status .v{font-size:19px;font-weight:600}
   .status .t{color:var(--accent);font-size:14px;margin-top:4px}
   .status.rest .v{color:var(--muted);font-weight:500}
+  .status .next-lbl{font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-weak);
+    padding:2px 7px;border-radius:6px;margin-right:8px;vertical-align:middle;letter-spacing:.05em}
 
   /* ---- legend ---- */
   .legend{display:flex;flex-wrap:wrap;gap:7px 14px;margin:0 2px 22px;
@@ -372,8 +374,9 @@ if(!isWeekday){
     statusEl.innerHTML = `<div class="k">今天</div><div class="v">課程都結束囉</div>`;
   }else{
     const up = items.find(it=> range(it.t)[0] > nowMin);
-    statusEl.innerHTML = `<div class="k">休息中</div>
-      <div class="v">${up.a.replace("＊","")}</div><div class="t num">下一節 ${up.t}</div>
+    statusEl.className = "status rest reveal";
+    statusEl.innerHTML = `<div class="k">下課休息中</div>
+      <div class="v"><span class="next-lbl">下一節</span>${up.a.replace("＊","")}</div><div class="t num">${up.t}</div>
       <div class="rem">再 <b class="num">${range(up.t)[0]-nowMin}</b> 分鐘開始</div>`;
   }
 }
