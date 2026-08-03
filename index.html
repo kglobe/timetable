@@ -379,6 +379,19 @@ if(!isWeekday){
       <div class="v"><span class="next-lbl">下一節</span>${up.a.replace("＊","")}</div><div class="t num">${up.t}</div>
       <div class="rem">再 <b class="num">${range(up.t)[0]-nowMin}</b> 分鐘開始</div>`;
   }
+
+  // 每分鐘偵測換節：階段變了就重載切狀態，同階段只更新休息/未開始的倒數
+  // ponytail: 換節用 reload 最省事（每 20~40 分才觸發一次），同階段內就地改數字不重繪
+  const phase = m => { const c=items.find(it=>{const[s,e]=range(it.t);return m>=s&&m<e;});
+    return c?c.t:(m<dayStart?'before':m>=dayEnd?'after':'break'); };
+  const sig0 = phase(nowMin);
+  setInterval(()=>{
+    const d=new Date(), m=d.getHours()*60+d.getMinutes();
+    if(phase(m)!==sig0){ location.reload(); return; }
+    const rb=statusEl.querySelector(".rem b"); if(!rb) return;
+    if(sig0==='before') rb.textContent=dayStart-m;
+    else if(sig0==='break'){ const up=items.find(it=>range(it.t)[0]>m); if(up) rb.textContent=range(up.t)[0]-m; }
+  },60000);
 }
 
 // ---- 完整週課表 ----
