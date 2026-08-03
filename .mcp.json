@@ -12,18 +12,6 @@
       ],
       "env": {},
       "startup_timeout_ms": 60000
-    },
-    "codegraph": {
-      "type": "stdio",
-      "command": "codegraph",
-      "args": ["serve", "--mcp"]
-    },
-    "playwright-extension": {
-      "command": "npx",
-      "args": ["@playwright/mcp@latest", "--extension", "--browser=chrome-beta"],
-      "env": {
-        "PLAYWRIGHT_MCP_EXTENSION_TOKEN": "_N75yvTkSGBpPqpT83aHpbvx3rf0pCnXkmEMi17Tcgg"
-      }
     }
   }
 }
