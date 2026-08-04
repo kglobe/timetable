@@ -44,11 +44,12 @@
 
   /* ---- header ---- */
   header{position:relative}
-  .themetog{position:absolute;top:-3px;right:-6px;width:40px;height:40px;
-    display:flex;align-items:center;justify-content:center;border:0;border-radius:50%;
-    background:transparent;color:var(--muted);cursor:pointer;
+  .themetog{position:absolute;top:-4px;right:-4px;width:44px;height:44px;
+    display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:50%;
+    background:var(--card);color:var(--muted);cursor:pointer;box-shadow:var(--shadow);
     -webkit-tap-highlight-color:transparent;transition:background .2s,color .2s}
-  .themetog:hover{background:var(--card);color:var(--accent)}
+  .themetog:hover{color:var(--accent)}
+  .themetog:active{color:var(--accent);background:var(--accent-weak)}
   .themetog .ic{width:19px;height:19px}
   .themetog .ic-moon{display:none}
   :root[data-theme="dark"] .themetog .ic-sun{display:none}
