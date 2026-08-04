@@ -474,23 +474,92 @@ function runnerPhase(){ if(!current) return 'run'; const [cs,ce]=range(current.t
   const d=new Date(),m=d.getHours()*60+d.getMinutes(); return phaseOf(m-cs,ce-m); }
 
 // 依狀態調速度與幅度＝手感旋鈕；四肢反相擺動＋上下彈＋馬尾甩＋前傾＋影子踩踏
+// 每隔幾秒跳起空中轉一圈再落地繼續跑
+let _jumpTimer=null;
 function loopRunner(phase){
+  if(_jumpTimer){ _jumpTimer.kill(); _jumpTimer=null; }
   const S=".node.now .runner", parts=[S,`${S} .leg-f`,`${S} .leg-b`,`${S} .arm-f`,`${S} .arm-b`,`${S} .pony`,`${S} .shadow`];
   gsap.killTweensOf(parts);
   const rn=document.querySelector(".node.now .nowrunner"); if(rn) rn.dataset.phase=phase;
-  const d    = phase==='sprint'?.15 : phase==='warm'?.42 : .26;  // 擺動週期（越小越快）
-  const sw   = phase==='sprint'?32  : phase==='warm'?16  : 24;   // 四肢幅度（度）
-  const bob  = phase==='sprint'?3.6 : phase==='warm'?1.6 : 2.5;  // 身體上下彈（px）
-  const lean = phase==='sprint'?9   : phase==='warm'?-4  : 0;    // 前傾/後仰（度）
-  const L={duration:d,ease:"sine.inOut",repeat:-1,yoyo:true};
-  gsap.to(S,{rotation:lean,svgOrigin:"20 40",duration:.5,ease:"power2.out"});
-  gsap.fromTo(`${S} .leg-f`,{rotation:-sw},{rotation:sw*.85,svgOrigin:"19 29",...L});
-  gsap.fromTo(`${S} .leg-b`,{rotation:sw*.85},{rotation:-sw,svgOrigin:"19 29",...L});
-  gsap.fromTo(`${S} .arm-f`,{rotation:sw+2},{rotation:-sw-2,svgOrigin:"20 18",...L});
-  gsap.fromTo(`${S} .arm-b`,{rotation:-sw-2},{rotation:sw+2,svgOrigin:"20 18",...L});
-  gsap.to(S,{y:-bob,...L});
-  gsap.fromTo(`${S} .pony`,{rotation:-10},{rotation:18,svgOrigin:"15 8",...L,duration:d*1.3});
-  gsap.fromTo(`${S} .shadow`,{scaleX:.7,opacity:.10},{scaleX:1,opacity:.22,svgOrigin:"20 43",...L});
+  const d    = phase==='sprint'?.13 : phase==='warm'?.38 : .21;  // 擺動週期（越小越快）
+  const sw   = phase==='sprint'?38  : phase==='warm'?20  : 30;   // 四肢幅度（度）
+  const bob  = phase==='sprint'?5.5 : phase==='warm'?2.4 : 4.2;  // 身體上下彈（px）
+  const lean = phase==='sprint'?11  : phase==='warm'?-3  : 3;    // 前傾/後仰（度）
+  const jInt = phase==='sprint'?2.5 : phase==='warm'?5   : 3.5;  // 跳躍間隔（秒）
+  function startRun(){
+    const L={duration:d,ease:"sine.inOut",repeat:-1,yoyo:true};
+    gsap.to(S,{rotation:lean,svgOrigin:"20 40",duration:.5,ease:"power2.out"});
+    gsap.fromTo(`${S} .leg-f`,{rotation:-sw},{rotation:sw*.85,svgOrigin:"19 29",...L});
+    gsap.fromTo(`${S} .leg-b`,{rotation:sw*.85},{rotation:-sw,svgOrigin:"19 29",...L});
+    gsap.fromTo(`${S} .arm-f`,{rotation:sw+2},{rotation:-sw-2,svgOrigin:"20 18",...L});
+    gsap.fromTo(`${S} .arm-b`,{rotation:-sw-2},{rotation:sw+2,svgOrigin:"20 18",...L});
+    gsap.to(S,{y:-bob,...L});
+    gsap.fromTo(`${S} .pony`,{rotation:-10},{rotation:18,svgOrigin:"15 8",...L,duration:d*1.3});
+    gsap.fromTo(`${S} .shadow`,{scaleX:.7,opacity:.10},{scaleX:1,opacity:.22,svgOrigin:"20 43",...L});
+  }
+  // pirouette 四格逐格動畫：正面 passé → 側面 → 背面 → 側面 → 正面 → 落地
+  const PIRO=[
+    // 0: 正面 passé（單腳站、另腳提膝、雙手上舉）
+    `<ellipse cx="20" cy="43" rx="5" ry="1.2" fill="var(--accent)" stroke="none" opacity=".10"/>
+     <path d="M15 8 C 7 5,4 12,9 17" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+     <line x1="20" y1="14" x2="20" y2="29" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round"/>
+     <path d="M20 29 L20 41" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+     <path d="M20 29 L27 25" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+     <path d="M20 18 L14 10" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+     <path d="M20 18 L26 10" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+     <circle cx="20" cy="9" r="6.2" fill="var(--accent)" stroke="none"/>`,
+    // 1: 側面（身體窄、四肢重疊）
+    `<ellipse cx="20" cy="43" rx="3" ry="1" fill="var(--accent)" stroke="none" opacity=".06"/>
+     <line x1="20" y1="14" x2="20" y2="29" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round"/>
+     <path d="M20 29 L20 41" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+     <path d="M20 29 L23 26" stroke="var(--accent)" stroke-width="3.6" stroke-linecap="round" fill="none"/>
+     <path d="M20 18 L20 10" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+     <circle cx="20" cy="9" r="5.4" fill="var(--accent)" stroke="none"/>`,
+    // 2: 背面（馬尾反向、提腳反側）
+    `<ellipse cx="20" cy="43" rx="5" ry="1.2" fill="var(--accent)" stroke="none" opacity=".10"/>
+     <path d="M25 8 C 33 5,36 12,31 17" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+     <line x1="20" y1="14" x2="20" y2="29" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round"/>
+     <path d="M20 29 L20 41" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+     <path d="M20 29 L13 25" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+     <path d="M20 18 L26 10" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+     <path d="M20 18 L14 10" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+     <circle cx="20" cy="9" r="6.2" fill="var(--accent)" stroke="none"/>`,
+    // 3: 側面（另一側）
+    `<ellipse cx="20" cy="43" rx="3" ry="1" fill="var(--accent)" stroke="none" opacity=".06"/>
+     <line x1="20" y1="14" x2="20" y2="29" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round"/>
+     <path d="M20 29 L20 41" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+     <path d="M20 29 L17 26" stroke="var(--accent)" stroke-width="3.6" stroke-linecap="round" fill="none"/>
+     <path d="M20 18 L20 10" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
+     <circle cx="20" cy="9" r="5.4" fill="var(--accent)" stroke="none"/>`,
+  ];
+  function doJump(){
+    if(!document.querySelector(".node.now .runner")) return;
+    gsap.killTweensOf(parts);
+    const sv=document.querySelector(S); if(!sv) return;
+    const orig=sv.innerHTML;
+    const tl=gsap.timeline({onComplete(){sv.innerHTML=orig;gsap.set(S,{y:0,rotation:lean,scaleX:1,svgOrigin:"20 40"});startRun();_jumpTimer=gsap.delayedCall(jInt+Math.random()*1.5,doJump);}});
+    // 準備：四肢收進 passé 姿勢
+    tl.to(S,{y:-3,rotation:0,svgOrigin:"20 40",duration:.2,ease:"power2.out"},0)
+      .to(`${S} .leg-f`,{rotation:80,svgOrigin:"19 29",duration:.2},0)
+      .to(`${S} .leg-b`,{rotation:2,svgOrigin:"19 29",duration:.2},0)
+      .to(`${S} .arm-f`,{rotation:-75,svgOrigin:"20 18",duration:.2},0)
+      .to(`${S} .arm-b`,{rotation:70,svgOrigin:"20 18",duration:.2},0)
+      .to(`${S} .pony`,{rotation:20,svgOrigin:"15 8",duration:.2},0)
+      .to(`${S} .shadow`,{scaleX:.4,opacity:.06,svgOrigin:"20 43",duration:.2},0)
+    // 跳起 + 逐格轉圈（正→側→背→側→正）
+      .call(()=>{sv.innerHTML=PIRO[0];},[],0.22)
+      .to(S,{y:-20,duration:.25,ease:"sine.out"},.22)
+      .call(()=>{sv.innerHTML=PIRO[1];},[],0.35)
+      .call(()=>{sv.innerHTML=PIRO[2];},[],0.48)
+      .call(()=>{sv.innerHTML=PIRO[3];},[],0.61)
+      .call(()=>{sv.innerHTML=PIRO[0];},[],0.74)
+      .to(S,{y:-16,duration:.35,ease:"sine.inOut"},.47)
+    // 落地
+      .to(S,{y:0,duration:.22,ease:"bounce.out"},.82)
+      .set(S,{rotation:lean,svgOrigin:"20 40"});
+  }
+  startRun();
+  _jumpTimer=gsap.delayedCall(jInt+Math.random()*1.5,doJump);
 }
 
 let out = "";
