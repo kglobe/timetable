@@ -106,7 +106,7 @@
 
   /* current class */
   .node.now .dot{background:var(--accent);box-shadow:0 0 0 4px var(--paper),0 0 0 6px var(--accent-weak)}
-  .node.now .card{box-shadow:inset 3px 0 0 var(--accent),var(--shadow-lift)}
+  .node.now .card{box-shadow:inset 3px 0 0 var(--accent),var(--shadow-lift);padding-bottom:34px}
   .node.now .time,.node.now .name{color:var(--accent)}
   /* now line */
   .nowline{position:relative;display:grid;grid-template-columns:26px 1fr;gap:14px;
@@ -362,6 +362,42 @@ const nowLineHTML = `<div class="nowline reveal" id="nowline">
   <div class="nl-body"><span class="nl-time num">${pad(now.getHours())}:${pad(now.getMinutes())}</span>
   <span class="nl-label">現在</span><span class="nl-rule" id="nlrule"></span></div></div>`;
 
+// 小女孩火柴人骨架（＋腳下影子）。動作全交給 loopRunner，這裡只有形狀。
+const RUNNER_SVG = `<svg class="runner" viewBox="0 0 40 44" fill="none" stroke="var(--accent)"
+  stroke-width="4.6" stroke-linecap="round" aria-hidden="true">
+  <ellipse class="shadow" cx="20" cy="43" rx="9" ry="1.5" fill="var(--accent)" stroke="none" opacity=".16"/>
+  <path class="pony" d="M16 8 C 6 5,2 14,8 20"/>
+  <path class="leg-b" d="M19 29 L12 41"/><path class="arm-b" d="M20 18 L12 23"/>
+  <line class="body" x1="21" y1="14" x2="19" y2="29"/>
+  <circle class="head" cx="21" cy="9" r="6.4" fill="var(--accent)" stroke="none"/>
+  <path class="arm-f" d="M20 18 L28 22"/><path class="leg-f" d="M19 29 L27 40"/></svg>`;
+
+// 三種狀態：剛上課5分暖身、剩5分衝刺、其餘正常跑
+const phaseOf=(inMin,leftMin)=> leftMin<=5?'sprint':inMin<=5?'warm':'run';
+console.assert(phaseOf(0,50)==='warm'&&phaseOf(20,30)==='run'&&phaseOf(46,4)==='sprint','phaseOf');
+function runnerPhase(){ if(!current) return 'run'; const [cs,ce]=range(current.t);
+  const d=new Date(),m=d.getHours()*60+d.getMinutes(); return phaseOf(m-cs,ce-m); }
+
+// 依狀態調速度與幅度＝手感旋鈕；四肢反相擺動＋上下彈＋馬尾甩＋前傾＋影子踩踏
+function loopRunner(phase){
+  const S=".node.now .runner", parts=[S,`${S} .leg-f`,`${S} .leg-b`,`${S} .arm-f`,`${S} .arm-b`,`${S} .pony`,`${S} .shadow`];
+  gsap.killTweensOf(parts);
+  const rn=document.querySelector(".node.now .nowrunner"); if(rn) rn.dataset.phase=phase;
+  const d    = phase==='sprint'?.15 : phase==='warm'?.42 : .26;  // 擺動週期（越小越快）
+  const sw   = phase==='sprint'?32  : phase==='warm'?16  : 24;   // 四肢幅度（度）
+  const bob  = phase==='sprint'?3.6 : phase==='warm'?1.6 : 2.5;  // 身體上下彈（px）
+  const lean = phase==='sprint'?9   : phase==='warm'?-4  : 0;    // 前傾/後仰（度）
+  const L={duration:d,ease:"sine.inOut",repeat:-1,yoyo:true};
+  gsap.to(S,{rotation:lean,svgOrigin:"20 40",duration:.5,ease:"power2.out"});
+  gsap.fromTo(`${S} .leg-f`,{rotation:-sw},{rotation:sw*.85,svgOrigin:"19 29",...L});
+  gsap.fromTo(`${S} .leg-b`,{rotation:sw*.85},{rotation:-sw,svgOrigin:"19 29",...L});
+  gsap.fromTo(`${S} .arm-f`,{rotation:sw+2},{rotation:-sw-2,svgOrigin:"20 18",...L});
+  gsap.fromTo(`${S} .arm-b`,{rotation:-sw-2},{rotation:sw+2,svgOrigin:"20 18",...L});
+  gsap.to(S,{y:-bob,...L});
+  gsap.fromTo(`${S} .pony`,{rotation:-10},{rotation:18,svgOrigin:"15 8",...L,duration:d*1.3});
+  gsap.fromTo(`${S} .shadow`,{scaleX:.7,opacity:.10},{scaleX:1,opacity:.22,svgOrigin:"20 43",...L});
+}
+
 let out = "";
 items.forEach((it,idx)=>{
   if(inSession && !current && idx===insertBefore) out += nowLineHTML;
@@ -373,13 +409,7 @@ items.forEach((it,idx)=>{
   const [cs,ce]=range(it.t);
   const runner = on ? `<div class="nowrunner" style="left:${pct(cs,ce)}%">
       <span class="rtime num">${pad(now.getHours())}:${pad(now.getMinutes())}</span>
-      <svg class="runner" viewBox="0 0 40 44" fill="none" stroke="var(--accent)"
-      stroke-width="4.6" stroke-linecap="round" aria-hidden="true">
-      <path class="pony" d="M16 8 C 6 5,2 14,8 20"/>
-      <path class="leg-b" d="M19 29 L12 41"/><path class="arm-b" d="M20 18 L12 23"/>
-      <line class="body" x1="21" y1="14" x2="19" y2="29"/>
-      <circle class="head" cx="21" cy="9" r="6.4" fill="var(--accent)" stroke="none"/>
-      <path class="arm-f" d="M20 18 L28 22"/><path class="leg-f" d="M19 29 L27 40"/></svg></div>` : "";
+      ${RUNNER_SVG}</div>` : "";
   const prog = on ? `<div class="prog"><i style="width:${pct(cs,ce)}%"><u></u></i></div><span class="nowglow"></span>${runner}` : "";
   out += `<div class="node reveal ${it.fixed?'fixed':''} ${on?'now':''}" style="${catStyle(cat)}">
     <div class="rail"><span class="dot"></span></div>
@@ -407,6 +437,7 @@ if(current){
     const rb=statusEl.querySelector(".rem b"); if(rb) rb.textContent=ce-m;
     const cb=document.querySelector(".node.now .prog i"); if(cb) cb.style.width=p+"%";
     const rn=document.querySelector(".node.now .nowrunner"); if(rn) rn.style.left=p+"%";
+    const ph=runnerPhase(); if(canAnim && rn && rn.dataset.phase!==ph) loopRunner(ph);
   },30000);
 }else if(!live){
   const diff = Math.round((new Date(disp.getFullYear(),disp.getMonth(),disp.getDate())
@@ -513,16 +544,11 @@ if(canAnim){
   // 進度流光（ambient 層，reduced-motion 時不啟用）
   gsap.fromTo(".node.now .prog i u",{xPercent:-120},
     {xPercent:340,duration:2.4,ease:"sine.inOut",repeat:-1,repeatDelay:.5,delay:.8});
-  // 跑步的馬尾小女孩：入場彈跳＋四肢反相擺動＋身體上下彈＋馬尾甩動
+  // 跑步的馬尾小女孩：入場彈跳一次，擺動交給 loopRunner（隨狀態換速度）
   const runner = document.querySelector(".node.now .nowrunner");
   if(runner){
     gsap.from(runner,{autoAlpha:0,scale:0,transformOrigin:"50% 100%",duration:.5,delay:.75,ease:"back.out(1.7)"});
-    gsap.fromTo(".runner .leg-f",{rotation:-24},{rotation:20,svgOrigin:"19 29",duration:.26,ease:"sine.inOut",repeat:-1,yoyo:true});
-    gsap.fromTo(".runner .leg-b",{rotation:20},{rotation:-24,svgOrigin:"19 29",duration:.26,ease:"sine.inOut",repeat:-1,yoyo:true});
-    gsap.fromTo(".runner .arm-f",{rotation:26},{rotation:-26,svgOrigin:"20 18",duration:.26,ease:"sine.inOut",repeat:-1,yoyo:true});
-    gsap.fromTo(".runner .arm-b",{rotation:-26},{rotation:26,svgOrigin:"20 18",duration:.26,ease:"sine.inOut",repeat:-1,yoyo:true});
-    gsap.to(".runner",{y:-2.5,duration:.26,ease:"sine.inOut",repeat:-1,yoyo:true});
-    gsap.fromTo(".runner .pony",{rotation:-10},{rotation:18,svgOrigin:"15 8",duration:.34,ease:"sine.inOut",repeat:-1,yoyo:true});
+    loopRunner(runnerPhase());
   }
   // 行事曆捲動進場
   if("IntersectionObserver" in window){
