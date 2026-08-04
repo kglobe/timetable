@@ -396,7 +396,7 @@ function actionLoop(){
       .fromTo(sv,{scale:.62,y:9,rotation:-6,transformOrigin:"50% 92%"},
                  {scale:1,y:0,rotation:0,duration:.5,ease:"back.out(2.2)"})   // 從上一動的下蹲彈起落地
       .to(S,{y:-2.5,duration:.55,ease:"sine.inOut",yoyo:true,repeat:2})       // 原地呼吸幾下
-      .to(S,{scale:.8,y:10,duration:.3,ease:"power2.in"});                    // 再次下沉蓄力→交棒下一動
+      .to(S,{scale:.9,y:4,duration:.3,ease:"power2.in"});                     // 再次下沉蓄力→交棒下一動
   };
   step();
 }
