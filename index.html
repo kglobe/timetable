@@ -481,10 +481,10 @@ function loopRunner(phase){
   const S=".node.now .runner", parts=[S,`${S} .leg-f`,`${S} .leg-b`,`${S} .arm-f`,`${S} .arm-b`,`${S} .pony`,`${S} .shadow`];
   gsap.killTweensOf(parts);
   const rn=document.querySelector(".node.now .nowrunner"); if(rn) rn.dataset.phase=phase;
-  const d    = phase==='sprint'?.13 : phase==='warm'?.38 : .21;  // 擺動週期（越小越快）
-  const sw   = phase==='sprint'?38  : phase==='warm'?20  : 30;   // 四肢幅度（度）
-  const bob  = phase==='sprint'?5.5 : phase==='warm'?2.4 : 4.2;  // 身體上下彈（px）
-  const lean = phase==='sprint'?11  : phase==='warm'?-3  : 3;    // 前傾/後仰（度）
+  const d    = phase==='sprint'?.16 : phase==='warm'?.38 : .24;  // 擺動週期（越小越快）
+  const sw   = phase==='sprint'?22  : phase==='warm'?12  : 18;   // 四肢幅度（度）
+  const bob  = phase==='sprint'?3.5 : phase==='warm'?1.8 : 2.8;  // 身體上下彈（px）
+  const lean = phase==='sprint'?7   : phase==='warm'?-2  : 2;    // 前傾/後仰（度）
   const jInt = phase==='sprint'?2.5 : phase==='warm'?5   : 3.5;  // 跳躍間隔（秒）
   function startRun(){
     const L={duration:d,ease:"sine.inOut",repeat:-1,yoyo:true};
