@@ -372,7 +372,92 @@ const RUNNER_SVG = `<svg class="runner" viewBox="0 0 40 44" fill="none" stroke="
   <circle class="head" cx="21" cy="9" r="6.4" fill="var(--accent)" stroke="none"/>
   <path class="arm-f" d="M20 18 L28 22"/><path class="leg-f" d="M19 29 L27 40"/></svg>`;
 
-// 三種狀態：剛上課5分暖身、剩5分衝刺、其餘正常跑
+// 依「現在這節課在做什麼」決定姿勢；跑步保留三階段，其餘各一段迴圈。
+const O=`<svg class="runner" viewBox="0 0 40 44" fill="none" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" aria-hidden="true">`;
+const A={ease:"sine.inOut",repeat:-1,yoyo:true};
+// 「其餘」課別的動感姿勢，每隔幾秒輪播一個（只換 <svg> 內容，外框沿用）
+const ACTIONS=[
+  `<ellipse class="shadow" cx="20" cy="43" rx="8" ry="1.4" fill="var(--accent)" stroke="none" opacity=".16"/><path class="pony" d="M15 8 C 7 5,4 12,9 17"/><path d="M20 30 L11 41"/><path d="M20 30 L29 41"/><line x1="20" y1="15" x2="20" y2="30"/><path d="M20 19 L11 11"/><path d="M20 19 L29 11"/><circle class="head" cx="20" cy="10" r="6.2" fill="var(--accent)" stroke="none"/>`,
+  `<ellipse class="shadow" cx="16" cy="43" rx="7" ry="1.3" fill="var(--accent)" stroke="none" opacity=".16"/><path class="pony" d="M12 8 C 4 5,1 13,6 18"/><path d="M18 29 L15 42"/><path d="M18 29 L34 21"/><line x1="17" y1="15" x2="18" y2="29"/><path d="M18 19 L11 24"/><path d="M18 19 L27 15"/><circle class="head" cx="16" cy="10" r="6.2" fill="var(--accent)" stroke="none"/>`,
+  `<ellipse class="shadow" cx="19" cy="43" rx="9" ry="1.4" fill="var(--accent)" stroke="none" opacity=".16"/><path class="pony" d="M27 17 C 33 15,34 22,29 24"/><line x1="17" y1="30" x2="24" y2="22"/><path d="M17 30 L14 42"/><path d="M17 30 L21 42"/><path d="M24 22 L19 40"/><path d="M24 22 L23 40"/><circle class="head" cx="25" cy="20" r="5.8" fill="var(--accent)" stroke="none"/>`,
+  `<ellipse class="shadow" cx="19" cy="43" rx="10" ry="1.4" fill="var(--accent)" stroke="none" opacity=".16"/><path class="pony" d="M11 9 C 3 6,0 14,6 19"/><line x1="16" y1="15" x2="18" y2="28"/><path d="M18 28 L27 34 L27 42"/><path d="M18 28 L10 42"/><path d="M17 19 L10 16"/><path d="M17 19 L25 15"/><circle class="head" cx="15" cy="10" r="6.2" fill="var(--accent)" stroke="none"/>`,
+  `<ellipse class="shadow" cx="20" cy="43" rx="9" ry="1.4" fill="var(--accent)" stroke="none" opacity=".16"/><path class="pony" d="M15 12 C 7 9,4 16,9 21"/><line x1="20" y1="18" x2="20" y2="27"/><path d="M20 27 L13 31 L13 40"/><path d="M20 27 L27 31 L27 40"/><path d="M20 20 L13 24"/><path d="M20 20 L27 24"/><circle class="head" cx="20" cy="13" r="6" fill="var(--accent)" stroke="none"/>`,
+];
+function actionLoop(){
+  const S=".node.now .runner", wrap=document.querySelector(".node.now .nowrunner");
+  if(!wrap) return;
+  let i=0;
+  const swap=()=>{
+    const sv=wrap.querySelector(".runner"); if(!sv) return; // 換節後元素沒了就停
+    gsap.killTweensOf(S);
+    sv.innerHTML=ACTIONS[i]; i=(i+1)%ACTIONS.length;
+    gsap.fromTo(sv,{scale:.55,rotation:-8,transformOrigin:"50% 90%"},{scale:1,rotation:0,duration:.5,ease:"back.out(2)"});
+    gsap.to(S,{y:-2,duration:.7,...A});
+    gsap.delayedCall(2.6,()=>{ if(document.querySelector(".node.now .runner")) swap(); });
+  };
+  swap();
+}
+const POSES={
+  eat:{svg:O+`
+    <ellipse class="shadow" cx="20" cy="43" rx="10" ry="1.5" fill="var(--accent)" stroke="none" opacity=".16"/>
+    <path class="pony" d="M15 8 C 7 5,4 12,9 17"/>
+    <path class="leg-b" d="M19 28 L28 30 L29 40"/><path class="arm-b" d="M20 19 L13 29"/>
+    <line class="body" x1="20" y1="14" x2="19" y2="28"/>
+    <circle class="head" cx="20" cy="9" r="6.2" fill="var(--accent)" stroke="none"/>
+    <ellipse cx="30" cy="34" rx="4.2" ry="1.9" fill="var(--accent)" stroke="none" opacity=".85"/>
+    <path class="arm-f" d="M20 19 L27 15"/></svg>`,
+    loop(){const S=".node.now .runner";
+      gsap.fromTo(`${S} .arm-f`,{rotation:-40},{rotation:16,svgOrigin:"20 19",duration:.55,...A});
+      gsap.to(S,{y:-1,duration:1.1,...A});}},
+  read:{svg:O+`
+    <ellipse class="shadow" cx="20" cy="43" rx="10" ry="1.5" fill="var(--accent)" stroke="none" opacity=".16"/>
+    <path class="pony" d="M15 8 C 7 5,4 12,9 17"/>
+    <path class="leg-b" d="M19 28 L29 29 L30 40"/>
+    <line class="body" x1="20" y1="14" x2="20" y2="28"/>
+    <path class="arm-b" d="M20 19 L26 23"/><path class="arm-f" d="M20 19 L27 24"/>
+    <rect class="page" x="24" y="17" width="10" height="9" rx="1" fill="var(--accent)" stroke="none" opacity=".2"/>
+    <circle class="head" cx="20" cy="9" r="6.2" fill="var(--accent)" stroke="none"/></svg>`,
+    loop(){const S=".node.now .runner";
+      gsap.fromTo(`${S} .head`,{rotation:-3},{rotation:7,svgOrigin:"20 9",duration:1.5,...A});
+      gsap.fromTo(`${S} .page`,{scaleX:.8},{scaleX:1,svgOrigin:"29 22",duration:1.9,...A});}},
+  paint:{svg:O+`
+    <ellipse class="shadow" cx="18" cy="43" rx="8.5" ry="1.5" fill="var(--accent)" stroke="none" opacity=".16"/>
+    <rect x="27" y="9" width="10" height="14" rx="1" fill="var(--accent)" stroke="none" opacity=".14"/>
+    <path class="pony" d="M13 8 C 5 5,1 14,7 20"/>
+    <path class="leg-b" d="M17 30 L13 42"/><path class="leg-f" d="M17 30 L21 42"/>
+    <line class="body" x1="18" y1="14" x2="17" y2="30"/>
+    <path class="arm-b" d="M17 19 L11 26"/>
+    <circle class="head" cx="18" cy="9" r="6.2" fill="var(--accent)" stroke="none"/>
+    <path class="arm-f" d="M17 19 L26 19"/></svg>`,
+    loop(){const S=".node.now .runner";
+      gsap.fromTo(`${S} .arm-f`,{rotation:-15},{rotation:13,svgOrigin:"17 19",duration:.5,...A});
+      gsap.to(S,{y:-1.3,duration:.9,...A});}},
+  sleep:{svg:O+`
+    <ellipse class="shadow" cx="21" cy="43" rx="13" ry="1.6" fill="var(--accent)" stroke="none" opacity=".16"/>
+    <path class="pony" d="M11 33 C 4 31,3 40,9 40"/>
+    <line class="body" x1="13" y1="37" x2="31" y2="37"/>
+    <path class="leg-b" d="M31 37 L38 40"/>
+    <circle class="head" cx="11" cy="36" r="5.6" fill="var(--accent)" stroke="none"/>
+    <text class="zzz" x="27" y="22" font-size="10" font-weight="700" fill="var(--accent)" stroke="none" text-anchor="middle">z</text></svg>`,
+    loop(){const S=".node.now .runner";
+      gsap.to(S,{y:-.8,duration:1.9,...A});
+      gsap.fromTo(`${S} .zzz`,{y:2,opacity:0},{y:-9,opacity:.75,duration:2,ease:"sine.out",repeat:-1});}},
+  action:{svg:O+ACTIONS[0]+`</svg>`, loop:actionLoop},
+};
+function poseOf(name){ const n=name.replace("＊","");
+  if(/午睡/.test(n)) return 'sleep';
+  if(/午餐|點心/.test(n)) return 'eat';
+  if(/晨間運動|體能|球|戶外|團康|團隊|運動/.test(n)) return 'run';
+  const c=catOf(n);
+  if(c==='art') return 'paint';
+  if(c==='lang') return 'read';
+  if(c==='nat') return 'run';
+  return 'action'; // 數理、到校、打掃…動感姿勢輪播
+}
+console.assert(poseOf('午睡')==='sleep'&&poseOf('午餐')==='eat'&&poseOf('拼音練習＊')==='read'&&poseOf('愛塗鴉')==='paint'&&poseOf('體能活動')==='run'&&poseOf('認識時鐘')==='action','poseOf');
+const pose = current ? poseOf(current.a) : 'run';
+
+// 三種狀態：剛上課5分暖身、剩5分衝刺、其餘正常跑（僅 pose==='run' 用）
 const phaseOf=(inMin,leftMin)=> leftMin<=5?'sprint':inMin<=5?'warm':'run';
 console.assert(phaseOf(0,50)==='warm'&&phaseOf(20,30)==='run'&&phaseOf(46,4)==='sprint','phaseOf');
 function runnerPhase(){ if(!current) return 'run'; const [cs,ce]=range(current.t);
@@ -407,9 +492,9 @@ items.forEach((it,idx)=>{
   const name = it.a.replace("＊",'<span class="star">＊</span>');
   const chip = cat ? `<span class="chip">${SUBJECT[it.a.replace("＊","")]||CAT[cat]}</span>` : "";
   const [cs,ce]=range(it.t);
-  const runner = on ? `<div class="nowrunner" style="left:${pct(cs,ce)}%">
+  const runner = on ? `<div class="nowrunner" data-pose="${pose}" style="left:${pct(cs,ce)}%">
       <span class="rtime num">${pad(now.getHours())}:${pad(now.getMinutes())}</span>
-      ${RUNNER_SVG}</div>` : "";
+      ${pose==='run'?RUNNER_SVG:POSES[pose].svg}</div>` : "";
   const prog = on ? `<div class="prog"><i style="width:${pct(cs,ce)}%"><u></u></i></div><span class="nowglow"></span>${runner}` : "";
   out += `<div class="node reveal ${it.fixed?'fixed':''} ${on?'now':''}" style="${catStyle(cat)}">
     <div class="rail"><span class="dot"></span></div>
@@ -437,7 +522,7 @@ if(current){
     const rb=statusEl.querySelector(".rem b"); if(rb) rb.textContent=ce-m;
     const cb=document.querySelector(".node.now .prog i"); if(cb) cb.style.width=p+"%";
     const rn=document.querySelector(".node.now .nowrunner"); if(rn) rn.style.left=p+"%";
-    const ph=runnerPhase(); if(canAnim && rn && rn.dataset.phase!==ph) loopRunner(ph);
+    if(canAnim && rn && pose==='run'){ const ph=runnerPhase(); if(rn.dataset.phase!==ph) loopRunner(ph); }
   },30000);
 }else if(!live){
   const diff = Math.round((new Date(disp.getFullYear(),disp.getMonth(),disp.getDate())
@@ -548,7 +633,7 @@ if(canAnim){
   const runner = document.querySelector(".node.now .nowrunner");
   if(runner){
     gsap.from(runner,{autoAlpha:0,scale:0,transformOrigin:"50% 100%",duration:.5,delay:.75,ease:"back.out(1.7)"});
-    loopRunner(runnerPhase());
+    if(pose==='run') loopRunner(runnerPhase()); else POSES[pose].loop();
   }
   // 行事曆捲動進場
   if("IntersectionObserver" in window){
