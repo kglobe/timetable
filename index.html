@@ -373,6 +373,7 @@ const RUNNER_SVG = `<svg class="runner" viewBox="0 0 40 44" fill="none" stroke="
   <circle class="head" cx="21" cy="9" r="6.4" fill="var(--accent)" stroke="none"/>
   <path class="arm-f" d="M20 18 L28 22"/><path class="leg-f" d="M19 29 L27 40"/></svg>`;
 
+const RUNNER_INNER=RUNNER_SVG.replace(/^<svg[^>]*>/,'').replace(/<\/svg>$/,'');
 // 依「現在這節課在做什麼」決定姿勢；跑步保留三階段，其餘各一段迴圈。
 const O=`<svg class="runner" viewBox="0 0 40 44" fill="none" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" aria-hidden="true">`;
 const A={ease:"sine.inOut",repeat:-1,yoyo:true};
@@ -475,11 +476,14 @@ function runnerPhase(){ if(!current) return 'run'; const [cs,ce]=range(current.t
 
 // 依狀態調速度與幅度＝手感旋鈕；四肢反相擺動＋上下彈＋馬尾甩＋前傾＋影子踩踏
 // 每隔幾秒跳起空中轉一圈再落地繼續跑
-let _jumpTimer=null;
+let _jumpTimer=null, _jumpTL=null;
 function loopRunner(phase){
   if(_jumpTimer){ _jumpTimer.kill(); _jumpTimer=null; }
+  if(_jumpTL){ _jumpTL.kill(); _jumpTL=null; }
   const S=".node.now .runner", parts=[S,`${S} .leg-f`,`${S} .leg-b`,`${S} .arm-f`,`${S} .arm-b`,`${S} .pony`,`${S} .shadow`];
   gsap.killTweensOf(parts);
+  const sv=document.querySelector(S);
+  if(sv){ sv.innerHTML=RUNNER_INNER; gsap.set(S,{y:0,rotation:0,scaleX:1,clearProps:"transform"}); }
   const rn=document.querySelector(".node.now .nowrunner"); if(rn) rn.dataset.phase=phase;
   const d    = phase==='sprint'?.16 : phase==='warm'?.38 : .24;  // 擺動週期（越小越快）
   const sw   = phase==='sprint'?22  : phase==='warm'?12  : 18;   // 四肢幅度（度）
@@ -537,7 +541,8 @@ function loopRunner(phase){
     gsap.killTweensOf(parts);
     const sv=document.querySelector(S); if(!sv) return;
     const orig=sv.innerHTML;
-    const tl=gsap.timeline({onComplete(){sv.innerHTML=orig;gsap.set(S,{y:0,rotation:lean,scaleX:1,svgOrigin:"20 40"});startRun();_jumpTimer=gsap.delayedCall(jInt+Math.random()*1.5,doJump);}});
+    _jumpTL=gsap.timeline({onComplete(){_jumpTL=null;sv.innerHTML=orig;gsap.set(S,{y:0,rotation:lean,scaleX:1,svgOrigin:"20 40"});startRun();_jumpTimer=gsap.delayedCall(jInt+Math.random()*1.5,doJump);}});
+    const tl=_jumpTL;
     // 準備：四肢收進 passé 姿勢
     tl.to(S,{y:-3,rotation:0,svgOrigin:"20 40",duration:.2,ease:"power2.out"},0)
       .to(`${S} .leg-f`,{rotation:80,svgOrigin:"19 29",duration:.2},0)
