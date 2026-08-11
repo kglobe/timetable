@@ -65,6 +65,14 @@
   .live .ring{position:relative;width:9px;height:9px}
   .live .ring i{position:absolute;inset:0;border-radius:50%;background:var(--accent)}
   .live .ring b{position:absolute;inset:0;border-radius:50%;border:1px solid var(--accent)}
+  .schoolink{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:8px 13px;
+    border-radius:999px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
+    font-size:13.5px;font-weight:600;color:var(--ink);text-decoration:none;
+    -webkit-tap-highlight-color:transparent;transition:box-shadow .2s,color .2s}
+  .schoolink:hover{color:var(--accent);box-shadow:var(--shadow-lift)}
+  .schoolink svg{width:15px;height:15px;color:var(--accent)}
+  .schoolink .arw{width:13px;height:13px;color:var(--muted)}
+  .schoolink b{color:var(--accent)}
 
   /* ---- status ---- */
   .status{margin:22px 0 16px;padding:16px 18px;border-radius:9px;background:var(--card);
@@ -216,6 +224,14 @@
       <span class="num" id="today"></span>
       <span class="live" id="livewrap" hidden><span class="ring"><b></b><i></i></span>LIVE</span>
     </div>
+    <a class="schoolink reveal" id="schoolink" href="school.html" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span>開學準備　<b class="num" id="schooldays"></b></span>
+      <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </a>
   </header>
 
   <section class="status reveal" id="status"></section>
@@ -652,6 +668,17 @@ setInterval(()=>{
   if(m<dayStart) rb.textContent=dayStart-m;
   else { const up=items.find(it=>range(it.t)[0]>m); if(up) rb.textContent=range(up.t)[0]-m; }
 },60000);
+
+// ---- 開學準備入口（開學前顯示倒數，開學後收起）----
+{
+  const open=new Date(2026,7,31);
+  const d0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const dd=Math.round((open-d0)/86400000);
+  if(dd>=0){
+    document.getElementById("schooldays").textContent = dd===0?"今天開學！":`還 ${dd} 天`;
+    document.getElementById("schoolink").hidden=false;
+  }
+}
 
 // ---- 完整週課表 ----
 let g = "<tr><th></th>" + WEEK.map((w,i)=>

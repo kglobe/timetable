@@ -1,0 +1,323 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>梓琪的開學準備</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>try{var _t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.dataset.theme=_t;}catch(e){document.documentElement.dataset.theme='light';}</script>
+<script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('preanim')</script>
+<style>
+  :root{
+    --paper:#fbf7f0; --card:#ffffff; --ink:#413b34; --muted:#9a9188;
+    --line:#ece5db; --rail:#ddd5c9; --accent:#3b7960; --accent-weak:#e3ede9;
+    --holiday:#e0a13f; --holiday-weak:#fbf0d8;
+    --c-lang:#d0576b; --c-lang-w:#f7e4e7;
+    --c-math:#2c82be; --c-math-w:#e1eef8;
+    --c-nat:#4ea47b;  --c-nat-w:#e1f0e9;
+    --c-art:#e0902d;  --c-art-w:#fbecd2;
+    --shadow:0 1px 2px rgba(75,70,65,.04),0 8px 22px rgba(75,70,65,.07);
+    --shadow-lift:0 2px 8px rgba(64,91,85,.18),0 14px 30px rgba(75,70,65,.13);
+  }
+  :root[data-theme="dark"]{
+      --paper:#24211d; --card:#2c2823; --ink:#ece5d9; --muted:#a89f92;
+      --line:#39332c; --rail:#463f37; --accent:#86b0a5; --accent-weak:#2b3733;
+      --holiday:#e6b25c; --holiday-weak:#352a1a;
+      --c-lang:#e88a99; --c-lang-w:#3a2a2d;
+      --c-math:#79b3e0; --c-math-w:#24303a;
+      --c-nat:#82c187;  --c-nat-w:#263320;
+      --c-art:#eab662;  --c-art-w:#362d1c;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.32);
+      --shadow-lift:0 2px 8px rgba(134,176,165,.16),0 14px 30px rgba(0,0,0,.4);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--paper);color:var(--ink);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,sans-serif;
+    line-height:1.5;-webkit-text-size-adjust:100%;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+    transition:background .3s ease,color .3s ease}
+  .num{font-family:"Space Grotesk",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .wrap{max-width:520px;margin:0 auto;padding:26px 18px 56px}
+  .preanim .reveal{opacity:0}
+
+  /* ---- header ---- */
+  header{position:relative}
+  .themetog{position:absolute;top:-2px;right:-2px;width:35px;height:35px;
+    display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:50%;
+    background:var(--card);color:var(--muted);cursor:pointer;box-shadow:var(--shadow);
+    -webkit-tap-highlight-color:transparent;transition:background .2s,color .2s}
+  .themetog:hover{color:var(--accent)}
+  .themetog:active{color:var(--accent);background:var(--accent-weak)}
+  .themetog .ic{width:22px;height:22px}
+  .themetog .ic-moon{display:none}
+  :root[data-theme="dark"] .themetog .ic-sun{display:none}
+  :root[data-theme="dark"] .themetog .ic-moon{display:block}
+  .back{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
+    color:var(--muted);text-decoration:none;margin-bottom:10px;letter-spacing:.04em;
+    transition:color .2s}
+  .back:hover{color:var(--accent)}
+  .back svg{width:14px;height:14px}
+  .eyebrow{font-size:12px;font-weight:600;letter-spacing:.18em;color:var(--accent);margin:0 0 8px}
+  h1{font-size:29px;font-weight:700;margin:0;letter-spacing:.01em}
+  h1 .who{color:var(--accent)}
+
+  /* ---- countdown hero ---- */
+  .count{margin:22px 0 26px;padding:22px 20px 20px;border-radius:9px;background:var(--card);
+    border:1px solid var(--line);box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .count .k{font-size:13px;font-weight:600;letter-spacing:.1em;color:var(--muted)}
+  .count .big{display:flex;align-items:baseline;gap:10px;margin-top:2px}
+  .count .dd{font-size:64px;font-weight:700;line-height:1.05;color:var(--accent)}
+  .count .unit{font-size:17px;font-weight:600;color:var(--ink)}
+  .count .date{font-size:14px;color:var(--muted);margin-top:6px}
+  .count .date b{color:var(--ink);font-weight:600}
+  .count .girl{position:absolute;right:16px;bottom:12px;width:46px;overflow:visible;
+    filter:drop-shadow(0 1px 1.5px rgba(59,121,96,.25))}
+  /* 開學當天／已開學 */
+  .count.today .dd{font-size:34px;line-height:1.2}
+
+  /* ---- class card ---- */
+  .cls{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:9px;overflow:hidden;box-shadow:var(--shadow);
+    margin-bottom:30px}
+  .cls>div{background:var(--card);padding:14px 16px}
+  .cls .k{font-size:12px;font-weight:600;letter-spacing:.1em;color:var(--muted);margin-bottom:3px}
+  .cls .v{font-size:19px;font-weight:700}
+  .cls .v .u{font-size:13px;font-weight:500;color:var(--muted);margin:0 2px}
+
+  /* ---- sections ---- */
+  h2{font-size:19px;font-weight:700;margin:0 0 4px}
+  .sub{font-size:14px;color:var(--muted);margin:0 0 14px}
+  section{margin-bottom:34px}
+
+  /* ---- checklist ---- */
+  .todo{list-style:none;margin:0;padding:0}
+  .todo li{margin-bottom:10px}
+  .todo label{display:flex;gap:13px;align-items:flex-start;padding:14px 16px;border-radius:9px;
+    background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);cursor:pointer;
+    -webkit-tap-highlight-color:transparent;transition:border-color .2s,box-shadow .2s}
+  .todo label:active{box-shadow:var(--shadow-lift)}
+  .todo input{position:absolute;opacity:0;pointer-events:none}
+  .todo .box{flex:0 0 auto;width:22px;height:22px;margin-top:1px;border-radius:7px;
+    border:2px solid var(--rail);background:var(--card);display:flex;align-items:center;justify-content:center;
+    transition:background .2s,border-color .2s}
+  .todo .box svg{width:13px;height:13px;color:#fff;opacity:0;transform:scale(.4);
+    transition:opacity .18s,transform .25s cubic-bezier(.34,1.56,.64,1)}
+  .todo input:checked+.box{background:var(--accent);border-color:var(--accent)}
+  .todo input:checked+.box svg{opacity:1;transform:scale(1)}
+  .todo input:focus-visible+.box{outline:2px solid var(--accent);outline-offset:2px}
+  .todo .txt .t{font-size:16px;font-weight:600;transition:color .2s}
+  .todo .txt .d{font-size:13.5px;color:var(--muted);margin-top:2px}
+  .todo input:checked~.txt .t{color:var(--muted);text-decoration:line-through;
+    text-decoration-color:var(--rail);text-decoration-thickness:2px}
+  .todo .tag{display:inline-block;font-size:11.5px;font-weight:600;color:var(--holiday);
+    background:var(--holiday-weak);padding:1px 8px;border-radius:999px;margin-left:7px;vertical-align:1px}
+  .done-note{display:none;margin-top:12px;padding:12px 16px;border-radius:9px;
+    background:var(--accent-weak);color:var(--accent);font-size:14.5px;font-weight:600;
+    align-items:center;gap:10px}
+  .done-note.show{display:flex}
+  .done-note svg{width:30px;height:30px;overflow:visible;flex:0 0 auto}
+
+  /* ---- textbook list ---- */
+  .books{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .bk{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:12px 14px;
+    box-shadow:inset 3px 0 0 var(--c,var(--rail)),var(--shadow)}
+  .bk .s{font-size:15px;font-weight:700}
+  .bk .p{font-size:13.5px;color:var(--muted);margin-top:1px}
+  .bk .p b{color:var(--c,var(--ink));font-weight:600}
+
+  /* ---- day flow ---- */
+  .flow{border-left:2px solid var(--rail);margin-left:5px;padding-left:18px}
+  .flow .f{position:relative;padding-bottom:16px}
+  .flow .f:last-child{padding-bottom:2px}
+  .flow .f::before{content:"";position:absolute;left:-24.5px;top:6px;width:11px;height:11px;
+    border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--paper)}
+  .flow .t{font-size:16px;font-weight:600}
+  .flow .d{font-size:13.5px;color:var(--muted);margin-top:1px}
+
+  footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);
+    color:var(--muted);font-size:12px;line-height:1.7}
+  footer a{color:var(--accent)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+  @media (max-width:360px){h1{font-size:25px}.wrap{padding:22px 14px 48px}.books{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+  <header>
+    <button class="themetog" id="themetog" type="button" aria-label="切換深色／淺色">
+      <svg class="ic ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="ic ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+    <a class="back reveal" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>回課表
+    </a>
+    <p class="eyebrow reveal">鎮昌國小 · 115 學年度</p>
+    <h1 class="reveal"><span class="who">梓琪</span>的開學準備</h1>
+  </header>
+
+  <div class="count reveal" id="count"></div>
+
+  <div class="cls reveal">
+    <div><div class="k">班級</div><div class="v num">1<span class="u">年</span>3<span class="u">班</span></div></div>
+    <div><div class="k">導師</div><div class="v">謝懿雯</div></div>
+  </div>
+
+  <section class="reveal">
+    <h2>開學前要做的事</h2>
+    <p class="sub">勾起來會記住，全家人打開都看得到自己的進度。</p>
+    <ul class="todo" id="todo">
+      <li><label><input type="checkbox" data-k="consent">
+        <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"
+          stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l5 5L20 7"/></svg></span>
+        <span class="txt"><span class="t">填寫數位學生證個資同意書<span class="tag">重要</span></span>
+        <span class="d">學校本週寄給新生的資料裡有同意書，填妥後開學第一天交給導師，才能製作一卡通學生證。</span></span>
+      </label></li>
+      <li><label><input type="checkbox" data-k="supplies">
+        <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"
+          stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l5 5L20 7"/></svg></span>
+        <span class="txt"><span class="t">開學用品確認</span>
+        <span class="d">餐具（碗一大一小）、水壺、盥洗用具、鉛筆五支、橡皮擦、尺、面紙、毛巾、午休小枕頭、彩色筆。</span></span>
+      </label></li>
+      <li><label><input type="checkbox" data-k="books">
+        <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"
+          stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l5 5L20 7"/></svg></span>
+        <span class="txt"><span class="t">領書時核對教科書版本</span>
+        <span class="d">對照下方的版本表，看看課本有沒有領錯。</span></span>
+      </label></li>
+    </ul>
+    <div class="done-note" id="donenote">
+      <svg id="doneGirl" viewBox="0 0 40 44" fill="none" stroke="var(--accent)" stroke-width="4.6"
+        stroke-linecap="round" aria-hidden="true">
+        <path d="M15 8 C 7 5,4 12,9 17"/>
+        <path d="M20 30 L11 41"/><path d="M20 30 L29 41"/>
+        <line x1="20" y1="15" x2="20" y2="30"/>
+        <path d="M20 19 L11 11"/><path d="M20 19 L29 11"/>
+        <circle cx="20" cy="10" r="6.2" fill="var(--accent)" stroke="none"/>
+      </svg>
+      都準備好了，安心等開學！
+    </div>
+  </section>
+
+  <section class="reveal">
+    <h2>一年級教科書版本</h2>
+    <p class="sub">115 學年度上學期，學校公告的選用版本。</p>
+    <div class="books">
+      <div class="bk" style="--c:var(--c-lang)"><div class="s">國語</div><div class="p"><b>翰林</b></div></div>
+      <div class="bk" style="--c:var(--c-lang)"><div class="s">臺灣台語</div><div class="p"><b>康軒</b></div></div>
+      <div class="bk" style="--c:var(--c-lang)"><div class="s">英文</div><div class="p"><b>何嘉仁</b> Super Fun 1</div></div>
+      <div class="bk" style="--c:var(--c-math)"><div class="s">數學</div><div class="p"><b>康軒</b></div></div>
+      <div class="bk" style="--c:var(--c-nat)"><div class="s">生活課程</div><div class="p"><b>翰林</b></div></div>
+      <div class="bk" style="--c:var(--c-nat)"><div class="s">健康與體育</div><div class="p"><b>翰林</b></div></div>
+      <div class="bk" style="--c:var(--c-art)"><div class="s">藝術</div><div class="p"><b>康軒</b></div></div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <h2>開學日這一天</h2>
+    <p class="sub">8/31（一）當天的重點。</p>
+    <div class="flow">
+      <div class="f"><div class="t">新生始業典禮</div><div class="d">含「祖孫快樂來上學」合影活動。</div></div>
+      <div class="f"><div class="t">親職教育講座</div><div class="d">家長參加，約 1 小時。</div></div>
+      <div class="f"><div class="t">交同意書給導師</div><div class="d">數位學生證個資同意書，交給 1 年 3 班謝懿雯老師。</div></div>
+      <div class="f"><div class="t">課後照顧班開始上課</div><div class="d">開學日當天正式上課。</div></div>
+    </div>
+  </section>
+
+  <footer>
+    資料來源：鎮昌國小首頁公告與 115 學年度第 1 學期行事曆<br>
+    <a href="index.html">回到每日課表</a>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+const root=document.documentElement;
+const canAnim=!!window.gsap && matchMedia("(prefers-reduced-motion: no-preference)").matches;
+
+// ---- 開學倒數 ----
+const OPEN=new Date(2026,7,31); // 2026-08-31
+const now=new Date();
+const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+const days=Math.round((OPEN-today)/86400000);
+const cd=document.getElementById("count");
+if(days>0){
+  cd.innerHTML=`<div class="k">距離開學還有</div>
+    <div class="big"><span class="dd num" id="dd">${days}</span><span class="unit">天</span></div>
+    <div class="date">開學日　<b class="num">8 / 31</b>（週一）</div>
+    <svg class="girl" viewBox="0 0 40 44" fill="none" stroke="var(--accent)" stroke-width="4.6"
+      stroke-linecap="round" aria-hidden="true">
+      <ellipse class="shadow" cx="20" cy="43" rx="9" ry="1.5" fill="var(--accent)" stroke="none" opacity=".16"/>
+      <path class="pony" d="M16 8 C 6 5,2 14,8 20"/>
+      <path d="M19 29 L12 41"/><path d="M20 18 L12 23"/>
+      <line x1="21" y1="14" x2="19" y2="29"/>
+      <circle cx="21" cy="9" r="6.4" fill="var(--accent)" stroke="none"/>
+      <path d="M20 18 L28 22"/><path d="M19 29 L27 40"/></svg>`;
+}else if(days===0){
+  cd.className="count today reveal";
+  cd.innerHTML=`<div class="k">今天</div><div class="big"><span class="dd">開學日！</span></div>
+    <div class="date">記得帶同意書交給導師。</div>`;
+}else{
+  cd.className="count today reveal";
+  cd.innerHTML=`<div class="k">115 學年度</div><div class="big"><span class="dd">已經開學囉</span></div>
+    <div class="date">開學日是 <b class="num">8 / 31</b>，這頁留作紀念。</div>`;
+}
+
+// ---- 準備清單（localStorage 記憶）----
+const KEY="prep-checks";
+let saved={};
+try{ saved=JSON.parse(localStorage.getItem(KEY)||"{}"); }catch(e){}
+const boxes=[...document.querySelectorAll('#todo input')];
+const note=document.getElementById("donenote");
+const syncNote=init=>{
+  const all=boxes.every(b=>b.checked);
+  note.classList.toggle("show",all);
+  if(all&&!init&&canAnim){
+    gsap.fromTo(note,{scale:.9,autoAlpha:0},{scale:1,autoAlpha:1,duration:.45,ease:"back.out(1.8)"});
+    gsap.fromTo("#doneGirl",{y:6},{y:0,duration:.5,ease:"bounce.out",delay:.15});
+  }
+};
+boxes.forEach(b=>{
+  b.checked=!!saved[b.dataset.k];
+  b.addEventListener("change",()=>{
+    saved[b.dataset.k]=b.checked;
+    try{ localStorage.setItem(KEY,JSON.stringify(saved)); }catch(e){}
+    if(b.checked&&canAnim) gsap.fromTo(b.nextElementSibling,{scale:1.25},{scale:1,duration:.35,ease:"back.out(2.5)"});
+    syncNote(false);
+  });
+});
+syncNote(true);
+
+// ---- 進場動畫（與 index.html 同節奏；女孩原地小跑步）----
+if(canAnim){
+  gsap.set(".reveal",{autoAlpha:0,y:14});
+  gsap.timeline({defaults:{ease:"power2.out"}})
+    .to("header .reveal",{autoAlpha:1,y:0,duration:.5,stagger:.07})
+    .to(".count, .cls",{autoAlpha:1,y:0,duration:.5,stagger:.09},"-=.25")
+    .to("section.reveal",{autoAlpha:1,y:0,duration:.5,stagger:.09},"-=.2")
+    .set(".reveal",{autoAlpha:1,y:0});
+  const dd=document.getElementById("dd");
+  if(dd){
+    const n=+dd.textContent, o={v:0};
+    gsap.to(o,{v:n,duration:1.1,delay:.35,ease:"power2.out",onUpdate:()=>dd.textContent=Math.round(o.v)});
+  }
+  const g=".count .girl";
+  if(document.querySelector(g)){
+    const L={duration:.3,ease:"sine.inOut",repeat:-1,yoyo:true};
+    gsap.to(g,{y:-2.5,...L});
+    gsap.fromTo(`${g} .pony`,{rotation:-8},{rotation:14,svgOrigin:"15 8",...L,duration:.4});
+    gsap.fromTo(`${g} .shadow`,{scaleX:.75,opacity:.1},{scaleX:1,opacity:.2,svgOrigin:"20 43",...L});
+  }
+}
+root.classList.remove("preanim");
+
+// ---- 深淺色切換 ----
+document.getElementById("themetog").addEventListener("click",()=>{
+  const next=root.dataset.theme==="dark"?"light":"dark";
+  root.dataset.theme=next;
+  try{ localStorage.setItem("theme",next); }catch(e){}
+});
+</script>
