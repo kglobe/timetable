@@ -192,11 +192,12 @@
     <div class="done-note" id="donenote">
       <svg id="doneGirl" viewBox="0 0 40 44" fill="none" stroke="var(--accent)" stroke-width="4.6"
         stroke-linecap="round" aria-hidden="true">
-        <path d="M15 8 C 7 5,4 12,9 17"/>
+        <path d="M15 8 C 11 5,8 10,10 15"/>
         <path d="M20 30 L11 41"/><path d="M20 30 L29 41"/>
         <line x1="20" y1="15" x2="20" y2="30"/>
         <path d="M20 19 L11 11"/><path d="M20 19 L29 11"/>
         <circle cx="20" cy="10" r="6.2" fill="var(--accent)" stroke="none"/>
+        <circle cx="15" cy="8" r="1.5" fill="#f0c050" stroke="none"/>
       </svg>
       都準備好了，安心等開學！
     </div>
@@ -249,11 +250,12 @@ if(days>0){
     <svg class="girl" viewBox="0 0 40 44" fill="none" stroke="var(--accent)" stroke-width="4.6"
       stroke-linecap="round" aria-hidden="true">
       <ellipse class="shadow" cx="20" cy="43" rx="9" ry="1.5" fill="var(--accent)" stroke="none" opacity=".16"/>
-      <path class="pony" d="M16 8 C 6 5,2 14,8 20"/>
-      <path d="M19 29 L12 41"/><path d="M20 18 L12 23"/>
-      <line x1="21" y1="14" x2="19" y2="29"/>
-      <circle cx="21" cy="9" r="6.4" fill="var(--accent)" stroke="none"/>
-      <path d="M20 18 L28 22"/><path d="M19 29 L27 40"/></svg>`;
+      <path class="pony" d="M15 8 C 11 5,8 10,10 17"/>
+      <path class="leg-b" d="M19 29 L12 41"/><path class="arm-b" d="M20 18 L12 23"/>
+      <line class="body" x1="21" y1="14" x2="19" y2="29"/>
+      <circle class="head" cx="21" cy="9" r="6.4" fill="var(--accent)" stroke="none"/>
+      <circle class="tie" cx="15" cy="8" r="1.5" fill="#f0c050" stroke="none"/>
+      <path class="arm-f" d="M20 18 L28 22"/><path class="leg-f" d="M19 29 L27 40"/></svg>`;
 }else if(days===0){
   cd.className="count today reveal";
   cd.innerHTML=`<div class="k">今天</div><div class="big"><span class="dd">開學日！</span></div>
@@ -304,10 +306,71 @@ if(canAnim){
   }
   const g=".count .girl";
   if(document.querySelector(g)){
-    const L={duration:.3,ease:"sine.inOut",repeat:-1,yoyo:true};
-    gsap.to(g,{y:-2.5,...L});
-    gsap.fromTo(`${g} .pony`,{rotation:-8},{rotation:14,svgOrigin:"15 8",...L,duration:.4});
-    gsap.fromTo(`${g} .shadow`,{scaleX:.75,opacity:.1},{scaleX:1,opacity:.2,svgOrigin:"20 43",...L});
+    const parts=[g,`${g} .leg-f`,`${g} .leg-b`,`${g} .arm-f`,`${g} .arm-b`,`${g} .pony`,`${g} .tie`,`${g} .shadow`];
+    const sw=16,d=.26,bob=2.5;
+    const L={duration:d,ease:"sine.inOut",repeat:-1,yoyo:true};
+    const startRun=()=>{
+      gsap.to(g,{rotation:2,svgOrigin:"20 40",duration:.4,ease:"power2.out"});
+      gsap.fromTo(`${g} .leg-f`,{rotation:-sw},{rotation:sw*.85,svgOrigin:"19 29",...L});
+      gsap.fromTo(`${g} .leg-b`,{rotation:sw*.85},{rotation:-sw,svgOrigin:"19 29",...L});
+      gsap.fromTo(`${g} .arm-f`,{rotation:sw+2},{rotation:-sw-2,svgOrigin:"20 18",...L});
+      gsap.fromTo(`${g} .arm-b`,{rotation:-sw-2},{rotation:sw+2,svgOrigin:"20 18",...L});
+      gsap.to(g,{y:-bob,...L});
+      gsap.fromTo(`${g} .pony, ${g} .tie`,{rotation:-10},{rotation:18,svgOrigin:"15 8",...L,duration:d*1.3});
+      gsap.fromTo(`${g} .shadow`,{scaleX:.7,opacity:.10},{scaleX:1,opacity:.22,svgOrigin:"20 43",...L});
+    };
+    // 體操旋轉跳：passé 抬腳 → 逐格轉一圈 → bounce 落地
+    const PIRO=[
+      // 0: 正面 passé（單腳站、另腳提膝、雙手上舉）
+      `<ellipse cx="20" cy="43" rx="5" ry="1.2" fill="var(--accent)" stroke="none" opacity=".10"/>
+       <path d="M15 8 C 11 5,8 10,10 16"/><line x1="20" y1="14" x2="20" y2="29"/>
+       <path d="M20 29 L20 41"/><path d="M20 29 L27 25"/>
+       <path d="M20 18 L14 10"/><path d="M20 18 L26 10"/>
+       <circle cx="20" cy="9" r="6.2" fill="var(--accent)" stroke="none"/>
+       <circle cx="15" cy="8" r="1.5" fill="#f0c050" stroke="none"/>`,
+      // 1: 側面（身體窄）
+      `<ellipse cx="20" cy="43" rx="3" ry="1" fill="var(--accent)" stroke="none" opacity=".06"/>
+       <line x1="20" y1="14" x2="20" y2="29"/><path d="M20 29 L20 41"/><path d="M20 29 L23 26"/>
+       <path d="M20 18 L20 10"/>
+       <circle cx="20" cy="9" r="5.4" fill="var(--accent)" stroke="none"/>`,
+      // 2: 背面（馬尾反向）
+      `<ellipse cx="20" cy="43" rx="5" ry="1.2" fill="var(--accent)" stroke="none" opacity=".10"/>
+       <path d="M25 8 C 29 5,32 10,30 16"/><line x1="20" y1="14" x2="20" y2="29"/>
+       <path d="M20 29 L20 41"/><path d="M20 29 L13 25"/>
+       <path d="M20 18 L26 10"/><path d="M20 18 L14 10"/>
+       <circle cx="20" cy="9" r="6.2" fill="var(--accent)" stroke="none"/>
+       <circle cx="25" cy="8" r="1.5" fill="#f0c050" stroke="none"/>`,
+      // 3: 另一側
+      `<ellipse cx="20" cy="43" rx="3" ry="1" fill="var(--accent)" stroke="none" opacity=".06"/>
+       <line x1="20" y1="14" x2="20" y2="29"/><path d="M20 29 L20 41"/><path d="M20 29 L17 26"/>
+       <path d="M20 18 L20 10"/>
+       <circle cx="20" cy="9" r="5.4" fill="var(--accent)" stroke="none"/>`,
+    ];
+    const doJump=()=>{
+      gsap.killTweensOf(parts);
+      const sv=document.querySelector(g); if(!sv) return;
+      const orig=sv.innerHTML;
+      gsap.timeline({onComplete(){sv.innerHTML=orig;gsap.set(g,{y:0,rotation:2,scaleX:1,svgOrigin:"20 40"});startRun();gsap.delayedCall(3.5+Math.random()*2,doJump);}})
+        // 收腿蓄力
+        .to(`${g} .leg-f`,{rotation:80,svgOrigin:"19 29",duration:.18},0)
+        .to(`${g} .leg-b`,{rotation:2,svgOrigin:"19 29",duration:.18},0)
+        .to(`${g} .arm-f`,{rotation:-75,svgOrigin:"20 18",duration:.18},0)
+        .to(`${g} .arm-b`,{rotation:70,svgOrigin:"20 18",duration:.18},0)
+        .to(`${g} .pony, ${g} .tie`,{rotation:20,svgOrigin:"15 8",duration:.18},0)
+        .to(`${g} .shadow`,{scaleX:.4,opacity:.06,svgOrigin:"20 43",duration:.18},0)
+        // 跳起 + 逐格轉圈（正→側→背→側→正）
+        .call(()=>{sv.innerHTML=PIRO[0];},[],0.20)
+        .to(g,{y:-20,rotation:0,svgOrigin:"20 40",duration:.25,ease:"sine.out"},.20)
+        .call(()=>{sv.innerHTML=PIRO[1];},[],0.33)
+        .call(()=>{sv.innerHTML=PIRO[2];},[],0.46)
+        .call(()=>{sv.innerHTML=PIRO[3];},[],0.59)
+        .call(()=>{sv.innerHTML=PIRO[0];},[],0.72)
+        .to(g,{y:-16,duration:.35,ease:"sine.inOut"},.45)
+        // 落地
+        .to(g,{y:0,duration:.22,ease:"bounce.out"},.80);
+    };
+    startRun();
+    gsap.delayedCall(3.5+Math.random()*2,doJump);
   }
 }
 root.classList.remove("preanim");
