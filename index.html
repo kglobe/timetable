@@ -11,7 +11,8 @@
   :root{
     --paper:#fbf7f0; --card:#ffffff; --ink:#413b34; --muted:#9a9188;
     --line:#ece5db; --rail:#ddd5c9; --accent:#3b7960; --accent-weak:#e3ede9; /* 木賊色 · 進行中主色 */
-    --holiday:#e0a13f; --holiday-weak:#fbf0d8;
+    --holiday:#ab3b3a; --holiday-weak:#f7e3e2;
+    --sport:#376b6d; --sport-weak:#e0eaea; /* 運動會 */
     /* 明亮童趣科目色 */
     --c-lang:#d0576b; --c-lang-w:#f7e4e7; /* 今様色 · 語文/社會 */
     --c-math:#2c82be; --c-math-w:#e1eef8; /* 縹色 · 數理 */
@@ -25,7 +26,8 @@
       color-scheme:dark;
       --paper:#24211d; --card:#2c2823; --ink:#ece5d9; --muted:#a89f92;
       --line:#39332c; --rail:#463f37; --accent:#86b0a5; --accent-weak:#2b3733;
-      --holiday:#e6b25c; --holiday-weak:#352a1a;
+      --holiday:#d97b79; --holiday-weak:#3a2523;
+      --sport:#96c3c4; --sport-weak:#22312f;
       --c-lang:#e88a99; --c-lang-w:#3a2a2d;
       --c-math:#79b3e0; --c-math-w:#24303a;
       --c-nat:#82c187;  --c-nat-w:#263320;
@@ -162,6 +164,9 @@
   .cal-head{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
   .cal-head h2{font-size:19px;font-weight:700;margin:0}
   .cal-head .rng{font-size:13px;color:var(--muted)}
+  .cal-head .all{margin-left:auto;font-size:13px;font-weight:600;color:var(--accent);
+    text-decoration:none;white-space:nowrap;transition:opacity .2s}
+  .cal-head .all:hover{opacity:.72}
   .cal-sub{font-size:14px;color:var(--muted);margin:0 0 14px}
   .ev{display:grid;grid-template-columns:52px 1fr;gap:16px;padding:13px 0;border-top:1px solid var(--line)}
   .ev:first-of-type{border-top:none}
@@ -171,6 +176,10 @@
   .ev .rng2{font-size:12px;color:var(--muted);margin-top:2px}
   .ev .txt{align-self:center;font-size:16px;font-weight:500}
   .ev.holiday .d .dd{color:var(--holiday)}
+  .ev.sport .d .dd,.ev.sport .txt{color:var(--sport)}
+  .ev.sport .txt{font-weight:600}
+  .ev.sport .tag{display:inline-block;font-size:12px;font-weight:600;color:var(--sport);
+    background:var(--sport-weak);padding:1px 8px;border-radius:999px;margin-left:8px;vertical-align:middle}
   .ev.holiday .tag{display:inline-block;font-size:12px;font-weight:600;color:var(--holiday);
     background:var(--holiday-weak);padding:1px 8px;border-radius:999px;margin-left:8px;vertical-align:middle}
   .empty{color:var(--muted);font-size:16px;padding:8px 0}
@@ -262,7 +271,8 @@
   </details>
 
   <section class="cal reveal">
-    <div class="cal-head"><h2>接下來一週</h2><span class="rng" id="calrange"></span></div>
+    <div class="cal-head"><h2>接下來一週</h2><span class="rng" id="calrange"></span>
+      <a class="all" href="calendar.html">全部行事曆 →</a></div>
     <p class="cal-sub">鎮昌國小 115 學年度第 1 學期行事曆</p>
     <div id="calendar"></div>
   </section>
@@ -274,6 +284,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="events.js"></script>
 <script>
 // ---- 課程資料 ----
 const COURSE_TIMES = ["09:00–09:50","10:00–10:50","11:00–11:50","14:00–14:50","15:00–15:50","16:30–17:20"];
@@ -309,33 +320,6 @@ const COURSE_CAT = {
 const SUBJECT = {"團隊活動":"社會","品格生活":"社會","生活知能":"社會","安全教育":"社會"};
 const catOf = n => COURSE_CAT[n.replace("＊","")] || null;
 const catStyle = c => c ? `--c:var(--c-${c});--cw:var(--c-${c}-w)` : "";
-// ---- 行事曆（115 學年=2026；1 月屬 2027）----
-const EVENTS = [
-  ["2026-08-31",null,"開學日・新生始業典禮・課後照顧班正式上課",false],
-  ["2026-09-09",null,"國民體育日",false],
-  ["2026-09-16",null,"地震避難演練及校園人為災害演練",false],
-  ["2026-09-21",null,"國家防災日",false],
-  ["2026-09-23",null,"牙齒檢查 (1)",false],
-  ["2026-09-25",null,"中秋節放假 1 天",true],
-  ["2026-09-28",null,"教師節放假 1 天",true],
-  ["2026-09-30",null,"牙齒檢查 (2)",false],
-  ["2026-10-01",null,"舉辦班親會",false],
-  ["2026-10-09",null,"國慶日補假 1 天",true],
-  ["2026-10-16",null,"親職教育講座",false],
-  ["2026-10-20","2026-10-22","國小體促會躲避球賽（暫定）",false],
-  ["2026-10-23",null,"第一次學生週會",false],
-  ["2026-10-26",null,"臺灣光復暨金門古寧頭大捷紀念日補假 1 天",true],
-  ["2026-11-02","2026-11-06","第 1 次定期評量週（期中考）",false],
-  ["2026-12-05",null,"運動會",false],
-  ["2026-12-07",null,"運動會補休",true],
-  ["2026-12-11",null,"親職教育講座",false],
-  ["2026-12-18",null,"第二次學生週會",false],
-  ["2026-12-25",null,"行憲紀念日放假 1 天",true],
-  ["2027-01-01",null,"開國紀念日放假 1 天",true],
-  ["2027-01-11","2027-01-15","第 2 次定期評量週（期末考）",false],
-  ["2027-01-19",null,"跳蚤市場（資源回收及理財教育）",false],
-  ["2027-01-20",null,"第一學期課程結束",false],
-];
 
 const WL = ["日","一","二","三","四","五","六"];
 const pad = n => String(n).padStart(2,"0");
@@ -713,9 +697,9 @@ document.getElementById("calrange").textContent = `${md(mid)} – ${md(new Date(
 
 const within = EVENTS.filter(ev=>{ const s=parse(ev[0]),e=ev[1]?parse(ev[1]):s; return e>=mid && s<weekEnd; });
 function evRow(ev){
-  const s=parse(ev[0]), holiday=ev[3];
+  const s=parse(ev[0]), holiday=ev[3], tone=ev[4]||"";
   const rng = ev[1] ? `${md(s)}–${md(parse(ev[1]))}` : "";
-  return `<div class="ev ${holiday?'holiday':''}">
+  return `<div class="ev ${holiday?'holiday':''} ${tone}">
     <div class="d"><div class="dd num">${s.getDate()}</div><div class="wl">週${WL[s.getDay()]}</div>
       ${rng?`<div class="rng2 num">${rng}</div>`:""}</div>
     <div class="txt">${ev[2]}${holiday?'<span class="tag">放假</span>':""}</div></div>`;
