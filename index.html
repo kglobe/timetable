@@ -48,10 +48,12 @@
 
   /* ---- header ---- */
   header{position:relative}
-  .themetog{position:absolute;top:-2px;right:-2px;width:35px;height:35px;
+  .themetog{position:absolute;top:-2px;right:-2px;width:35px;height:35px;z-index:5;
     display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:50%;
     background:var(--card);color:var(--muted);cursor:pointer;box-shadow:var(--shadow);
     -webkit-tap-highlight-color:transparent;transition:background .2s,color .2s,transform .16s cubic-bezier(.23,1,.32,1)}
+  /* 右上角整塊都能按：把可點範圍往外撐到約 55×55，視覺仍是 35px 圓鈕 */
+  .themetog::after{content:"";position:absolute;inset:-10px;border-radius:50%}
   .themetog:active{color:var(--accent);background:var(--accent-weak);transform:scale(.93)}
   @media(hover:hover)and(pointer:fine){.themetog:hover{color:var(--accent)}}
   .themetog .ic{width:22px;height:22px}
@@ -64,11 +66,6 @@
   h1 .who{color:var(--accent)}
   .datebar{display:flex;align-items:center;gap:9px;margin-top:8px;color:var(--muted);font-size:15px}
   .datebar .num{font-size:16px}
-  .live{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;
-    letter-spacing:.14em;color:var(--accent);margin-left:auto}
-  .live .ring{position:relative;width:9px;height:9px}
-  .live .ring i{position:absolute;inset:0;border-radius:50%;background:var(--accent)}
-  .live .ring b{position:absolute;inset:0;border-radius:50%;border:1px solid var(--accent)}
   .schoolink{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:8px 13px;
     border-radius:999px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
     font-size:13.5px;font-weight:600;color:var(--ink);text-decoration:none;
@@ -237,7 +234,6 @@
     <h1 class="reveal"><span class="who">梓琪</span>的今日課表</h1>
     <div class="datebar reveal">
       <span class="num" id="today"></span>
-      <span class="live" id="livewrap" hidden><span class="ring"><b></b><i></i></span>LIVE</span>
     </div>
     <a class="schoolink reveal" id="schoolink" href="school.html" hidden>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -349,7 +345,6 @@ document.getElementById("today").textContent =
 // ---- 今日課表 ----
 const tl = document.getElementById("timeline");
 const statusEl = document.getElementById("status");
-const liveWrap = document.getElementById("livewrap");
 
 const col = dispDow-1;
 let items = FIXED.map(f=>({t:f[0],a:f[1],fixed:true}));
@@ -603,7 +598,6 @@ items.forEach((it,idx)=>{
 if(inSession && !current && insertBefore===-1) out += nowLineHTML;
 tl.innerHTML = out;
 
-liveWrap.hidden = !inSession;
 if(current){
   const [cs,ce]=range(current.t);
   statusEl.innerHTML = `<div class="k">現在進行</div>
@@ -730,7 +724,6 @@ if(canAnim){
   }
   gsap.fromTo(".node.now .card",{scale:.985},{scale:1,duration:.6,delay:.5,ease:"power2.out"});
   gsap.from(".status .bar i, .node.now .prog i",{scaleX:0,duration:.9,delay:.55,ease:"power2.out"});
-  gsap.to(".live .ring b",{scale:2.4,autoAlpha:0,duration:1.6,ease:"sine.out",repeat:-1,repeatDelay:.2});
   // now-line 呼吸光暈
   gsap.fromTo(".nl-rail span b",{scale:.6,autoAlpha:.5},
     {scale:2.4,autoAlpha:0,duration:1.8,ease:"sine.out",repeat:-1,repeatDelay:.3,delay:.6});
