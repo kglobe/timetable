@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>115 學年度第 1 學期行事曆</title>
+<title>課後班點心表</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -12,7 +12,6 @@
     --paper:#fbf7f0; --card:#ffffff; --ink:#413b34; --muted:#9a9188;
     --line:#ece5db; --rail:#ddd5c9; --accent:#3b7960; --accent-weak:#e3ede9;
     --holiday:#ab3b3a; --holiday-weak:#f7e3e2;
-    --sport:#376b6d; --sport-weak:#e0eaea; /* 運動會 */
     --shadow:0 1px 2px rgba(75,70,65,.04),0 8px 22px rgba(75,70,65,.07);
     --shadow-lift:0 2px 8px rgba(64,91,85,.18),0 14px 30px rgba(75,70,65,.13);
   }
@@ -22,7 +21,6 @@
       --paper:#24211d; --card:#2c2823; --ink:#ece5d9; --muted:#a89f92;
       --line:#39332c; --rail:#463f37; --accent:#86b0a5; --accent-weak:#2b3733;
       --holiday:#d97b79; --holiday-weak:#3a2523;
-      --sport:#96c3c4; --sport-weak:#22312f;
       --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.32);
       --shadow-lift:0 2px 8px rgba(134,176,165,.16),0 14px 30px rgba(0,0,0,.4);
   }
@@ -57,8 +55,26 @@
   h1{font-size:27px;font-weight:700;margin:0;letter-spacing:.01em}
   .lede{font-size:14px;color:var(--muted);margin:8px 0 0}
 
+  /* ---- 今天／下一份 ---- */
+  .hero{position:relative;overflow:hidden;margin-top:20px;background:var(--card);
+    border:1px solid var(--line);border-radius:18px;
+    padding:20px 22px;box-shadow:var(--shadow-lift)}
+  .hero-art{position:absolute;top:-14px;right:-18px;width:150px;height:150px;
+    color:var(--accent);pointer-events:none}
+  .hero.off .hero-art{color:var(--holiday)}
+  .hero > .body{position:relative;padding-right:64px}
+  .hero .k{font-size:11.5px;font-weight:700;letter-spacing:.16em;color:var(--accent)}
+  .hero .item{font-size:26px;font-weight:700;margin-top:9px;line-height:1.3}
+  .hero .when{font-size:13.5px;color:var(--muted);margin-top:7px}
+  .hero.off .k,.hero.off .item{color:var(--holiday)}
+
+  .note{display:flex;gap:9px;align-items:flex-start;margin-top:14px;padding:11px 14px;
+    border-radius:12px;background:var(--holiday-weak);color:var(--holiday);
+    font-size:13px;font-weight:600;line-height:1.55}
+  .note svg{width:16px;height:16px;flex:0 0 auto;margin-top:2px}
+
   /* ---- 篩選 ---- */
-  .filters{display:flex;gap:8px;margin:18px 0 4px}
+  .filters{display:flex;gap:8px;margin:22px 0 4px}
   .fb{flex:0 0 auto;font-size:13.5px;font-weight:600;color:var(--muted);background:var(--card);
     border:1px solid var(--line);border-radius:999px;padding:7px 15px;cursor:pointer;
     -webkit-tap-highlight-color:transparent;box-shadow:var(--shadow);
@@ -75,19 +91,15 @@
   .mo-h .y{font-size:12px;font-weight:600;letter-spacing:.1em;color:var(--muted)}
   .mo-h .n{margin-left:auto;font-size:12px;color:var(--muted)}
 
-  /* ---- 事件列 ---- */
+  /* ---- 每日一列 ---- */
   .ev{display:grid;grid-template-columns:52px 1fr;gap:16px;padding:13px 0;
     border-bottom:1px solid var(--line)}
   .ev:last-child{border-bottom:none}
   .ev .d{text-align:center}
   .ev .d .dd{font-size:24px;font-weight:700;line-height:1}
   .ev .d .wl{font-size:12px;color:var(--muted);margin-top:3px}
-  .ev .rng2{font-size:11.5px;color:var(--muted);margin-top:2px}
   .ev .txt{align-self:center;font-size:16px;font-weight:500}
-  .ev.holiday .d .dd{color:var(--holiday)}
-  .ev.sport .d .dd,.ev.sport .txt{color:var(--sport)}
-  .ev.sport .txt{font-weight:600}
-  .ev.sport .tag{color:var(--sport);background:var(--sport-weak)}
+  .ev.off .d .dd,.ev.off .txt{color:var(--holiday)}
   .ev .tag{display:inline-block;font-size:11.5px;font-weight:600;padding:1px 8px;
     border-radius:999px;margin-left:8px;vertical-align:middle;
     color:var(--holiday);background:var(--holiday-weak)}
@@ -96,18 +108,20 @@
   .ev.today .txt{font-weight:700}
   .ev.today .tag.now{color:var(--accent);background:var(--accent-weak)}
 
-  /* ---- 今天分隔線 ---- */
   .todayline{display:grid;grid-template-columns:52px 1fr;gap:16px;align-items:center;padding:6px 0}
   .todayline .lbl{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--accent);text-align:center}
   .todayline .rule{height:2px;background:linear-gradient(90deg,var(--accent),transparent);
     transform-origin:left center}
 
   .empty{color:var(--muted);font-size:15px;padding:22px 0}
-  footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);
+  .scan{display:block;margin-top:30px;border-radius:14px;overflow:hidden;border:1px solid var(--line);
+    box-shadow:var(--shadow)}
+  .scan img{display:block;width:100%;height:auto}
+  footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);
     color:var(--muted);font-size:12px;line-height:1.7}
   footer a{color:var(--accent)}
   :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
-  @media (max-width:360px){h1{font-size:23px}.wrap{padding:22px 14px 48px}}
+  @media (max-width:360px){h1{font-size:23px}.wrap{padding:22px 14px 48px}.hero .item{font-size:23px}}
 </style>
 
 <div class="wrap">
@@ -123,78 +137,163 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
         stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>回課表
     </a>
-    <p class="eyebrow reveal">鎮昌國小 · 115 學年度第 1 學期</p>
-    <h1 class="reveal">完整行事曆</h1>
+    <p class="eyebrow reveal">國小課後班 · A1 表</p>
+    <h1 class="reveal">8、9 月點心表</h1>
     <p class="lede reveal" id="lede"></p>
+
+    <div class="hero reveal" id="hero">
+      <svg class="hero-art" viewBox="0 0 120 120" fill="none" stroke="currentColor" aria-hidden="true">
+        <!-- 慢轉的虛線環 -->
+        <g class="art-ring">
+          <circle cx="60" cy="60" r="46" stroke-width="1" opacity=".16"/>
+          <circle cx="60" cy="60" r="46" stroke-width="2.5" opacity=".1" stroke-dasharray="5 17"/>
+          <circle cx="60" cy="14" r="3.5" fill="currentColor" stroke="none" opacity=".16"/>
+        </g>
+        <!-- 餐盤與叉匙 -->
+        <circle cx="60" cy="60" r="27" stroke-width="1.6" opacity=".38"/>
+        <circle cx="60" cy="60" r="18" stroke-width="1.1" opacity=".2"/>
+        <g class="art-cutlery" transform="translate(49 49)" stroke-width="1.5"
+           stroke-linecap="round" stroke-linejoin="round" opacity=".42">
+          <path d="M3 2v7a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V2"/>
+          <path d="M7 2v20"/>
+          <path d="M21 15V2a5 5 0 0 0-5 5v6a2 2 0 0 0 2 2h3zm0 0v7"/>
+        </g>
+        <!-- 浮動小圓 -->
+        <circle class="art-float" cx="22" cy="30" r="7" fill="currentColor" stroke="none" opacity=".12"/>
+        <circle class="art-float" cx="99" cy="41" r="5" fill="currentColor" stroke="none" opacity=".15"/>
+        <circle class="art-float" cx="30" cy="93" r="4.5" fill="currentColor" stroke="none" opacity=".1"/>
+        <circle class="art-float" cx="95" cy="88" r="6" fill="currentColor" stroke="none" opacity=".12"/>
+        <!-- 閃點 -->
+        <circle class="art-spark" cx="14" cy="62" r="2" fill="currentColor" stroke="none" opacity=".4"/>
+        <circle class="art-spark" cx="108" cy="66" r="2.2" fill="currentColor" stroke="none" opacity=".35"/>
+        <circle class="art-spark" cx="58" cy="106" r="2" fill="currentColor" stroke="none" opacity=".3"/>
+        <circle class="art-spark" cx="84" cy="20" r="1.8" fill="currentColor" stroke="none" opacity=".45"/>
+      </svg>
+      <div class="body" id="hero-body"></div>
+    </div>
+
+    <div class="note reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/>
+        <path d="M12 8v5M12 16.5v.01"/></svg>
+      <span>為了您的健康，點心隔餐勿食。</span>
+    </div>
+
     <div class="filters reveal">
       <button class="fb" id="f-up" type="button" aria-pressed="false">只看之後</button>
-      <button class="fb" id="f-hol" type="button" aria-pressed="false">只看放假</button>
     </div>
   </header>
 
   <div id="list"></div>
 
+  <a class="scan reveal" href="img/snack-a1.jpg">
+    <img src="img/snack-a1.jpg" alt="2026 年 8、9 月份國小課後班點心表 A1 原始掃描圖" loading="lazy">
+  </a>
+
   <footer>
-    資料來源：鎮昌國小 115 學年度第 1 學期重要行事曆<br>
-    <a href="index.html">回到每日課表</a>　·　<a href="school.html">開學準備</a>　·　<a href="snack.html">點心表</a>
+    本公司豬肉一律採用溫體豬，請安心食用。<br>
+    資料來源：點心叔叔實業行「2026 年 8.9 月份國小課後班點心表-A1」<br>
+    <a href="index.html">回到每日課表</a>　·　<a href="calendar.html">完整行事曆</a>
   </footer>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="events.js"></script>
 <script>
 const root=document.documentElement;
 const canAnim=!!window.gsap && matchMedia("(prefers-reduced-motion: no-preference)").matches;
 const WL=["日","一","二","三","四","五","六"];
 const MO=["一","二","三","四","五","六","七","八","九","十","十一","十二"];
-const pad=n=>String(n).padStart(2,"0");
-const parse=s=>{const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d);};
-const md=dt=>`${pad(dt.getMonth()+1)}/${pad(dt.getDate())}`;
+
+// [日期, 品名, 放假]
+const SNACKS=[
+  ["2026-08-31","餅乾＋玉米濃湯"],
+  ["2026-09-01","御飯糰"],
+  ["2026-09-02","滷味"],
+  ["2026-09-03","綜合壽司"],
+  ["2026-09-04","麥克雞塊 x4"],
+  ["2026-09-07","火腿夾心起司"],
+  ["2026-09-08","餅乾＋統一大布丁"],
+  ["2026-09-09","手工水餃 x5"],
+  ["2026-09-10","燒賣 x3"],
+  ["2026-09-11","繽紛馬卡龍"],
+  ["2026-09-14","烤饅頭＋果汁"],
+  ["2026-09-15","雙色海綿蛋糕"],
+  ["2026-09-16","關東煮"],
+  ["2026-09-17","羅宋"],
+  ["2026-09-18","義大利肉醬麵"],
+  ["2026-09-21","銅鑼燒"],
+  ["2026-09-22","小奶皇包 x2"],
+  ["2026-09-23","檸檬愛玉"],
+  ["2026-09-24","雙熱狗麵包"],
+  ["2026-09-25","中秋節",true],
+  ["2026-09-28","教師節",true],
+  ["2026-09-29","海苔壽司捲"],
+  ["2026-09-30","珍珠丸 x3"],
+];
 
 const now=new Date();
 const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+const parse=s=>{const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d);};
 
-// 事件 → {s,e,txt,holiday,state}；state: past / today / future
-const ITEMS=EVENTS.map(ev=>{
-  const s=parse(ev[0]), e=ev[1]?parse(ev[1]):s;
-  return {s,e,txt:ev[2],holiday:ev[3],tone:ev[4]||"",
-    state: e<today ? "past" : (s<=today ? "today" : "future")};
+const ITEMS=SNACKS.map(([ds,txt,off])=>{
+  const d=parse(ds);
+  return {d,txt,off:!!off,
+    state:d<today?"past":(d.getTime()===today.getTime()?"today":"future")};
 });
-console.assert(ITEMS.length===EVENTS.length&&ITEMS.every(i=>i.e>=i.s),"事件日期區間顛倒");
+console.assert(ITEMS.every((it,i)=>i===0||it.d>ITEMS[i-1].d),"點心日期未依序排列");
 
-const upcoming=ITEMS.filter(i=>i.state!=="past").length;
-document.getElementById("lede").textContent =
-  `共 ${ITEMS.length} 項，還有 ${upcoming} 項尚未發生。`;
+const nOff=ITEMS.filter(i=>i.off).length;
+document.getElementById("lede").textContent=
+  `8/31 – 9/30，共 ${ITEMS.length-nOff} 份點心，${nOff} 天放假。`;
 
-let onlyUpcoming=false, onlyHoliday=false;
+// ---- 今天／下一份 ----
+const cur=ITEMS.find(i=>i.state==="today");
+const next=ITEMS.find(i=>i.state==="future");
+const hero=document.getElementById("hero");
+const heroBody=document.getElementById("hero-body");
+const dateLabel=i=>`${i.d.getMonth()+1}/${i.d.getDate()}（週${WL[i.d.getDay()]}）`;
+if(cur){
+  hero.className="hero reveal"+(cur.off?" off":"");
+  heroBody.innerHTML=`<div class="k">${cur.off?"今天放假":"今天的點心"}</div>
+    <div class="item">${cur.txt}</div><div class="when">${dateLabel(cur)}</div>`;
+}else if(next){
+  const days=Math.round((next.d-today)/86400000);
+  hero.className="hero reveal"+(next.off?" off":"");
+  heroBody.innerHTML=`<div class="k">${next.off?"下一個上課日放假":"下一份點心"}</div>
+    <div class="item">${next.txt}</div>
+    <div class="when">${dateLabel(next)}　·　還有 <b class="num">${days}</b> 天</div>`;
+}else{
+  heroBody.innerHTML=`<div class="k">這一期結束了</div>
+    <div class="item">等下一張點心表</div>
+    <div class="when">9/30 之後的品項還沒公布</div>`;
+}
+
+let onlyUpcoming=false;
 function render(){
-  const list=ITEMS.filter(i=>(!onlyUpcoming||i.state!=="past")&&(!onlyHoliday||i.holiday));
+  const list=ITEMS.filter(i=>!onlyUpcoming||i.state!=="past");
   const box=document.getElementById("list");
   if(!list.length){ box.innerHTML=`<div class="empty">沒有符合的項目。</div>`; return; }
   let out="", mo="", ruled=false;
   list.forEach(i=>{
-    const key=i.s.getFullYear()+"-"+i.s.getMonth();
+    const key=i.d.getFullYear()+"-"+i.d.getMonth();
     if(key!==mo){
       if(mo) out+="</section>";
       mo=key;
-      const n=list.filter(x=>x.s.getFullYear()+"-"+x.s.getMonth()===key).length;
+      const n=list.filter(x=>x.d.getFullYear()+"-"+x.d.getMonth()===key).length;
       out+=`<section class="mo reveal"><div class="mo-h">
-        <span class="m">${MO[i.s.getMonth()]}月</span>
-        <span class="y num">${i.s.getFullYear()}</span>
-        <span class="n num">${n} 項</span></div>`;
+        <span class="m">${MO[i.d.getMonth()]}月</span>
+        <span class="y num">${i.d.getFullYear()}</span>
+        <span class="n num">${n} 天</span></div>`;
     }
-    // 第一個「尚未發生」的項目前插入今天的分隔線
     if(!ruled && i.state!=="past" && !onlyUpcoming){
       ruled=true;
       out+=`<div class="todayline reveal"><span class="lbl">今天</span><span class="rule"></span></div>`;
     }
-    const rng=i.e>i.s?`${md(i.s)}–${md(i.e)}`:"";
-    out+=`<div class="ev reveal ${i.state} ${i.holiday?'holiday':''} ${i.tone}">
-      <div class="d"><div class="dd num">${i.s.getDate()}</div>
-        <div class="wl">週${WL[i.s.getDay()]}</div>
-        ${rng?`<div class="rng2 num">${rng}</div>`:""}</div>
-      <div class="txt">${i.txt}${i.holiday?'<span class="tag">放假</span>':""}${
-        i.state==="today"?'<span class="tag now">進行中</span>':""}</div></div>`;
+    out+=`<div class="ev reveal ${i.state} ${i.off?"off":""}">
+      <div class="d"><div class="dd num">${i.d.getDate()}</div>
+        <div class="wl">週${WL[i.d.getDay()]}</div></div>
+      <div class="txt">${i.txt}${i.off?'<span class="tag">放假</span>':""}${
+        i.state==="today"&&!i.off?'<span class="tag now">今天</span>':""}</div></div>`;
   });
   out+="</section>";
   box.innerHTML=out;
@@ -205,30 +304,33 @@ function render(){
 }
 render();
 
-function toggle(btn,set){
-  btn.addEventListener("click",()=>{
-    const on=btn.getAttribute("aria-pressed")!=="true";
-    btn.setAttribute("aria-pressed",on);
-    set(on); render();
-  });
-}
-toggle(document.getElementById("f-up"),v=>onlyUpcoming=v);
-toggle(document.getElementById("f-hol"),v=>onlyHoliday=v);
-
-// 開啟時捲到今天（過去的項目太多會蓋掉重點）
-const first=document.querySelector(".ev.today, .ev.future");
-if(first) first.scrollIntoView({block:"center"});
+document.getElementById("f-up").addEventListener("click",e=>{
+  const on=e.currentTarget.getAttribute("aria-pressed")!=="true";
+  e.currentTarget.setAttribute("aria-pressed",on);
+  onlyUpcoming=on; render();
+});
 
 if(canAnim){
   gsap.set("header .reveal",{autoAlpha:0,y:14});
   gsap.to("header .reveal",{autoAlpha:1,y:0,duration:.5,stagger:.07,ease:"power2.out"});
   gsap.from(".todayline .rule",{scaleX:0,duration:.7,delay:.3,ease:"power3.out"});
+
+  // hero 裝飾：慢轉環 + 浮動圓 + 閃點
+  gsap.to(".art-ring",{rotation:360,duration:60,ease:"none",repeat:-1,transformOrigin:"50% 50%"});
+  gsap.utils.toArray(".art-float").forEach((el,i)=>{
+    gsap.to(el,{y:"random(-7,7)",x:"random(-5,5)",duration:"random(3,5)",
+      ease:"sine.inOut",repeat:-1,yoyo:true,delay:i*.35});
+  });
+  gsap.utils.toArray(".art-spark").forEach((el,i)=>{
+    gsap.to(el,{opacity:"random(.15,.6)",scale:"random(.7,1.3)",duration:"random(1.5,3)",
+      ease:"sine.inOut",repeat:-1,yoyo:true,delay:i*.25,transformOrigin:"50% 50%"});
+  });
 }
 root.classList.remove("preanim");
 
 document.getElementById("themetog").addEventListener("click",()=>{
-  const next=root.dataset.theme==="dark"?"light":"dark";
-  root.dataset.theme=next;
-  try{ localStorage.setItem("theme",next); }catch(e){}
+  const t=root.dataset.theme==="dark"?"light":"dark";
+  root.dataset.theme=t;
+  try{ localStorage.setItem("theme",t); }catch(e){}
 });
 </script>
