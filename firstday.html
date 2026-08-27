@@ -95,6 +95,10 @@
     box-shadow:inset 3px 0 0 var(--c,var(--rail)),var(--shadow)}
   .sp .s{font-size:15px;font-weight:700}
   .sp .p{font-size:13px;color:var(--muted);margin-top:2px}
+  .sp ul{margin:8px 0 0;padding-left:17px;font-size:13.5px;color:var(--muted)}
+  .sp li{margin-bottom:3px}
+  .sp li:last-child{margin-bottom:0}
+  .spots.one{grid-template-columns:1fr}
 
   /* ---- 地圖 ---- */
   .map{border:1px solid var(--line);border-radius:9px;background:var(--card);
@@ -140,17 +144,44 @@
   </div>
 
   <section class="reveal">
+    <h2>當天要帶</h2>
+    <p class="sub">前一晚先裝好，早上不用想。</p>
+    <div class="spots one">
+      <div class="sp" style="--c:var(--kid)">
+        <div class="s">梓琪</div>
+        <ul>
+          <li>穿<b>便服</b>，不用制服。</li>
+          <li><b>空書包</b>，課本不用帶。</li>
+          <li>水壺<b>裝滿水</b>。</li>
+          <li>鉛筆盒。</li>
+        </ul>
+      </div>
+      <div class="sp" style="--c:var(--par)">
+        <div class="s">家長</div>
+        <ul>
+          <li><b>原子筆</b>：當天要填好幾張資料單。</li>
+          <li>數位學生證同意書（在學校寄給家長的信裡）。</li>
+          <li>戶口名簿影本。</li>
+          <li>預防注射卡影本。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="reveal">
     <h2>當天流程</h2>
     <p class="sub">五個段落，家長中間會和孩子分開行動。</p>
     <div class="flow">
 
       <div class="step">
-        <div class="time num">07:30 – 08:00　到校</div>
+        <div class="time num">07:30 – 07:50　到校</div>
         <div class="card">
           <div class="t">歡迎寶貝來上學</div>
           <ul>
+            <li>校門口有迎新活動。</li>
             <li>先到玄關拍照，玄關有布置，留下入學紀念。</li>
             <li>拍完到 1 年 3 班教室報到（115 教室，面對玄關往右側一樓）。</li>
+            <li><b>孩子進教室後家長先別離開</b>，在教室外等 8:15 的班親會。</li>
           </ul>
           <div class="where"><span class="pin">校門口</span><span class="pin">玄關</span><span class="pin kid">115 教室</span></div>
         </div>
@@ -159,9 +190,10 @@
       <div class="step">
         <div class="time num">08:15 – 09:20　第一大節</div>
         <div class="card">
-          <div class="t">相見歡 · 迎新儀式</div>
+          <div class="t">相見歡 · 迎新儀式｜家長班親會</div>
           <ul>
-            <li>學生由老師帶到 4 樓禮堂，<b>家長留在教室</b>。</li>
+            <li>學生由老師帶到 4 樓禮堂（輔導處志工帶隊），<b>家長留在教室開班親會，導師座談</b>。</li>
+            <li>家長現場要填資料單，<b>記得帶原子筆</b>。</li>
             <li>蓄勢待發：敲智慧鐘、自我介紹。</li>
             <li>福氣滿滿：過健康快樂聰明門、許願、發聰明餅。</li>
             <li>硃砂啟智：右手虎口點硃砂。</li>
