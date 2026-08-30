@@ -1,5 +1,9 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fbf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#24211d" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="noindex, nofollow">
 <title>始業式流程 · 8/31</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -9,11 +13,11 @@
 <script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('preanim')</script>
 <style>
   :root{
-    --paper:#fbf7f0; --card:#ffffff; --ink:#413b34; --muted:#9a9188;
-    --line:#ece5db; --rail:#ddd5c9; --accent:#3b7960; --accent-weak:#e3ede9;
-    --holiday:#e0a13f; --holiday-weak:#fbf0d8;
-    --kid:#2c82be; --kid-w:#e1eef8;
-    --par:#d0576b; --par-w:#f7e4e7;
+    --paper:#fbf7f0; --card:#ffffff; --ink:#413b34; --muted:#7a7067;
+    --line:#ece5db; --rail:#ddd5c9; --accent:#39755d; --accent-weak:#e3ede9;
+    --holiday:#bc7e1e; --holiday-weak:#fbf0d8;
+    --kid:#2c82be; --kid-w:#e1eef8; --kid-t:#2670a4;
+    --par:#d0576b; --par-w:#f7e4e7; --par-t:#be354c;
     --shadow:0 1px 2px rgba(75,70,65,.04),0 8px 22px rgba(75,70,65,.07);
     --shadow-lift:0 2px 8px rgba(64,91,85,.18),0 14px 30px rgba(75,70,65,.13);
   }
@@ -21,13 +25,14 @@
     --paper:#24211d; --card:#2c2823; --ink:#ece5d9; --muted:#a89f92;
     --line:#39332c; --rail:#463f37; --accent:#86b0a5; --accent-weak:#2b3733;
     --holiday:#e6b25c; --holiday-weak:#352a1a;
-    --kid:#79b3e0; --kid-w:#24303a;
-    --par:#e88a99; --par-w:#3a2a2d;
+    --kid:#79b3e0; --kid-w:#24303a; --kid-t:#79b3e0;
+    --par:#e88a99; --par-w:#3a2a2d; --par-t:#e88a99;
     --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.32);
     --shadow-lift:0 2px 8px rgba(134,176,165,.16),0 14px 30px rgba(0,0,0,.4);
   }
   *{box-sizing:border-box}
   html,body{margin:0}
+  body{touch-action:manipulation}
   body{background:var(--paper);color:var(--ink);
     font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,sans-serif;
     line-height:1.5;-webkit-text-size-adjust:100%;
@@ -54,7 +59,7 @@
   .back:hover{color:var(--accent)}
   .back svg{width:14px;height:14px}
   .eyebrow{font-size:12px;font-weight:600;letter-spacing:.18em;color:var(--accent);margin:0 0 8px}
-  h1{font-size:29px;font-weight:700;margin:0;letter-spacing:.01em}
+  h1{font-size:29px;font-weight:700;margin:0;letter-spacing:.01em;text-wrap:balance}
   h1 .who{color:var(--accent)}
   .lead{font-size:14.5px;color:var(--muted);margin:10px 0 0}
 
@@ -86,8 +91,8 @@
   .where{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
   .pin{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;
     padding:2px 9px;border-radius:999px;background:var(--accent-weak);color:var(--accent)}
-  .pin.kid{background:var(--kid-w);color:var(--kid)}
-  .pin.par{background:var(--par-w);color:var(--par)}
+  .pin.kid{background:var(--kid-w);color:var(--kid-t)}
+  .pin.par{background:var(--par-w);color:var(--par-t)}
 
   /* ---- 地點速查 ---- */
   .spots{display:grid;grid-template-columns:1fr 1fr;gap:9px}
@@ -104,9 +109,10 @@
   .map{border:1px solid var(--line);border-radius:9px;background:var(--card);
     box-shadow:var(--shadow);overflow:hidden}
   .map img{display:block;width:100%;height:auto}
+  .map button{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in}
   .maphint{font-size:12.5px;color:var(--muted);margin-top:8px}
   .mapfull{position:fixed;inset:0;z-index:50;background:rgba(20,18,16,.88);display:none;
-    align-items:center;justify-content:center;padding:12px;overflow:auto}
+    align-items:center;justify-content:center;padding:12px;overflow:auto;overscroll-behavior:contain}
   .mapfull.show{display:flex}
   .mapfull img{max-width:none;width:1400px;height:auto;border-radius:6px}
 
@@ -261,8 +267,8 @@
   <section class="reveal">
     <h2>校舍平面圖</h2>
     <p class="sub">115 學年度校舍平面圖。點一下可放大。</p>
-    <div class="map"><img id="mapimg" src="img/campus-map.png"
-      alt="高雄市前鎮區鎮昌國小 115 學年度校舍平面圖"></div>
+    <div class="map"><button type="button" id="mapbtn" aria-label="放大校舍平面圖"><img src="img/campus-map.png"
+      alt="高雄市前鎮區鎮昌國小 115 學年度校舍平面圖"></button></div>
     <p class="maphint">下方一排是通學步道與樹人路校門；1 年 1～3 班在右下角一樓（113、114、115）。</p>
   </section>
 
@@ -273,7 +279,7 @@
   </footer>
 </div>
 
-<div class="mapfull" id="mapfull"><img src="img/campus-map.png" alt="校舍平面圖放大"></div>
+<div class="mapfull" id="mapfull" role="dialog" aria-modal="true" aria-label="校舍平面圖放大" tabindex="-1"><img src="img/campus-map.png" alt="校舍平面圖放大"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script>
@@ -282,9 +288,12 @@ const canAnim=!!window.gsap && matchMedia("(prefers-reduced-motion: no-preferenc
 
 // ---- 地圖放大 ----
 const full=document.getElementById("mapfull");
-document.getElementById("mapimg").addEventListener("click",()=>full.classList.add("show"));
-full.addEventListener("click",()=>full.classList.remove("show"));
-addEventListener("keydown",e=>{if(e.key==="Escape")full.classList.remove("show")});
+const mapbtn=document.getElementById("mapbtn");
+const openFull=()=>{full.classList.add("show");full.focus();};
+const closeFull=()=>{if(!full.classList.contains("show"))return;full.classList.remove("show");mapbtn.focus();};
+mapbtn.addEventListener("click",openFull);
+full.addEventListener("click",closeFull);
+addEventListener("keydown",e=>{if(e.key==="Escape")closeFull()});
 
 // ---- 進場動畫 ----
 if(canAnim){

@@ -1,5 +1,9 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fbf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#24211d" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="noindex, nofollow">
 <title>梓琪的開學準備</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -9,13 +13,13 @@
 <script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('preanim')</script>
 <style>
   :root{
-    --paper:#fbf7f0; --card:#ffffff; --ink:#413b34; --muted:#9a9188;
-    --line:#ece5db; --rail:#ddd5c9; --accent:#3b7960; --accent-weak:#e3ede9;
+    --paper:#fbf7f0; --card:#ffffff; --ink:#413b34; --muted:#7a7067;
+    --line:#ece5db; --rail:#ddd5c9; --accent:#39755d; --accent-weak:#e3ede9;
     --holiday:#ab3b3a; --holiday-weak:#f7e3e2;
-    --c-lang:#d0576b; --c-lang-w:#f7e4e7;
-    --c-math:#2c82be; --c-math-w:#e1eef8;
-    --c-nat:#4ea47b;  --c-nat-w:#e1f0e9;
-    --c-art:#e0902d;  --c-art-w:#fbecd2;
+    --c-lang:#d0576b; --c-lang-w:#f7e4e7; --c-lang-t:#be354c;
+    --c-math:#2c82be; --c-math-w:#e1eef8; --c-math-t:#2670a4;
+    --c-nat:#4ea47b;  --c-nat-w:#e1f0e9; --c-nat-t:#39775a;
+    --c-art:#e0902d;  --c-art-w:#fbecd2; --c-art-t:#995f17;
     --shadow:0 1px 2px rgba(75,70,65,.04),0 8px 22px rgba(75,70,65,.07);
     --shadow-lift:0 2px 8px rgba(64,91,85,.18),0 14px 30px rgba(75,70,65,.13);
   }
@@ -23,15 +27,16 @@
       --paper:#24211d; --card:#2c2823; --ink:#ece5d9; --muted:#a89f92;
       --line:#39332c; --rail:#463f37; --accent:#86b0a5; --accent-weak:#2b3733;
       --holiday:#d97b79; --holiday-weak:#3a2523;
-      --c-lang:#e88a99; --c-lang-w:#3a2a2d;
-      --c-math:#79b3e0; --c-math-w:#24303a;
-      --c-nat:#82c187;  --c-nat-w:#263320;
-      --c-art:#eab662;  --c-art-w:#362d1c;
+      --c-lang:#e88a99; --c-lang-w:#3a2a2d; --c-lang-t:#e88a99;
+      --c-math:#79b3e0; --c-math-w:#24303a; --c-math-t:#79b3e0;
+      --c-nat:#82c187;  --c-nat-w:#263320; --c-nat-t:#82c187;
+      --c-art:#eab662;  --c-art-w:#362d1c; --c-art-t:#eab662;
       --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.32);
       --shadow-lift:0 2px 8px rgba(134,176,165,.16),0 14px 30px rgba(0,0,0,.4);
   }
   *{box-sizing:border-box}
   html,body{margin:0}
+  body{touch-action:manipulation}
   body{background:var(--paper);color:var(--ink);
     font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,sans-serif;
     line-height:1.5;-webkit-text-size-adjust:100%;
@@ -59,7 +64,7 @@
   .back:hover{color:var(--accent)}
   .back svg{width:14px;height:14px}
   .eyebrow{font-size:12px;font-weight:600;letter-spacing:.18em;color:var(--accent);margin:0 0 8px}
-  h1{font-size:29px;font-weight:700;margin:0;letter-spacing:.01em}
+  h1{font-size:29px;font-weight:700;margin:0;letter-spacing:.01em;text-wrap:balance}
   h1 .who{color:var(--accent)}
 
   /* ---- countdown hero ---- */
@@ -189,7 +194,7 @@
         <span class="d">對照下方的版本表，看看課本有沒有領錯。</span></span>
       </label></li>
     </ul>
-    <div class="done-note" id="donenote">
+    <div class="done-note" id="donenote" role="status">
       <svg id="doneGirl" viewBox="0 0 40 44" fill="none" stroke="var(--accent)" stroke-width="4.6"
         stroke-linecap="round" aria-hidden="true">
         <path d="M15 8 C 11 5,8 10,10 15"/>

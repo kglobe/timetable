@@ -1,5 +1,9 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fbf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#24211d" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="noindex, nofollow">
 <title>梓琪的課表</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -9,15 +13,15 @@
 <script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('preanim')</script>
 <style>
   :root{
-    --paper:#fbf7f0; --card:#ffffff; --ink:#413b34; --muted:#9a9188;
-    --line:#ece5db; --rail:#ddd5c9; --accent:#3b7960; --accent-weak:#e3ede9; /* 木賊色 · 進行中主色 */
+    --paper:#fbf7f0; --card:#ffffff; --ink:#413b34; --muted:#7a7067;
+    --line:#ece5db; --rail:#ddd5c9; --accent:#39755d; --accent-weak:#e3ede9; /* 木賊色 · 進行中主色 */
     --holiday:#ab3b3a; --holiday-weak:#f7e3e2;
     --sport:#376b6d; --sport-weak:#e0eaea; /* 運動會 */
     /* 明亮童趣科目色 */
-    --c-lang:#d0576b; --c-lang-w:#f7e4e7; /* 今様色 · 語文/社會 */
-    --c-math:#2c82be; --c-math-w:#e1eef8; /* 縹色 · 數理 */
-    --c-nat:#4ea47b;  --c-nat-w:#e1f0e9;  /* 若竹色 · 自然/體育 */
-    --c-art:#e0902d;  --c-art-w:#fbecd2;  /* 柑子色 · 藝術 */
+    --c-lang:#d0576b; --c-lang-w:#f7e4e7; --c-lang-t:#be354c; /* 今様色 · 語文/社會 */
+    --c-math:#2c82be; --c-math-w:#e1eef8; --c-math-t:#2670a4; /* 縹色 · 數理 */
+    --c-nat:#4ea47b;  --c-nat-w:#e1f0e9; --c-nat-t:#39775a;  /* 若竹色 · 自然/體育 */
+    --c-art:#e0902d;  --c-art-w:#fbecd2; --c-art-t:#995f17;  /* 柑子色 · 藝術 */
     --shadow:0 1px 2px rgba(75,70,65,.04),0 8px 22px rgba(75,70,65,.07);
     --shadow-lift:0 2px 8px rgba(64,91,85,.18),0 14px 30px rgba(75,70,65,.13);
   }
@@ -28,15 +32,16 @@
       --line:#39332c; --rail:#463f37; --accent:#86b0a5; --accent-weak:#2b3733;
       --holiday:#d97b79; --holiday-weak:#3a2523;
       --sport:#96c3c4; --sport-weak:#22312f;
-      --c-lang:#e88a99; --c-lang-w:#3a2a2d;
-      --c-math:#79b3e0; --c-math-w:#24303a;
-      --c-nat:#82c187;  --c-nat-w:#263320;
-      --c-art:#eab662;  --c-art-w:#362d1c;
+      --c-lang:#e88a99; --c-lang-w:#3a2a2d; --c-lang-t:#e88a99;
+      --c-math:#79b3e0; --c-math-w:#24303a; --c-math-t:#79b3e0;
+      --c-nat:#82c187;  --c-nat-w:#263320; --c-nat-t:#82c187;
+      --c-art:#eab662;  --c-art-w:#362d1c; --c-art-t:#eab662;
       --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.32);
       --shadow-lift:0 2px 8px rgba(134,176,165,.16),0 14px 30px rgba(0,0,0,.4);
   }
   *{box-sizing:border-box}
   html,body{margin:0}
+  body{touch-action:manipulation}
   body{background:var(--paper);color:var(--ink);
     font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,sans-serif;
     line-height:1.5;-webkit-text-size-adjust:100%;
@@ -45,6 +50,10 @@
   .num{font-family:"Space Grotesk",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
   .wrap{max-width:520px;margin:0 auto;padding:26px 18px 56px}
   .preanim .reveal{opacity:0}
+  /* 骨架佔位：JS 注入內容前先撐開版位，避免整頁下推（CLS 0.57 -> 0）*/
+  #status:empty{min-height:115px}
+  #timeline:empty{min-height:1008px}
+  #calendar:empty{min-height:72px}
 
   /* ---- header ---- */
   header{position:relative}
@@ -62,7 +71,7 @@
   :root[data-theme="dark"] .themetog .ic-moon{display:block}
   .eyebrow{font-size:12px;font-weight:600;letter-spacing:.18em;
     color:var(--accent);margin:0 0 8px}
-  h1{font-size:29px;font-weight:700;margin:0;letter-spacing:.01em}
+  h1{font-size:29px;font-weight:700;margin:0;letter-spacing:.01em;text-wrap:balance}
   h1 .who{color:var(--accent)}
   .datebar{display:flex;align-items:center;gap:9px;margin-top:8px;color:var(--muted);font-size:15px}
   .datebar .num{font-size:16px}
@@ -112,7 +121,7 @@
   .node.fixed .name{font-size:16px;font-weight:400;color:var(--muted)}
   .name .star{color:var(--accent);font-weight:700}
   .chip{margin-left:auto;align-self:flex-start;margin-top:2px;flex:0 0 auto;font-size:12px;font-weight:600;
-    color:var(--c);background:var(--cw);padding:2px 9px;border-radius:999px;letter-spacing:.02em}
+    color:var(--ct,var(--c));background:var(--cw);padding:2px 9px;border-radius:999px;letter-spacing:.02em}
 
   /* current class */
   .node.now .dot{background:var(--accent);box-shadow:0 0 0 4px var(--paper),0 0 0 6px var(--accent-weak)}
@@ -150,7 +159,7 @@
   table{border-collapse:separate;border-spacing:0;font-size:13px;min-width:500px;width:100%}
   th,td{padding:9px 10px;text-align:center;white-space:nowrap;border-bottom:1px solid var(--line)}
   th{font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.04em}
-  td{color:var(--c,var(--ink));font-weight:500}
+  td{color:var(--ct,var(--ink));font-weight:500}
   td.time-c{color:var(--muted);text-align:left;font-weight:400}
   th.today{color:var(--accent)}
   td.today{box-shadow:inset 0 0 0 999px var(--accent-weak)}
@@ -245,7 +254,7 @@
     </a>
   </header>
 
-  <section class="status reveal" id="status"></section>
+  <section class="status reveal" id="status" role="status"></section>
 
   <div class="legend reveal">
     <span><i style="background:var(--c-lang)"></i>語文 · 社會</span>
@@ -316,7 +325,7 @@ const COURSE_CAT = {
 // 與語文同色、但 chip 標籤要另外顯示的科目
 const SUBJECT = {"團隊活動":"社會","品格生活":"社會","生活知能":"社會","安全教育":"社會"};
 const catOf = n => COURSE_CAT[n.replace("＊","")] || null;
-const catStyle = c => c ? `--c:var(--c-${c});--cw:var(--c-${c}-w)` : "";
+const catStyle = c => c ? `--c:var(--c-${c});--cw:var(--c-${c}-w);--ct:var(--c-${c}-t)` : "";
 
 const WL = ["日","一","二","三","四","五","六"];
 const pad = n => String(n).padStart(2,"0");

@@ -1,5 +1,9 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fbf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#24211d" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="noindex, nofollow">
 <title>115 學年度第 1 學期行事曆</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -9,8 +13,8 @@
 <script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('preanim')</script>
 <style>
   :root{
-    --paper:#fbf7f0; --card:#ffffff; --ink:#413b34; --muted:#9a9188;
-    --line:#ece5db; --rail:#ddd5c9; --accent:#3b7960; --accent-weak:#e3ede9;
+    --paper:#fbf7f0; --card:#ffffff; --ink:#413b34; --muted:#7a7067;
+    --line:#ece5db; --rail:#ddd5c9; --accent:#39755d; --accent-weak:#e3ede9;
     --holiday:#ab3b3a; --holiday-weak:#f7e3e2;
     --sport:#376b6d; --sport-weak:#e0eaea; /* 運動會 */
     --shadow:0 1px 2px rgba(75,70,65,.04),0 8px 22px rgba(75,70,65,.07);
@@ -28,6 +32,7 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0}
+  body{touch-action:manipulation}
   body{background:var(--paper);color:var(--ink);
     font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,sans-serif;
     line-height:1.5;-webkit-text-size-adjust:100%;
@@ -36,6 +41,8 @@
   .num{font-family:"Space Grotesk",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
   .wrap{max-width:520px;margin:0 auto;padding:26px 18px 56px}
   .preanim .reveal{opacity:0}
+  /* 骨架佔位：JS 注入內容前先撐開版位，避免整頁下推（CLS 0.57 -> 0）*/
+  #list:empty{min-height:3030px}
 
   /* ---- header ---- */
   header{position:relative}
@@ -54,7 +61,7 @@
   .back:hover{color:var(--accent)}
   .back svg{width:14px;height:14px}
   .eyebrow{font-size:12px;font-weight:600;letter-spacing:.18em;color:var(--accent);margin:0 0 8px}
-  h1{font-size:27px;font-weight:700;margin:0;letter-spacing:.01em}
+  h1{font-size:27px;font-weight:700;margin:0;letter-spacing:.01em;text-wrap:balance}
   .lede{font-size:14px;color:var(--muted);margin:8px 0 0}
 
   /* ---- 篩選 ---- */
@@ -125,7 +132,7 @@
     </a>
     <p class="eyebrow reveal">鎮昌國小 · 115 學年度第 1 學期</p>
     <h1 class="reveal">完整行事曆</h1>
-    <p class="lede reveal" id="lede"></p>
+    <p class="lede reveal" id="lede" role="status"></p>
     <div class="filters reveal">
       <button class="fb" id="f-up" type="button" aria-pressed="false">只看之後</button>
       <button class="fb" id="f-hol" type="button" aria-pressed="false">只看放假</button>
@@ -169,6 +176,9 @@ document.getElementById("lede").textContent =
 let onlyUpcoming=false, onlyHoliday=false;
 function render(){
   const list=ITEMS.filter(i=>(!onlyUpcoming||i.state!=="past")&&(!onlyHoliday||i.holiday));
+  document.getElementById("lede").textContent = (onlyUpcoming||onlyHoliday)
+    ? `篩選後 ${list.length} 項。`
+    : `共 ${ITEMS.length} 項，還有 ${upcoming} 項尚未發生。`;
   const box=document.getElementById("list");
   if(!list.length){ box.innerHTML=`<div class="empty">沒有符合的項目。</div>`; return; }
   let out="", mo="", ruled=false;
