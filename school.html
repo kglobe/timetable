@@ -103,6 +103,61 @@
   .bk .p b{color:var(--c,var(--ink));font-weight:600}
 
 
+  /* ---- 放學時間週表 ---- */
+  .week{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:9px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:12px}
+  .week>div{background:var(--card);padding:10px 2px 11px;text-align:center}
+  .week .d{font-size:12px;color:var(--muted)}
+  .week .t{font-size:14.5px;font-weight:700;margin-top:2px}
+  .week .late{background:var(--accent-weak)}
+  .week .late .t{color:var(--accent)}
+
+  /* ---- 家長接送區位置圖 ---- */
+  .mapcard{background:var(--card);border:1px solid var(--line);border-radius:9px;
+    box-shadow:var(--shadow);padding:12px 12px 10px;margin-bottom:12px}
+  .map{width:100%;height:auto;display:block}
+  .map .rd{fill:var(--line)}
+  .map .lot{fill:none;stroke:var(--rail);stroke-width:1.4}
+  .map .bld{fill:var(--accent-weak);stroke:var(--rail);stroke-width:1}
+  .map .gate{fill:var(--card);stroke:var(--rail);stroke-width:1}
+  .map .zone{fill:var(--ink)}
+  .map text{fill:var(--ink);font-size:9.5px;font-weight:600;text-anchor:middle;
+    dominant-baseline:middle;font-family:inherit}
+  .map .zt{fill:var(--paper);font-size:8.5px;letter-spacing:.04em}
+  .map .rt{fill:var(--muted);font-size:9px;letter-spacing:.3em}
+  .map .sm{font-size:8px;font-weight:500;fill:var(--muted);letter-spacing:0}
+  .map .arw{fill:none;stroke:var(--rail);stroke-width:1.6}
+  .map .no{fill:none;stroke:var(--holiday);stroke-width:1.6}
+  .map .pin{fill:var(--card);stroke:var(--rail);stroke-width:1.4}
+  .map .pt{font-size:9px;fill:var(--muted)}
+  .map .pin.on{fill:var(--accent);stroke:var(--accent)}
+  .map .pt.on{fill:var(--card);font-weight:700}
+  .map .bld.on{fill:var(--accent);stroke:var(--accent)}
+  .map .bt.on{fill:var(--card)}
+  .legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:9px;
+    font-size:12.5px;color:var(--muted)}
+  .legend b{color:var(--ink);font-weight:600}
+  .legend .on{color:var(--accent);font-weight:700}
+
+  /* ---- 條列卡 ---- */
+  .list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+  .list li{background:var(--card);border:1px solid var(--line);border-radius:9px;
+    padding:11px 14px;font-size:14.5px;box-shadow:var(--shadow)}
+  .list li b{font-weight:700}
+  .list li .m{display:block;font-size:13.5px;color:var(--muted);margin-top:2px}
+
+  /* ---- 常見問題 ---- */
+  details{background:var(--card);border:1px solid var(--line);border-radius:9px;
+    box-shadow:var(--shadow);margin-bottom:8px}
+  summary{padding:12px 14px;font-size:14.5px;font-weight:600;cursor:pointer;
+    list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;
+    -webkit-tap-highlight-color:transparent}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--muted);font-size:17px;font-weight:400;line-height:1}
+  details[open] summary::after{content:"−"}
+  details .a{padding:0 14px 13px;font-size:14px;color:var(--muted);line-height:1.7}
+  details .a b{color:var(--ink)}
+
   footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);
     color:var(--muted);font-size:12px;line-height:1.7}
   footer a{color:var(--accent)}
@@ -129,11 +184,6 @@
 
   <div class="count reveal" id="count"></div>
 
-  <div class="cls reveal">
-    <div><div class="k">班級</div><div class="v num">1<span class="u">年</span>3<span class="u">班</span></div></div>
-    <div><div class="k">導師</div><div class="v">謝懿雯</div></div>
-  </div>
-
   <section class="reveal">
     <h2>一年級教科書版本</h2>
     <p class="sub">115 學年度上學期，學校公告的選用版本。</p>
@@ -146,8 +196,155 @@
     </div>
   </section>
 
+  <section class="reveal">
+    <h2>上學與放學</h2>
+    <p class="sub">學務處宣導單。梓琪走<b>第四路線（玄關）</b>。</p>
+    <div class="cls" style="margin-bottom:14px">
+      <div><div class="k">上學時間</div><div class="v num">7:30<span class="u">–</span>7:50</div></div>
+      <div><div class="k">放學路線</div><div class="v">④ 玄關</div></div>
+    </div>
+
+    <div class="mapcard">
+      <svg class="map" viewBox="0 0 340 250" role="img"
+        aria-label="家長接送區位置圖：梓琪走第四路線，在玄關等候接送">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="var(--rail)"/>
+          </marker>
+        </defs>
+
+        <!-- 道路 -->
+        <rect class="rd" x="2" y="2" width="18" height="246" rx="2"/>
+        <rect class="rd" x="20" y="2" width="318" height="26" rx="2"/>
+        <rect class="rd" x="274" y="28" width="14" height="220" rx="2"/>
+        <text class="rt" transform="translate(11,120) rotate(-90)">鎮海路</text>
+        <text class="rt" x="170" y="15">樹人路</text>
+        <text class="rt" transform="translate(281,160) rotate(-90)">樹德路</text>
+
+        <!-- 前鎮高中 -->
+        <rect class="lot" x="292" y="60" width="44" height="140" rx="2"/>
+        <text x="314" y="124">前鎮<tspan x="314" dy="13">高中</tspan></text>
+
+        <!-- 家長接送區 -->
+        <rect class="zone" x="36" y="30" width="94" height="14" rx="2"/>
+        <text class="zt" x="83" y="37.5">家長接送區（一）</text>
+        <rect class="zone" x="166" y="30" width="92" height="14" rx="2"/>
+        <text class="zt" x="212" y="37.5">家長接送區（二）</text>
+        <rect class="zone" x="258" y="100" width="14" height="80" rx="2"/>
+        <text class="zt" transform="translate(265.5,140) rotate(-90)">家長接送區（三）</text>
+        <circle class="no" cx="29" cy="37" r="6"/><path class="no" d="M25 41 L33 33"/>
+        <circle class="no" cx="265" cy="93" r="6"/><path class="no" d="M261 97 L269 89"/>
+
+        <!-- 校園 -->
+        <rect class="lot" x="26" y="44" width="232" height="184" rx="2"/>
+        <text x="196" y="196">鎮昌國小</text>
+        <rect class="gate" x="28" y="60" width="13" height="92" rx="2"/>
+        <text class="sm" transform="translate(34.5,106) rotate(-90)">汽機車出入口</text>
+        <rect class="bld" x="46" y="56" width="60" height="42" rx="2"/>
+        <text x="76" y="77">北棟</text>
+        <rect class="bld" x="170" y="56" width="76" height="42" rx="2"/>
+        <text x="208" y="77">南棟</text>
+
+        <!-- 門 -->
+        <rect class="gate" x="132" y="37" width="34" height="15" rx="2"/>
+        <text x="149" y="44.5">大門</text>
+        <rect class="gate" x="94" y="220" width="40" height="15" rx="2"/>
+        <text x="114" y="227.5">後門</text>
+        <rect class="gate" x="245" y="116" width="13" height="38" rx="2"/>
+        <text class="sm" transform="translate(251.5,135) rotate(-90)">南側門</text>
+
+        <!-- 玄關（第四路線） -->
+        <rect class="bld on" x="112" y="96" width="40" height="18" rx="2"/>
+        <text class="bt on" x="132" y="105.5">玄關</text>
+
+        <!-- 路線箭頭 -->
+        <path class="arw" d="M142 96 C 146 80,146 68,148 54" marker-end="url(#ah)"/>
+        <path class="arw" d="M152 110 C 190 118,214 126,240 133" marker-end="url(#ah)"/>
+        <path class="arw" d="M118 114 C 112 150,110 184,112 216" marker-end="url(#ah)"/>
+
+        <!-- 編號 -->
+        <circle class="pin" cx="160" cy="74" r="8"/><text class="pt" x="160" y="74.5">1</text>
+        <circle class="pin" cx="200" cy="122" r="8"/><text class="pt" x="200" y="122.5">2</text>
+        <circle class="pin" cx="98" cy="170" r="8"/><text class="pt" x="98" y="170.5">3</text>
+        <circle class="pin on" cx="95" cy="112" r="8"/><text class="pt on" x="95" y="112.5">4</text>
+      </svg>
+      <div class="legend">
+        <span><b>①</b> 大門</span>
+        <span><b>②</b> 南側門</span>
+        <span><b>③</b> 後門</span>
+        <span class="on">④ 玄關（梓琪）</span>
+      </div>
+    </div>
+    <div class="week">
+      <div><div class="d">一</div><div class="t num">12:40</div></div>
+      <div class="late"><div class="d">二</div><div class="t num">15:55</div></div>
+      <div><div class="d">三</div><div class="t num">12:40</div></div>
+      <div><div class="d">四</div><div class="t num">12:40</div></div>
+      <div><div class="d">五</div><div class="t num">12:40</div></div>
+    </div>
+    <ul class="list">
+      <li>上學時間有導護老師和志工指揮交通，別提早到、也別遲到。<span class="m">導師另外提醒：最晚不要超過 8:00，早餐在家吃完再出門。</span></li>
+      <li><b>大門口</b><span class="m">拒馬前是機車停等區，大門兩側是汽車接送區，汽車不要停在大門正前方。</span></li>
+      <li><b>南側門</b><span class="m">門前空地是機車停等區，兩側是汽車接送區。上放學時段不開放家長進入，要進去請到大門口登記。</span></li>
+      <li>不要在教職員工車輛出入口接送小孩。<span class="m">停車場出入口也要叮嚀孩子別穿越。</span></li>
+      <li>機車、腳踏車不要騎上人行道；不管晴天雨天，臨停都不要久留。</li>
+      <li>太晚沒被接走的孩子，一律到<b>校門玄關</b>等家長或安親班。</li>
+      <li>騎車記得幫自己和孩子戴安全帽，過馬路走斑馬線。</li>
+    </ul>
+  </section>
+
+  <section class="reveal">
+    <h2>每天要帶的東西</h2>
+    <p class="sub">班親會級務報告。</p>
+    <ul class="list">
+      <li><b>餐具</b><span class="m">兩個中型碗或大碗，雙層不鏽鋼防燙的最好，有把手更方便；別用幼兒園那種小碗。在校不洗餐具，衛生紙擦過帶回家洗，隔天再帶去。</span></li>
+      <li><b>口罩</b><span class="m">多備幾個放在書包裡。</span></li>
+      <li><b>小毛巾</b><span class="m">天氣熱，隨時擦汗才不會著涼。</span></li>
+      <li><b>抽取式衛生紙 1 包</b></li>
+      <li><b>鉛筆 5 枝</b><span class="m">輪著用，睡前削好放進鉛筆盒。</span></li>
+      <li><b>體育課當天</b><span class="m">穿鎮昌運動服和運動鞋，盡量不要穿涼鞋。</span></li>
+    </ul>
+  </section>
+
+  <section class="reveal">
+    <h2>班級規定</h2>
+    <p class="sub">導師報告與級務報告重點。</p>
+    <ul class="list">
+      <li>每天幫孩子<b>簽聯絡簿</b>（簽名，不要蓋章），並檢查功課、整理書包。</li>
+      <li>獎懲制度是<b>榮譽卡</b>。家長參加學校親職講座，孩子也能蓋榮譽卡。</li>
+      <li>放學前老師會再提醒檢查作業和該帶回的東西。<span class="m">忘記帶就不能再回學校或教室拿，一方面是放學後的安全，一方面也讓孩子學著負責。</span></li>
+      <li>學校沒有點心時間，不鼓勵帶零食到校。<span class="m">怕製造髒污滋生鼠蠅，也會影響中午的食慾。</span></li>
+      <li>本學期行事曆請看<b>聯絡簿</b>；班級訊息看<b>Line@</b>。</li>
+    </ul>
+  </section>
+
+  <section class="reveal">
+    <h2>親師交流</h2>
+    <p class="sub">班親會當天老師的解答。</p>
+    <details>
+      <summary>小朋友抗拒上學、有分離焦慮怎麼辦？</summary>
+      <div class="a">老師說最常見的狀況，是前一天太晚睡、早上起不來被拖著來上學，到校後就吵鬧哭。<b>太晚到校也是情緒不穩的常見源頭</b>。指定時間內其他小朋友已經進班開始一天的作息，晚到的孩子不好融入，容易焦慮。所以作息要顧好，休閒娛樂盡量排在假日，晚上別玩太晚。學校有辦親職教育講座，聽完專家意見回家馬上試，效果最好。</div>
+    </details>
+    <details>
+      <summary>小學和幼兒園差在哪？</summary>
+      <div class="a">幼兒園著重生活能力的建立，每班有兩位老師，還有一名幼保員。上小學等於跟整個台灣的學制接軌，有課程進度的壓力、有固定作息，而且每班<b>只有一位導師</b>。一、二年級很需要家長從旁協助，中高年級再逐步放手。</div>
+    </details>
+    <details>
+      <summary>學校運動服要買幾套？什麼時候穿？</summary>
+      <div class="a">體育課和全校性活動（例如校慶）穿。建議<b>長袖、短袖各至少 1 套</b>，方便換洗。</div>
+    </details>
+    <details>
+      <summary>老師推薦什麼餐具？</summary>
+      <div class="a">不要用幼兒園的小碗。<b>兩個中型碗（或大碗）</b>，雙層不鏽鋼可防燙的最好，有附把手也很好。</div>
+    </details>
+    <details>
+      <summary>家長可以怎麼配合學校和班級？</summary>
+      <div class="a">善用班級 Line@，訊息更新記得詳閱。不必過份操心，也不宜過早放手；小朋友上小學，家長們上親職學，一起學習一起成長。</div>
+    </details>
+  </section>
+
   <footer>
-    資料來源：鎮昌國小首頁公告與 115 學年度第 1 學期行事曆<br>
+    資料來源：鎮昌國小首頁公告、115 學年度上學／放學宣導單、1 年 3 班班親會資料（115/8/31）<br>
     <a href="index.html">回到每日課表</a>
   </footer>
 </div>
@@ -185,7 +382,7 @@ if(canAnim){
   gsap.set(".reveal",{autoAlpha:0,y:14});
   gsap.timeline({defaults:{ease:"power2.out"}})
     .to("header .reveal",{autoAlpha:1,y:0,duration:.5,stagger:.07})
-    .to(".count, .cls",{autoAlpha:1,y:0,duration:.5,stagger:.09},"-=.25")
+    .to(".count",{autoAlpha:1,y:0,duration:.5,stagger:.09},"-=.25")
     .to("section.reveal",{autoAlpha:1,y:0,duration:.5,stagger:.09},"-=.2")
     .set(".reveal",{autoAlpha:1,y:0});
   const dd=document.getElementById("dd");
