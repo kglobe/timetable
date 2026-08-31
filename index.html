@@ -119,7 +119,7 @@
   .node.fixed .time{color:var(--muted);font-weight:500}
   .name{font-size:17px;font-weight:600}
   .node.fixed .name{font-size:16px;font-weight:400;color:var(--muted)}
-  .name .star{color:var(--accent);font-weight:700}
+  .name .tch{margin-left:6px;font-size:13px;font-weight:400;color:var(--muted)}
   .chip{margin-left:auto;align-self:flex-start;margin-top:2px;flex:0 0 auto;font-size:12px;font-weight:600;
     color:var(--ct,var(--c));background:var(--cw);padding:2px 9px;border-radius:999px;letter-spacing:.02em}
 
@@ -161,6 +161,7 @@
   th{font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.04em}
   td{color:var(--ct,var(--ink));font-weight:500}
   td.time-c{color:var(--muted);text-align:left;font-weight:400}
+  td.span{color:var(--muted);font-weight:400;letter-spacing:.3em}
   th.today{color:var(--accent)}
   td.today{box-shadow:inset 0 0 0 999px var(--accent-weak)}
   tr:last-child td{border-bottom:none}
@@ -239,7 +240,7 @@
       <svg class="ic ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
         stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
     </button>
-    <p class="eyebrow reveal">暑假課後班 · 生活營</p>
+    <p class="eyebrow reveal">鎮昌國小 一年三班 · 導師：謝懿雯</p>
     <h1 class="reveal"><span class="who">梓琪</span>的今日課表</h1>
     <div class="datebar reveal">
       <span class="num" id="today"></span>
@@ -257,10 +258,10 @@
   <section class="status reveal" id="status" role="status"></section>
 
   <div class="legend reveal">
-    <span><i style="background:var(--c-lang)"></i>語文 · 社會</span>
-    <span><i style="background:var(--c-math)"></i>數理</span>
-    <span><i style="background:var(--c-nat)"></i>自然 · 體育</span>
-    <span><i style="background:var(--c-art)"></i>藝術</span>
+    <span><i style="background:var(--c-lang)"></i>語文</span>
+    <span><i style="background:var(--c-math)"></i>數學</span>
+    <span><i style="background:var(--c-nat)"></i>健體</span>
+    <span><i style="background:var(--c-art)"></i>生活</span>
   </div>
 
   <div class="tl" id="timeline"></div>
@@ -271,7 +272,7 @@
         stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       完整一週課表
     </summary>
-    <p class="grid-note">＊拼音練習：週二、三、五上午；自然生態：週四下午。</p>
+    <p class="grid-note">科任教室：健康 109、彈英 110、台語 311。</p>
     <div class="scroll"><table id="grid"></table></div>
   </details>
 
@@ -283,8 +284,8 @@
   </section>
 
   <footer>
-    資料來源：暑假課後班課程表 ＋ 鎮昌國小 115 學年度第 1 學期行事曆<br>
-    週一至週五上課，週六日休息。<br>
+    資料來源：鎮昌國小 115 學年度一年三班課表 ＋ 第 1 學期行事曆<br>
+    週二上到 15:55，其餘四天午休後放學；放學後到課後輔導班，18:00 接回。<br>
     <a href="snack.html">8、9 月點心表 →</a>
   </footer>
 </div>
@@ -293,37 +294,36 @@
 <script src="events.js"></script>
 <script>
 // ---- 課程資料 ----
-const COURSE_TIMES = ["09:00–09:50","10:00–10:50","11:00–11:50","14:00–14:50","15:00–15:50","16:30–17:20"];
 const WEEK = ["星期一","星期二","星期三","星期四","星期五"];
-const COURSES = [
-  ["認識時鐘","拼音練習＊","拼音練習＊","數字遊戲","拼音練習＊"],
-  ["愛塗鴉","拼音練習＊","拼音練習＊","筆順練習","拼音練習＊"],
-  ["筆順練習","專注力遊戲","影片欣賞","口語表達","繪本引導"],
-  ["昆蟲 Life 秀","創意 DIY","團康遊戲","自然生態＊","唱跳音符"],
-  ["認識校園","品格生活","生活知能","安全教育","益智遊戲"],
-  ["團隊活動","體能活動","角落活動","球類活動","戶外遊戲"],
+// 一列＝一個時段；字串＝全週相同，陣列＝一～五，null＝當天沒排
+const ROWS = [
+  ["07:50–08:05", ["打掃","教師晨會","打掃","打掃","打掃"]],
+  ["08:05–08:15", ["生活指導","教師晨會","升旗","閱讀指導","生活指導"]],
+  ["08:15–08:35", "導師時間"],
+  ["08:40–09:20", ["數學","數學","數學","數學","彈性"]],
+  ["09:30–10:10", ["國語","國語","國語","體育","彈英"]],
+  ["10:10–10:30", "課間活動"],
+  ["10:30–11:10", ["體育","國語","生活","國語","國語"]],
+  ["11:20–12:00", ["生活","生活","健康","生活","生活"]],
+  ["12:00–12:40", "午餐時間"],
+  ["12:40–13:20", "午休時間"],
+  ["13:30–14:10", [null,"彈性",null,null,null]],
+  ["14:20–15:00", [null,"生活",null,null,null]],
+  ["15:00–15:15", [null,"打掃活動",null,null,null]],
+  ["15:15–15:55", [null,"台語",null,null,null]],
 ];
-const FIXED = [
-  ["07:30–08:00","互道早安、歡喜上學（到校）"],
-  ["08:00–08:50","晨間運動"],
-  ["12:00–12:40","午餐"],
-  ["12:40–13:50","午睡"],
-  ["16:00–16:20","點心時間"],
-  ["17:30–18:00","打掃環境、等家長接回"],
-];
+// 科任老師（含教室）
+const TEACHER = {"體育":"林仕涵","健康":"林仕涵 · 109","彈英":"潘妍瑜 · 110","台語":"曾晉祥 · 311"};
 // ---- 科目分類 ----
-const CAT = {lang:"語文",math:"數理",nat:"自然",art:"藝術"};
+const CAT = {lang:"語文",math:"數學",nat:"健體",art:"生活"};
 const COURSE_CAT = {
-  "拼音練習":"lang","筆順練習":"lang","口語表達":"lang","繪本引導":"lang",
-  "品格生活":"lang","生活知能":"lang","安全教育":"lang",
-  "認識時鐘":"math","數字遊戲":"math","專注力遊戲":"math","益智遊戲":"math",
-  "昆蟲 Life 秀":"nat","自然生態":"nat","團康遊戲":"nat",
-  "體能活動":"nat","球類活動":"nat","戶外遊戲":"nat","認識校園":"nat",
-  "團隊活動":"lang",
-  "愛塗鴉":"art","影片欣賞":"art","創意 DIY":"art","唱跳音符":"art","角落活動":"art",
+  "國語":"lang","彈性":"lang","彈英":"lang","台語":"lang",
+  "數學":"math",
+  "體育":"nat","健康":"nat",
+  "生活":"art",
 };
-// 與語文同色、但 chip 標籤要另外顯示的科目
-const SUBJECT = {"團隊活動":"社會","品格生活":"社會","生活知能":"社會","安全教育":"社會"};
+// chip 標籤要另外顯示的科目
+const SUBJECT = {"彈英":"英語","台語":"本土語","彈性":"彈性","體育":"體育","健康":"健康"};
 const catOf = n => COURSE_CAT[n.replace("＊","")] || null;
 const catStyle = c => c ? `--c:var(--c-${c});--cw:var(--c-${c}-w);--ct:var(--c-${c}-t)` : "";
 
@@ -357,9 +357,23 @@ const tl = document.getElementById("timeline");
 const statusEl = document.getElementById("status");
 
 const col = dispDow-1;
-let items = FIXED.map(f=>({t:f[0],a:f[1],fixed:true}));
-COURSE_TIMES.forEach((t,i)=> items.push({t,a:COURSES[i][col],fixed:false}));
-items.sort((x,y)=> range(x.t)[0]-range(y.t)[0]);
+const dayItems = d => {
+  const out=[];
+  ROWS.forEach(([t,cells])=>{
+    const a = Array.isArray(cells) ? cells[d] : cells;
+    if(!a) return;
+    const prev = out[out.length-1];
+    // 相鄰同名合併（週二教師晨會橫跨兩格）
+    if(prev && prev.a===a){ prev.t = prev.t.split("–")[0]+"–"+t.split("–")[1]; return; }
+    out.push({t,a,fixed:!catOf(a)});
+  });
+  // 放學後直接到課後輔導班，接到 18:00
+  out.push({t:out[out.length-1].t.split("–")[1]+"–18:00", a:"課後輔導班", fixed:true});
+  return out;
+};
+console.assert(dayItems(1)[0].t==="07:50–08:15" && dayItems(0).at(-1).t==="13:20–18:00"
+  && dayItems(1).at(-1).t==="15:55–18:00","dayItems");
+const items = dayItems(col);
 
 const current = live ? items.find(it=>{ const [s,e]=range(it.t); return nowMin>=s && nowMin<e; }) : null;
 const dayStart = range(items[0].t)[0];
@@ -472,16 +486,16 @@ const POSES={
   action:{svg:O+ACTIONS[0]+`</svg>`, loop:actionLoop},
 };
 function poseOf(name){ const n=name.replace("＊","");
-  if(/午睡/.test(n)) return 'sleep';
+  if(/午睡|午休/.test(n)) return 'sleep';
   if(/午餐|點心/.test(n)) return 'eat';
-  if(/晨間運動|體能|球|戶外|團康|團隊|運動/.test(n)) return 'run';
+  if(/體育|晨間運動|體能|球|戶外|團康|團隊|運動/.test(n)) return 'run';
   const c=catOf(n);
   if(c==='art') return 'paint';
   if(c==='lang') return 'read';
   if(c==='nat') return 'run';
   return 'action'; // 數理、到校、打掃…動感姿勢輪播
 }
-console.assert(poseOf('午睡')==='sleep'&&poseOf('午餐')==='eat'&&poseOf('拼音練習＊')==='read'&&poseOf('愛塗鴉')==='paint'&&poseOf('體能活動')==='run'&&poseOf('認識時鐘')==='action','poseOf');
+console.assert(poseOf('午休時間')==='sleep'&&poseOf('午餐時間')==='eat'&&poseOf('國語')==='read'&&poseOf('生活')==='paint'&&poseOf('體育')==='run'&&poseOf('數學')==='action','poseOf');
 const pose = current ? poseOf(current.a) : 'run';
 
 // 三種狀態：剛上課5分暖身、剩5分衝刺、其餘正常跑（僅 pose==='run' 用）
@@ -591,7 +605,7 @@ items.forEach((it,idx)=>{
   const [start,end]=it.t.split("–");
   const on = current===it;
   const cat = it.fixed ? null : catOf(it.a);
-  const name = it.a.replace("＊",'<span class="star">＊</span>');
+  const name = it.a + (TEACHER[it.a] ? `<span class="tch">${TEACHER[it.a]}</span>` : "");
   const chip = cat ? `<span class="chip">${SUBJECT[it.a.replace("＊","")]||CAT[cat]}</span>` : "";
   const [cs,ce]=range(it.t);
   const runner = on ? `<div class="nowrunner" data-pose="${pose}" style="left:${pct(cs,ce)}%">
@@ -630,10 +644,10 @@ if(current){
     - new Date(now.getFullYear(),now.getMonth(),now.getDate()))/86400000);
   statusEl.className = "status rest reveal";
   statusEl.innerHTML = `<div class="k">${diff===1?'明天課表':'週'+WL[dispDow]+'課表'}</div>
-    <div class="v">${items[0].a.replace("＊","")}</div><div class="t num">第一節 ${items[0].t}</div>`;
+    <div class="v">${items[0].a.replace("＊","")}</div><div class="t num">${items[0].t} 開始</div>`;
 }else if(nowMin < dayStart){
   statusEl.innerHTML = `<div class="k">今天還沒開始</div>
-    <div class="v">${items[0].a.replace("＊","")}</div><div class="t num">第一節 ${items[0].t}</div>
+    <div class="v">${items[0].a.replace("＊","")}</div><div class="t num">${items[0].t} 開始</div>
     <div class="rem">再 <b class="num">${dayStart-nowMin}</b> 分鐘開始</div>`;
 }else if(nowMin >= dayEnd){
   statusEl.className = "status rest reveal";
@@ -684,13 +698,19 @@ setInterval(()=>{
 // ---- 完整週課表 ----
 let g = "<tr><th></th>" + WEEK.map((w,i)=>
   `<th class="${isWeekday&&i===dow-1?'today':''}">${w}</th>`).join("") + "</tr>";
-COURSE_TIMES.forEach((t,r)=>{
-  g += `<tr><td class="time-c num">${t}</td>` + COURSES[r].map((c,i)=>{
-    const cat = catOf(c);
-    const today = isWeekday&&i===dow-1 ? "today":"";
-    return `<td class="${today}" style="${catStyle(cat)}">${c}</td>`;
-  }).join("") + "</tr>";
+ROWS.forEach(([t,cells])=>{
+  g += `<tr><td class="time-c num">${t}</td>`;
+  if(Array.isArray(cells)){
+    g += cells.map((c,i)=>{
+      const today = isWeekday&&i===dow-1 ? "today":"";
+      return `<td class="${today}" style="${catStyle(c&&catOf(c))}">${c||""}</td>`;
+    }).join("");
+  }else{
+    g += `<td class="span" colspan="5">${cells}</td>`;
+  }
+  g += "</tr>";
 });
+g += `<tr><td class="span" colspan="6">放學後 ～ 18:00　課後輔導班</td></tr>`;
 document.getElementById("grid").innerHTML = g;
 
 // ---- 接下來一週行事曆 ----
