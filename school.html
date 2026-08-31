@@ -95,34 +95,6 @@
   .sub{font-size:14px;color:var(--muted);margin:0 0 14px}
   section{margin-bottom:34px}
 
-  /* ---- checklist ---- */
-  .todo{list-style:none;margin:0;padding:0}
-  .todo li{margin-bottom:10px}
-  .todo label{display:flex;gap:13px;align-items:flex-start;padding:14px 16px;border-radius:9px;
-    background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);cursor:pointer;
-    -webkit-tap-highlight-color:transparent;transition:border-color .2s,box-shadow .2s}
-  .todo label:active{box-shadow:var(--shadow-lift)}
-  .todo input{position:absolute;opacity:0;pointer-events:none}
-  .todo .box{flex:0 0 auto;width:22px;height:22px;margin-top:1px;border-radius:7px;
-    border:2px solid var(--rail);background:var(--card);display:flex;align-items:center;justify-content:center;
-    transition:background .2s,border-color .2s}
-  .todo .box svg{width:13px;height:13px;color:#fff;opacity:0;transform:scale(.4);
-    transition:opacity .18s,transform .25s cubic-bezier(.34,1.56,.64,1)}
-  .todo input:checked+.box{background:var(--accent);border-color:var(--accent)}
-  .todo input:checked+.box svg{opacity:1;transform:scale(1)}
-  .todo input:focus-visible+.box{outline:2px solid var(--accent);outline-offset:2px}
-  .todo .txt .t{font-size:16px;font-weight:600;transition:color .2s}
-  .todo .txt .d{font-size:13.5px;color:var(--muted);margin-top:2px}
-  .todo input:checked~.txt .t{color:var(--muted);text-decoration:line-through;
-    text-decoration-color:var(--rail);text-decoration-thickness:2px}
-  .todo .tag{display:inline-block;font-size:11.5px;font-weight:600;color:var(--holiday);
-    background:var(--holiday-weak);padding:1px 8px;border-radius:999px;margin-left:7px;vertical-align:1px}
-  .done-note{display:none;margin-top:12px;padding:12px 16px;border-radius:9px;
-    background:var(--accent-weak);color:var(--accent);font-size:14.5px;font-weight:600;
-    align-items:center;gap:10px}
-  .done-note.show{display:flex}
-  .done-note svg{width:30px;height:30px;overflow:visible;flex:0 0 auto}
-
   /* ---- textbook list ---- */
   .books{display:grid;grid-template-columns:1fr 1fr;gap:9px}
   .bk{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:12px 14px;
@@ -131,14 +103,6 @@
   .bk .p{font-size:13.5px;color:var(--muted);margin-top:1px}
   .bk .p b{color:var(--c,var(--ink));font-weight:600}
 
-  /* ---- day flow ---- */
-  .flow{border-left:2px solid var(--rail);margin-left:5px;padding-left:18px}
-  .flow .f{position:relative;padding-bottom:16px}
-  .flow .f:last-child{padding-bottom:2px}
-  .flow .f::before{content:"";position:absolute;left:-24.5px;top:6px;width:11px;height:11px;
-    border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--paper)}
-  .flow .t{font-size:16px;font-weight:600}
-  .flow .d{font-size:13.5px;color:var(--muted);margin-top:1px}
 
   footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);
     color:var(--muted);font-size:12px;line-height:1.7}
@@ -172,43 +136,6 @@
   </div>
 
   <section class="reveal">
-    <h2>開學前要做的事</h2>
-    <p class="sub">勾起來會記住，全家人打開都看得到自己的進度。</p>
-    <ul class="todo" id="todo">
-      <li><label><input type="checkbox" data-k="consent">
-        <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"
-          stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l5 5L20 7"/></svg></span>
-        <span class="txt"><span class="t">填寫數位學生證個資同意書<span class="tag">重要</span></span>
-        <span class="d">學校本週寄給新生的資料裡有同意書，填妥後開學第一天交給導師，才能製作一卡通學生證。</span></span>
-      </label></li>
-      <li><label><input type="checkbox" data-k="supplies">
-        <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"
-          stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l5 5L20 7"/></svg></span>
-        <span class="txt"><span class="t">開學用品確認</span>
-        <span class="d">餐具（碗一大一小）、水壺、盥洗用具、鉛筆五支、橡皮擦、尺、面紙、毛巾、午休小枕頭、彩色筆。</span></span>
-      </label></li>
-      <li><label><input type="checkbox" data-k="books">
-        <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"
-          stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l5 5L20 7"/></svg></span>
-        <span class="txt"><span class="t">領書時核對教科書版本</span>
-        <span class="d">對照下方的版本表，看看課本有沒有領錯。</span></span>
-      </label></li>
-    </ul>
-    <div class="done-note" id="donenote" role="status">
-      <svg id="doneGirl" viewBox="0 0 40 44" fill="none" stroke="var(--accent)" stroke-width="4.6"
-        stroke-linecap="round" aria-hidden="true">
-        <path d="M15 8 C 11 5,8 10,10 15"/>
-        <path d="M20 30 L11 41"/><path d="M20 30 L29 41"/>
-        <line x1="20" y1="15" x2="20" y2="30"/>
-        <path d="M20 19 L11 11"/><path d="M20 19 L29 11"/>
-        <circle cx="20" cy="10" r="6.2" fill="var(--accent)" stroke="none"/>
-        <circle cx="15" cy="8" r="1.5" fill="#f0c050" stroke="none"/>
-      </svg>
-      都準備好了，安心等開學！
-    </div>
-  </section>
-
-  <section class="reveal">
     <h2>一年級教科書版本</h2>
     <p class="sub">115 學年度上學期，學校公告的選用版本。</p>
     <div class="books">
@@ -217,17 +144,6 @@
       <div class="bk" style="--c:var(--c-math)"><div class="s">數學</div><div class="p"><b>康軒</b></div></div>
       <div class="bk" style="--c:var(--c-nat)"><div class="s">生活課程</div><div class="p"><b>翰林</b></div></div>
       <div class="bk" style="--c:var(--c-nat)"><div class="s">健康與體育</div><div class="p"><b>翰林</b></div></div>
-    </div>
-  </section>
-
-  <section class="reveal">
-    <h2>開學日這一天</h2>
-    <p class="sub">8/31（一）當天的重點。<a href="firstday.html" style="color:var(--accent);font-weight:600">看完整始業式流程與校舍平面圖 →</a></p>
-    <div class="flow">
-      <div class="f"><div class="t">新生始業典禮</div><div class="d">含「祖孫快樂來上學」合影活動。</div></div>
-      <div class="f"><div class="t">親職教育講座</div><div class="d">家長參加，約 1 小時。</div></div>
-      <div class="f"><div class="t">交同意書給導師</div><div class="d">數位學生證個資同意書，交給 1 年 3 班謝懿雯老師。</div></div>
-      <div class="f"><div class="t">課後照顧班開始上課</div><div class="d">開學日當天正式上課。</div></div>
     </div>
   </section>
 
@@ -270,31 +186,6 @@ if(days>0){
   cd.innerHTML=`<div class="k">115 學年度</div><div class="big"><span class="dd">已經開學囉</span></div>
     <div class="date">開學日是 <b class="num">8 / 31</b>，這頁留作紀念。</div>`;
 }
-
-// ---- 準備清單（localStorage 記憶）----
-const KEY="prep-checks";
-let saved={};
-try{ saved=JSON.parse(localStorage.getItem(KEY)||"{}"); }catch(e){}
-const boxes=[...document.querySelectorAll('#todo input')];
-const note=document.getElementById("donenote");
-const syncNote=init=>{
-  const all=boxes.every(b=>b.checked);
-  note.classList.toggle("show",all);
-  if(all&&!init&&canAnim){
-    gsap.fromTo(note,{scale:.9,autoAlpha:0},{scale:1,autoAlpha:1,duration:.45,ease:"back.out(1.8)"});
-    gsap.fromTo("#doneGirl",{y:6},{y:0,duration:.5,ease:"bounce.out",delay:.15});
-  }
-};
-boxes.forEach(b=>{
-  b.checked=!!saved[b.dataset.k];
-  b.addEventListener("change",()=>{
-    saved[b.dataset.k]=b.checked;
-    try{ localStorage.setItem(KEY,JSON.stringify(saved)); }catch(e){}
-    if(b.checked&&canAnim) gsap.fromTo(b.nextElementSibling,{scale:1.25},{scale:1,duration:.35,ease:"back.out(2.5)"});
-    syncNote(false);
-  });
-});
-syncNote(true);
 
 // ---- 進場動畫（與 index.html 同節奏；女孩原地小跑步）----
 if(canAnim){
