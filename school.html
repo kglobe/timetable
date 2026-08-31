@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fbf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#24211d" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="noindex, nofollow">
-<title>梓琪的開學準備</title>
+<title>梓琪的校園資訊</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -125,7 +125,7 @@
         stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>回課表
     </a>
     <p class="eyebrow reveal">鎮昌國小 · 115 學年度</p>
-    <h1 class="reveal"><span class="who">梓琪</span>的開學準備</h1>
+    <h1 class="reveal"><span class="who">梓琪</span>的校園資訊</h1>
   </header>
 
   <div class="count reveal" id="count"></div>
@@ -177,14 +177,8 @@ if(days>0){
       <circle class="head" cx="21" cy="9" r="6.4" fill="var(--accent)" stroke="none"/>
       <circle class="tie" cx="15" cy="8" r="1.5" fill="#f0c050" stroke="none"/>
       <path class="arm-f" d="M20 18 L28 22"/><path class="leg-f" d="M19 29 L27 40"/></svg>`;
-}else if(days===0){
-  cd.className="count today reveal";
-  cd.innerHTML=`<div class="k">今天</div><div class="big"><span class="dd">開學日！</span></div>
-    <div class="date">記得帶同意書交給導師。</div>`;
 }else{
-  cd.className="count today reveal";
-  cd.innerHTML=`<div class="k">115 學年度</div><div class="big"><span class="dd">已經開學囉</span></div>
-    <div class="date">開學日是 <b class="num">8 / 31</b>，這頁留作紀念。</div>`;
+  cd.remove();
 }
 
 // ---- 進場動畫（與 index.html 同節奏；女孩原地小跑步）----

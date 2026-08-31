@@ -245,14 +245,6 @@
     <div class="datebar reveal">
       <span class="num" id="today"></span>
     </div>
-    <a class="schoolink reveal" id="schoolink" href="school.html" hidden>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-        stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-      <span>開學準備　<b class="num" id="schooldays"></b></span>
-      <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-        stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-    </a>
   </header>
 
   <section class="status reveal" id="status" role="status"></section>
@@ -282,6 +274,15 @@
     <p class="cal-sub">鎮昌國小 115 學年度第 1 學期行事曆</p>
     <div id="calendar"></div>
   </section>
+
+  <a class="schoolink reveal" href="school.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    <span>校園資訊</span>
+    <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+  </a>
 
   <footer>
     資料來源：鎮昌國小 115 學年度一年三班課表 ＋ 第 1 學期行事曆<br>
@@ -684,17 +685,6 @@ setInterval(()=>{
   else { const up=items.find(it=>range(it.t)[0]>m); if(up) rb.textContent=range(up.t)[0]-m; }
 },60000);
 
-// ---- 開學準備入口（開學前顯示倒數，開學後收起）----
-{
-  const open=new Date(2026,7,31);
-  const d0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const dd=Math.round((open-d0)/86400000);
-  if(dd>=0){
-    document.getElementById("schooldays").textContent = dd===0?"今天開學！":`還 ${dd} 天`;
-    document.getElementById("schoolink").hidden=false;
-  }
-}
-
 // ---- 完整週課表 ----
 let g = "<tr><th></th>" + WEEK.map((w,i)=>
   `<th class="${isWeekday&&i===dow-1?'today':''}">${w}</th>`).join("") + "</tr>";
@@ -745,7 +735,7 @@ if(canAnim){
    .to(".status, .legend",{autoAlpha:1,y:0,duration:.5,stagger:.08},"-=.25")
    .to(".node",{autoAlpha:1,y:0,duration:.45,stagger:.045},"-=.1")
    .to("#nowline",{autoAlpha:1,duration:.3},"-=.45")
-   .to(".more, .cal, .cal .next",{autoAlpha:1,y:0,duration:.5,stagger:.06},"-=.2")
+   .to(".more, .cal, .cal .next, .schoolink",{autoAlpha:1,y:0,duration:.5,stagger:.06},"-=.2")
    .set(".reveal, #nowline",{autoAlpha:1,y:0}); // 保底：任何漏網 reveal 都顯示
   const rule = document.getElementById("nlrule");
   if(rule){
