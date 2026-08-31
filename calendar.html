@@ -160,12 +160,14 @@ const md=dt=>`${pad(dt.getMonth()+1)}/${pad(dt.getDate())}`;
 
 const now=new Date();
 const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+// ponytail: 晚上 19:00 後當天視為結束，游標推到隔天（今天分隔線往下一格）
+const cursor=new Date(now.getFullYear(),now.getMonth(),now.getDate()+(now.getHours()>=19?1:0));
 
 // 事件 → {s,e,txt,holiday,state}；state: past / today / future
 const ITEMS=EVENTS.map(ev=>{
   const s=parse(ev[0]), e=ev[1]?parse(ev[1]):s;
   return {s,e,txt:ev[2],holiday:ev[3],tone:ev[4]||"",
-    state: e<today ? "past" : (s<=today ? "today" : "future")};
+    state: e<cursor ? "past" : (s<=today ? "today" : "future")};
 });
 console.assert(ITEMS.length===EVENTS.length&&ITEMS.every(i=>i.e>=i.s),"事件日期區間顛倒");
 

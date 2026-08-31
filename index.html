@@ -63,7 +63,7 @@
     -webkit-tap-highlight-color:transparent;transition:background .2s,color .2s,transform .16s cubic-bezier(.23,1,.32,1)}
   /* 右上角整塊都能按：把可點範圍往外撐到約 55×55，視覺仍是 35px 圓鈕 */
   .themetog::after{content:"";position:absolute;inset:-10px;border-radius:50%}
-  .themetog:active{color:var(--accent);background:var(--accent-weak);transform:scale(.93)}
+  .themetog:active{color:var(--accent);background:var(--accent-weak);transform:scale(.96)}
   @media(hover:hover)and(pointer:fine){.themetog:hover{color:var(--accent)}}
   .themetog .ic{width:22px;height:22px}
   .themetog .ic-moon{display:none}
@@ -79,7 +79,7 @@
     border-radius:999px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
     font-size:13.5px;font-weight:600;color:var(--ink);text-decoration:none;
     -webkit-tap-highlight-color:transparent;transition:box-shadow .2s,color .2s}
-  .schoolink:hover{color:var(--accent);box-shadow:var(--shadow-lift)}
+  @media(hover:hover)and(pointer:fine){.schoolink:hover{color:var(--accent);box-shadow:var(--shadow-lift)}}
   .schoolink svg{width:15px;height:15px;color:var(--accent)}
   .schoolink .arw{width:13px;height:13px;color:var(--muted)}
   .schoolink b{color:var(--accent)}
@@ -140,8 +140,8 @@
     transform-origin:left center}
   /* 跑步的馬尾小女孩：站在進度條尖端＝「現在」，頭上小膠囊顯示現在時間 */
   .node.now .nowrunner{position:absolute;bottom:8px;margin-left:-12px;z-index:3;pointer-events:none}
-  .node.now .nowrunner .runner{display:block;width:24px;height:auto;overflow:visible;
-    filter:drop-shadow(0 1px 1.5px rgba(59,121,96,.28))}
+  /* 不加 filter：四肢每幀轉動，drop-shadow 會每幀重算；SVG 內已有 .shadow 假影子 */
+  .node.now .nowrunner .runner{display:block;width:24px;height:auto;overflow:visible}
   .node.now .rtime{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
     margin-bottom:2px;white-space:nowrap;font-size:10.5px;font-weight:700;color:var(--accent);
     background:var(--card);padding:1px 6px;border-radius:999px;
@@ -173,7 +173,7 @@
   .cal-head .rng{font-size:13px;color:var(--muted)}
   .cal-head .all{margin-left:auto;font-size:13px;font-weight:600;color:var(--accent);
     text-decoration:none;white-space:nowrap;transition:opacity .2s}
-  .cal-head .all:hover{opacity:.72}
+  @media(hover:hover)and(pointer:fine){.cal-head .all:hover{opacity:.72}}
   .cal-sub{font-size:14px;color:var(--muted);margin:0 0 14px}
   .ev{display:grid;grid-template-columns:52px 1fr;gap:16px;padding:13px 0;border-top:1px solid var(--line)}
   .ev:first-of-type{border-top:none}
@@ -198,22 +198,16 @@
     color:var(--muted);font-size:12px;line-height:1.7}
   /* ---- 進度條 · 剩餘時間 ---- */
   .status .bar{height:5px;border-radius:999px;background:var(--accent-weak);margin-top:11px;overflow:hidden}
-  .status .bar i{display:block;height:100%;border-radius:999px;background:var(--accent);transform-origin:left center}
+  .status .bar i{display:block;width:100%;height:100%;border-radius:999px;background:var(--accent);transform-origin:left center}
   .status .rem{color:var(--muted);font-size:13.5px;margin-top:8px}
   .status .rem b{color:var(--accent);font-weight:700}
+  .status .rem.pe{margin-top:10px;padding:7px 10px;border-radius:8px;
+    background:var(--accent-weak);color:var(--ink)}
   .node.now .card{position:relative}
   .node.now .prog{position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--accent-weak);
     border-radius:0 0 8px 8px;overflow:hidden}
-  .node.now .prog i{position:relative;display:block;height:100%;background:var(--accent);
-    transform-origin:left center;overflow:hidden}
-  .node.now .prog i u{position:absolute;top:0;bottom:0;left:0;width:38%;
-    background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent)}
-  .node.now .nowglow{position:absolute;inset:0;border-radius:8px;pointer-events:none;
-    box-shadow:0 0 0 3px var(--accent-weak);opacity:0}
-  @media (prefers-reduced-motion:no-preference){
-    .node.now .nowglow{animation:nowbreath 3.4s ease-in-out infinite}
-  }
-  @keyframes nowbreath{0%,100%{opacity:0}50%{opacity:1}}
+  .node.now .prog i{display:block;width:100%;height:100%;background:var(--accent);
+    transform-origin:left center}
 
   /* ---- now-line 呼吸光暈 ---- */
   .nl-rail span{position:relative}
@@ -341,6 +335,9 @@ const nowMin = now.getHours()*60 + now.getMinutes();
 const isWeekday = dow>=1 && dow<=5;
 const root = document.documentElement;
 const canAnim = !!window.gsap && matchMedia("(prefers-reduced-motion: no-preference)").matches;
+// 跨節 reload 不重播進場（一天跨節十幾次，每次都播就變成高頻動畫）
+let skipIntro=false;
+try{ skipIntro = sessionStorage.getItem("nointro")==="1"; sessionStorage.removeItem("nointro"); }catch(e){}
 
 // 平日 19:00 前顯示當天（即時狀態）；之後或週末改預覽下個上課日
 const PREVIEW_AFTER = 19*60;
@@ -372,6 +369,8 @@ const dayItems = d => {
   out.push({t:out[out.length-1].t.split("–")[1]+"–18:00", a:"課後輔導班", fixed:true});
   return out;
 };
+console.assert(dayItems(0).some(it=>it.a==="體育") && dayItems(3).some(it=>it.a==="體育")
+  && !dayItems(1).some(it=>it.a==="體育"),"PE days");
 console.assert(dayItems(1)[0].t==="07:50–08:15" && dayItems(0).at(-1).t==="13:20–18:00"
   && dayItems(1).at(-1).t==="15:55–18:00","dayItems");
 const items = dayItems(col);
@@ -401,6 +400,13 @@ const RUNNER_SVG = `<svg class="runner" viewBox="0 0 40 44" fill="none" stroke="
   <path class="arm-f" d="M20 18 L28 22"/><path class="leg-f" d="M19 29 L27 40"/></svg>`;
 
 const RUNNER_INNER=RUNNER_SVG.replace(/^<svg[^>]*>/,'').replace(/<\/svg>$/,'');
+// 影格只 parse 一次，之後換姿勢只搬節點：innerHTML 每次都是 parse→建 DOM→recalc→layout→paint
+const _frames=new Map();
+function setFrame(sv,html){
+  let n=_frames.get(html);
+  if(!n){ const d=sv.cloneNode(false); d.innerHTML=html; n=[...d.childNodes]; _frames.set(html,n); }
+  sv.replaceChildren(...n);
+}
 // 依「現在這節課在做什麼」決定姿勢；跑步保留三階段，其餘各一段迴圈。
 const O=`<svg class="runner" viewBox="0 0 40 44" fill="none" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" aria-hidden="true">`;
 const A={ease:"sine.inOut",repeat:-1,yoyo:true};
@@ -411,6 +417,8 @@ const ACTIONS=[
   `<ellipse class="shadow" cx="19" cy="43" rx="10" ry="1.4" fill="var(--accent)" stroke="none" opacity=".16"/><path class="pony" d="M11 9 C 7 6,5 11,7 17"/><line x1="16" y1="15" x2="18" y2="28"/><path d="M18 28 L27 34 L27 42"/><path d="M18 28 L10 42"/><path d="M17 19 L10 16"/><path d="M17 19 L25 15"/><circle class="head" cx="15" cy="10" r="6.2" fill="var(--accent)" stroke="none"/><circle class="tie" cx="11" cy="9" r="1.5" fill="#f0c050" stroke="none"/>`,
   `<ellipse class="shadow" cx="20" cy="43" rx="9" ry="1.4" fill="var(--accent)" stroke="none" opacity=".16"/><path class="pony" d="M15 12 C 11 9,8 14,10 19"/><line x1="20" y1="18" x2="20" y2="27"/><path d="M20 27 L13 31 L13 40"/><path d="M20 27 L27 31 L27 40"/><path d="M20 20 L13 24"/><path d="M20 20 L27 24"/><circle class="head" cx="20" cy="13" r="6" fill="var(--accent)" stroke="none"/><circle class="tie" cx="15" cy="12" r="1.5" fill="#f0c050" stroke="none"/>`,
 ];
+// 捲出視窗時設 true：自我排程的迴圈（actionLoop / doJump）看到就停手，不再續排
+let _runnerOff=false;
 function actionLoop(){
   const S=".node.now .runner", wrap=document.querySelector(".node.now .nowrunner");
   if(!wrap) return;
@@ -418,9 +426,9 @@ function actionLoop(){
   let i=0;
   // 星形跳→高踢→弓步→深蹲：每動「彈起→呼吸→下沉蓄力」，下沉即為下一動的起跳，動作才接得起來
   const step=()=>{
-    if(!document.querySelector(".node.now .runner")) return; // 換節後元素沒了就停
+    if(_runnerOff || !document.querySelector(".node.now .runner")) return; // 捲出視窗或換節後就停
     gsap.killTweensOf(S);
-    sv.innerHTML=ACTIONS[i]; i=(i+1)%ACTIONS.length;
+    setFrame(sv,ACTIONS[i]); i=(i+1)%ACTIONS.length;
     gsap.timeline({onComplete:step})
       .fromTo(sv,{scale:.62,y:9,rotation:-6,transformOrigin:"50% 92%"},
                  {scale:1,y:0,rotation:0,duration:.5,ease:"back.out(2.2)"})   // 從上一動的下蹲彈起落地
@@ -483,7 +491,9 @@ const POSES={
     <text class="zzz" x="22" y="20" font-size="10" font-weight="700" fill="var(--accent)" stroke="none" text-anchor="middle">z</text></svg>`,
     loop(){const S=".node.now .runner";
       gsap.fromTo(`${S} .quilt`,{scaleY:1},{scaleY:1.13,svgOrigin:"25 33.5",duration:1.9,...A});
-      gsap.fromTo(`${S} .zzz`,{y:2,opacity:0},{y:-9,opacity:.75,duration:2,ease:"sine.out",repeat:-1});}},
+      gsap.fromTo(`${S} .zzz`,{y:2},{y:-9,duration:2,ease:"sine.out",repeat:-1});
+      // opacity 分開跑 yoyo，才會淡出而不是停在 .75 硬切回 0
+      gsap.fromTo(`${S} .zzz`,{opacity:0},{opacity:.75,duration:1,ease:"none",repeat:-1,yoyo:true});}},
   action:{svg:O+ACTIONS[0]+`</svg>`, loop:actionLoop},
 };
 function poseOf(name){ const n=name.replace("＊","");
@@ -514,7 +524,7 @@ function loopRunner(phase){
   const S=".node.now .runner", parts=[S,`${S} .leg-f`,`${S} .leg-b`,`${S} .arm-f`,`${S} .arm-b`,`${S} .pony`,`${S} .tie`,`${S} .shadow`];
   gsap.killTweensOf(parts);
   const sv=document.querySelector(S);
-  if(sv){ sv.innerHTML=RUNNER_INNER; gsap.set(S,{y:0,rotation:0,scaleX:1,clearProps:"transform"}); }
+  if(sv){ setFrame(sv,RUNNER_INNER); gsap.set(S,{clearProps:"transform"}); }
   const rn=document.querySelector(".node.now .nowrunner"); if(rn) rn.dataset.phase=phase;
   const d    = phase==='sprint'?.16 : phase==='warm'?.38 : .24;  // 擺動週期（越小越快）
   const sw   = phase==='sprint'?22  : phase==='warm'?12  : 18;   // 四肢幅度（度）
@@ -570,11 +580,10 @@ function loopRunner(phase){
      <circle cx="20" cy="9" r="5.4" fill="var(--accent)" stroke="none"/>`,
   ];
   function doJump(){
-    if(!document.querySelector(".node.now .runner")) return;
+    if(_runnerOff || !document.querySelector(".node.now .runner")) return;
     gsap.killTweensOf(parts);
     const sv=document.querySelector(S); if(!sv) return;
-    const orig=sv.innerHTML;
-    _jumpTL=gsap.timeline({onComplete(){_jumpTL=null;sv.innerHTML=orig;gsap.set(S,{y:0,rotation:lean,scaleX:1,svgOrigin:"20 40"});startRun();_jumpTimer=gsap.delayedCall(jInt+Math.random()*1.5,doJump);}});
+    _jumpTL=gsap.timeline({onComplete(){_jumpTL=null;setFrame(sv,RUNNER_INNER);gsap.set(S,{y:0,rotation:lean,scaleX:1,svgOrigin:"20 40"});startRun();_jumpTimer=gsap.delayedCall(jInt+Math.random()*1.5,doJump);}});
     const tl=_jumpTL;
     // 準備：四肢收進 passé 姿勢
     tl.to(S,{y:-3,rotation:0,svgOrigin:"20 40",duration:.2,ease:"power2.out"},0)
@@ -585,20 +594,34 @@ function loopRunner(phase){
       .to(`${S} .pony, ${S} .tie`,{rotation:20,svgOrigin:"15 8",duration:.2},0)
       .to(`${S} .shadow`,{scaleX:.4,opacity:.06,svgOrigin:"20 43",duration:.2},0)
     // 跳起 + 逐格轉圈（正→側→背→側→正）
-      .call(()=>{sv.innerHTML=PIRO[0];},[],0.22)
+      .call(()=>{setFrame(sv,PIRO[0]);},[],0.22)
       .to(S,{y:-20,duration:.25,ease:"sine.out"},.22)
-      .call(()=>{sv.innerHTML=PIRO[1];},[],0.35)
-      .call(()=>{sv.innerHTML=PIRO[2];},[],0.48)
-      .call(()=>{sv.innerHTML=PIRO[3];},[],0.61)
-      .call(()=>{sv.innerHTML=PIRO[0];},[],0.74)
+      .call(()=>{setFrame(sv,PIRO[1]);},[],0.35)
+      .call(()=>{setFrame(sv,PIRO[2]);},[],0.48)
+      .call(()=>{setFrame(sv,PIRO[3]);},[],0.61)
+      .call(()=>{setFrame(sv,PIRO[0]);},[],0.74)
       .to(S,{y:-16,duration:.35,ease:"sine.inOut"},.47)
-    // 落地
-      .to(S,{y:0,duration:.22,ease:"bounce.out"},.82)
+    // 落地：下墜要加速（重力），觸地後小回彈，不要用 bounce.out 一路減速飄下來
+      .to(S,{y:0,duration:.18,ease:"power2.in"},.82)
+      .to(S,{y:-3,duration:.1,ease:"power2.out"})
+      .to(S,{y:0,duration:.14,ease:"power2.in"})
       .set(S,{rotation:lean,svgOrigin:"20 40"});
   }
   startRun();
   _jumpTimer=gsap.delayedCall(jInt+Math.random()*1.5,doJump);
 }
+
+// ---- 捲出視窗就停跑（省電；也免得在看不見的地方全速跑一整天）----
+// 停＝殺掉重建，不做 pause/resume：這是 idle 迴圈，重新起跑看不出差別，程式少一半
+function killRunner(){
+  if(_jumpTimer){ _jumpTimer.kill(); _jumpTimer=null; }
+  if(_jumpTL){ _jumpTL.kill(); _jumpTL=null; }
+  gsap.killTweensOf(".node.now .runner");
+  gsap.killTweensOf(".node.now .runner *");
+}
+function startRunner(){ killRunner(); _runnerOff=false;   // killRunner 讓重複呼叫安全
+  if(pose==='run') loopRunner(runnerPhase()); else POSES[pose].loop(); }
+function stopRunner(){ _runnerOff=true; killRunner(); }
 
 let out = "";
 items.forEach((it,idx)=>{
@@ -612,7 +635,7 @@ items.forEach((it,idx)=>{
   const runner = on ? `<div class="nowrunner" data-pose="${pose}" style="left:${pct(cs,ce)}%">
       <span class="rtime num">${pad(now.getHours())}:${pad(now.getMinutes())}</span>
       ${pose==='run'?RUNNER_SVG:POSES[pose].svg}</div>` : "";
-  const prog = on ? `<div class="prog"><i style="width:${pct(cs,ce)}%"><u></u></i></div><span class="nowglow"></span>${runner}` : "";
+  const prog = on ? `<div class="prog"><i style="transform:scaleX(${(pct(cs,ce)/100).toFixed(4)})"></i></div>${runner}` : "";
   out += `<div class="node reveal ${it.fixed?'fixed':''} ${on?'now':''}" style="${catStyle(cat)}">
     <div class="rail"><span class="dot"></span></div>
     <div class="card">
@@ -627,25 +650,38 @@ if(current){
   const [cs,ce]=range(current.t);
   statusEl.innerHTML = `<div class="k">現在進行</div>
     <div class="v">${current.a.replace("＊","")}</div><div class="t num">${current.t}</div>
-    <div class="bar"><i style="width:${pct(cs,ce)}%"></i></div>
+    <div class="bar"><i style="transform:scaleX(${(pct(cs,ce)/100).toFixed(4)})"></i></div>
     <div class="rem">還有 <b class="num">${ce-nowMin}</b> 分鐘下課</div>`;
-  // 每 30 秒更新剩餘時間與進度條（ponytail: 跨節不即時重繪，換節靠下次載入）
+  // 每 30 秒更新剩餘時間（ponytail: 跨節不即時重繪，換節靠下次載入）
   setInterval(()=>{
     const d=new Date(), m=d.getHours()*60+d.getMinutes();
     if(m<cs||m>=ce) return;
-    const p=Math.min(100,Math.max(0,(m-cs)/(ce-cs)*100));
-    const sb=statusEl.querySelector(".bar i"); if(sb) sb.style.width=p+"%";
     const rb=statusEl.querySelector(".rem b"); if(rb) rb.textContent=ce-m;
-    const cb=document.querySelector(".node.now .prog i"); if(cb) cb.style.width=p+"%";
-    const rn=document.querySelector(".node.now .nowrunner"); if(rn) rn.style.left=p+"%";
-    if(canAnim && rn && pose==='run'){ const ph=runnerPhase(); if(rn.dataset.phase!==ph) loopRunner(ph); }
+    const p=Math.min(100,Math.max(0,(m-cs)/(ce-cs)*100));
+    const sb=statusEl.querySelector(".bar i"), cb=document.querySelector(".node.now .prog i");
+    const rn=document.querySelector(".node.now .nowrunner"), prg=document.querySelector(".node.now .prog");
+    if(canAnim){
+      // 滑 2 秒到新位置：連續移動取代瞬移，且每 30 秒對一次真實時間，不會漂移
+      gsap.to([sb,cb].filter(Boolean),{scaleX:p/100,duration:2,ease:"none"});
+      // 跑者位移走 transform 不走 left，避免每幀 layout
+      if(rn&&prg) gsap.to(rn,{x:prg.clientWidth*(p-pct(cs,ce))/100,duration:2,ease:"none"});
+    }else{
+      if(sb) sb.style.transform="scaleX("+(p/100).toFixed(4)+")";
+      if(cb) cb.style.transform="scaleX("+(p/100).toFixed(4)+")";
+      if(rn) rn.style.left=p+"%";
+    }
+    // 捲出視窗時不重啟；捲回來時 startRunner 自然會抓當下的 phase
+    if(canAnim && rn && !_runnerOff && pose==='run'){ const ph=runnerPhase(); if(rn.dataset.phase!==ph) loopRunner(ph); }
   },30000);
 }else if(!live){
   const diff = Math.round((new Date(disp.getFullYear(),disp.getMonth(),disp.getDate())
     - new Date(now.getFullYear(),now.getMonth(),now.getDate()))/86400000);
   statusEl.className = "status rest reveal";
+  // 有體育課（週一、週四）要提醒穿運動服
+  const pe = items.some(it=>it.a==="體育");
   statusEl.innerHTML = `<div class="k">${diff===1?'明天課表':'週'+WL[dispDow]+'課表'}</div>
-    <div class="v">${items[0].a.replace("＊","")}</div><div class="t num">${items[0].t} 開始</div>`;
+    <div class="v">${items[0].a.replace("＊","")}</div><div class="t num">${items[0].t} 開始</div>
+    ${pe?'<div class="rem pe">有<b>體育課</b>，要穿運動服和運動鞋</div>':''}`;
 }else if(nowMin < dayStart){
   statusEl.innerHTML = `<div class="k">今天還沒開始</div>
     <div class="v">${items[0].a.replace("＊","")}</div><div class="t num">${items[0].t} 開始</div>
@@ -675,7 +711,7 @@ function stateKey(){
 const sig0 = stateKey();
 setInterval(()=>{
   const d=new Date(), m=d.getHours()*60+d.getMinutes();
-  if(stateKey()!==sig0){ location.reload(); return; }
+  if(stateKey()!==sig0){ try{sessionStorage.setItem("nointro","1");}catch(e){} location.reload(); return; }
   const tstr=pad(d.getHours())+":"+pad(d.getMinutes());
   const nt=document.querySelector(".nl-time"); if(nt) nt.textContent=tstr;
   const rt2=document.querySelector(".node.now .rtime"); if(rt2) rt2.textContent=tstr;
@@ -728,33 +764,38 @@ if(within.length){
 
 // ---- 動畫（GSAP 失敗或偏好減少動態時，內容照樣完整顯示）----
 if(canAnim){
-  gsap.set(".reveal",{autoAlpha:0,y:14});
-  gsap.set("#nowline",{autoAlpha:0,y:0});
-  const t = gsap.timeline({defaults:{ease:"power2.out"}});
-  t.to("header .reveal",{autoAlpha:1,y:0,duration:.5,stagger:.07})
-   .to(".status, .legend",{autoAlpha:1,y:0,duration:.5,stagger:.08},"-=.25")
-   .to(".node",{autoAlpha:1,y:0,duration:.45,stagger:.045},"-=.1")
-   .to("#nowline",{autoAlpha:1,duration:.3},"-=.45")
-   .to(".more, .cal, .cal .next, .schoolink",{autoAlpha:1,y:0,duration:.5,stagger:.06},"-=.2")
-   .set(".reveal, #nowline",{autoAlpha:1,y:0}); // 保底：任何漏網 reveal 都顯示
-  const rule = document.getElementById("nlrule");
-  if(rule){
-    t.from("#nowline .nl-rail span",{scale:0,duration:.5,ease:"back.out(2)"},"-=.55")
-     .from(rule,{scaleX:0,duration:.7,ease:"power3.out"},"-=.5");
+  const runner = document.querySelector(".node.now .nowrunner");
+  if(skipIntro){
+    gsap.set(".reveal, #nowline",{autoAlpha:1,y:0});
+  }else{
+    gsap.set(".reveal",{autoAlpha:0,y:14});
+    gsap.set("#nowline",{autoAlpha:0,y:0});
+    // 首屏外的區塊不排進場：滾到時早就播完了，只是白佔 0.7 秒
+    gsap.set(".more, .cal, .cal .next, .schoolink",{autoAlpha:1,y:0});
+    const t = gsap.timeline({defaults:{ease:"power2.out"}});
+    t.to("header .reveal",{autoAlpha:1,y:0,duration:.22,stagger:.03})
+     .to(".status, .legend",{autoAlpha:1,y:0,duration:.22,stagger:.04},"-=.15")
+     .to(".node",{autoAlpha:1,y:0,duration:.22,stagger:.03},"-=.06")
+     .to("#nowline",{autoAlpha:1,duration:.2},"-=.3")
+     .set(".reveal, #nowline",{autoAlpha:1,y:0}); // 保底：任何漏網 reveal 都顯示
+    const rule = document.getElementById("nlrule");
+    if(rule){
+      t.from("#nowline .nl-rail span",{scale:.7,autoAlpha:0,duration:.3,ease:"back.out(2)"},"-=.3")
+       .from(rule,{scaleX:0,duration:.35,ease:"power3.out"},"-=.25");
+    }
+    if(runner) gsap.from(runner,{autoAlpha:0,scale:.85,transformOrigin:"50% 100%",duration:.35,delay:.25,ease:"back.out(1.7)"});
   }
-  gsap.fromTo(".node.now .card",{scale:.985},{scale:1,duration:.6,delay:.5,ease:"power2.out"});
-  gsap.from(".status .bar i, .node.now .prog i",{scaleX:0,duration:.9,delay:.55,ease:"power2.out"});
   // now-line 呼吸光暈
   gsap.fromTo(".nl-rail span b",{scale:.6,autoAlpha:.5},
     {scale:2.4,autoAlpha:0,duration:1.8,ease:"sine.out",repeat:-1,repeatDelay:.3,delay:.6});
-  // 進度流光（ambient 層，reduced-motion 時不啟用）
-  gsap.fromTo(".node.now .prog i u",{xPercent:-120},
-    {xPercent:340,duration:2.4,ease:"sine.inOut",repeat:-1,repeatDelay:.5,delay:.8});
-  // 跑步的馬尾小女孩：入場彈跳一次，擺動交給 loopRunner（隨狀態換速度）
-  const runner = document.querySelector(".node.now .nowrunner");
+  // 跑步的馬尾小女孩：擺動交給 loopRunner（隨狀態換速度），捲出視窗就停
   if(runner){
-    gsap.from(runner,{autoAlpha:0,scale:0,transformOrigin:"50% 100%",duration:.5,delay:.75,ease:"back.out(1.7)"});
-    if(pose==='run') loopRunner(runnerPhase()); else POSES[pose].loop();
+    startRunner();
+    const card=runner.closest(".card");
+    if(card && "IntersectionObserver" in window){
+      new IntersectionObserver(([e])=>{ e.isIntersecting?startRunner():stopRunner(); },
+        {rootMargin:"80px 0px"}).observe(card);
+    }
   }
   // 行事曆捲動進場
   if("IntersectionObserver" in window){
