@@ -761,7 +761,9 @@ setInterval(()=>{
 // ---- 背景省電：頁籤隱藏停動畫、回來刷新 ----
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){ if(canAnim) stopRunner(); return; }
-  if(stateKey()!==sig0){ location.reload(); return; }
+  if(stateKey()!==sig0){
+    if(current) sendNotif('下課了！',current.a.replace('＊','')+'　下課了');
+    try{sessionStorage.setItem("nointro","1");}catch(e){} location.reload(); return; }
   if(canAnim && document.querySelector(".node.now .nowrunner")) startRunner();
 });
 
