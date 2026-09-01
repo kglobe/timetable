@@ -430,6 +430,7 @@ const ACTIONS=[
 ];
 // 捲出視窗時設 true：自我排程的迴圈（actionLoop / doJump）看到就停手，不再續排
 let _runnerOff=false;
+let _actionTs=0; // actionLoop 心跳：每次 step 更新，30s interval 偵測斷鏈重啟
 function actionLoop(){
   const S=".node.now .runner", wrap=document.querySelector(".node.now .nowrunner");
   if(!wrap) return;
@@ -438,6 +439,7 @@ function actionLoop(){
   // 星形跳→高踢→弓步→深蹲：每動「彈起→呼吸→下沉蓄力」，下沉即為下一動的起跳，動作才接得起來
   const step=()=>{
     if(_runnerOff || !document.querySelector(".node.now .runner")) return; // 捲出視窗或換節後就停
+    _actionTs=Date.now();
     gsap.killTweensOf(S);
     setFrame(sv,ACTIONS[i]); i=(i+1)%ACTIONS.length;
     gsap.timeline({onComplete:step})
@@ -683,7 +685,10 @@ if(current){
       if(rn) rn.style.left=p+"%";
     }
     // 捲出視窗時不重啟；捲回來時 startRunner 自然會抓當下的 phase
-    if(canAnim && rn && !_runnerOff && pose==='run'){ const ph=runnerPhase(); if(rn.dataset.phase!==ph) loopRunner(ph); }
+    if(canAnim && rn && !_runnerOff){
+      if(pose==='run'){ const ph=runnerPhase(); if(rn.dataset.phase!==ph) loopRunner(ph); }
+      else if(Date.now()-_actionTs>5000) POSES[pose].loop(); // 非 run 姿勢斷鏈→重啟
+    }
   },30000);
 }else if(holidayEvent){
   statusEl.className = "status rest reveal";
@@ -746,6 +751,7 @@ function stateKey(){
 }
 const sig0 = stateKey();
 setInterval(()=>{
+  if(document.hidden) return; // 背景頁籤不 reload，交給 visibilitychange 處理
   const d=new Date(), m=d.getHours()*60+d.getMinutes();
   if(stateKey()!==sig0){
     if(current) sendNotif('下課了！',current.a.replace('＊','')+'　下課了');
