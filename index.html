@@ -715,8 +715,11 @@ if(current){
 }
 
 // ---- 下課通知 ----
+let _swReg=null;
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').then(r=>{_swReg=r}).catch(()=>{});
 const _notifyOk = ()=>{ try{return localStorage.getItem('notify')==='on' && Notification.permission==='granted'}catch(e){return false} };
-function sendNotif(title,body){ if(!_notifyOk()) return; try{new Notification(title,{body,tag:title})}catch(e){} }
+function sendNotif(title,body){ if(!_notifyOk()) return;
+  try{ if(_swReg) _swReg.showNotification(title,{body,tag:title}); else new Notification(title,{body,tag:title}); }catch(e){} }
 const _bellBtn=document.getElementById('notifytog');
 if(_notifyOk()) _bellBtn.classList.add('on');
 _bellBtn.addEventListener('click',async()=>{
@@ -724,7 +727,7 @@ _bellBtn.addEventListener('click',async()=>{
   if(!('Notification' in window)){ alert('此瀏覽器不支援通知'); return; }
   const p=await Notification.requestPermission();
   if(p==='granted'){ try{localStorage.setItem('notify','on')}catch(e){} _bellBtn.classList.add('on');
-    new Notification('通知已開啟',{body:'下課時會通知你，16:30 會提醒接小孩'}); }
+    sendNotif('通知已開啟','下課時會通知你，16:30 會提醒接小孩'); }
 });
 // 16:30 接小孩（sessionStorage 防同日重複）
 const _p16k='pickup16-'+now.toDateString();
