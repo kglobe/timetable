@@ -1,0 +1,32 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - button "切換深色／淺色" [ref=e4] [cursor=pointer]
+    - paragraph [ref=e8]: 鎮昌國小 一年三班 · 導師：謝懿雯
+    - heading "今日課表" [level=1] [ref=e9]
+    - generic [ref=e10]: 2026 / 09 / 01 週二
+  - status [ref=e12]:
+    - generic [ref=e13]: 下課休息中
+    - generic [ref=e14]: 下一節數學
+    - generic [ref=e15]: 08:40–09:20
+    - generic [ref=e16]: 再 4 分鐘開始
+  - group [ref=e18]:
+    - generic "完整一週課表" [ref=e19] [cursor=pointer]
+  - generic [ref=e22]:
+    - generic [ref=e23]:
+      - heading "接下來一週" [level=2] [ref=e24]
+      - generic [ref=e25]: 09/01 – 09/07
+      - link "全部行事曆 →" [ref=e26] [cursor=pointer]:
+        - /url: calendar.html
+    - paragraph [ref=e27]: 鎮昌國小 115 學年度第 1 學期行事曆
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - generic [ref=e31]: "7"
+        - generic [ref=e32]: 週一
+        - generic [ref=e33]: 09/07–09/18
+      - generic [ref=e34]: 身高體重、視力及頭蝨檢查
+  - link "校園資訊" [ref=e35] [cursor=pointer]:
+    - /url: school.html
+  - contentinfo [ref=e42]:
+    - text: 資料來源：鎮昌國小 115 學年度一年三班課表 ＋ 第 1 學期行事曆 週二上到 15:55，其餘四天午休後放學；放學後到課後輔導班，18:00 接回。
+    - link "8、9 月點心表 →" [ref=e43] [cursor=pointer]:
+      - /url: snack.html

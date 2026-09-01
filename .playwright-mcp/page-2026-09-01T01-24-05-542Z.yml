@@ -1,0 +1,118 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - button "切換深色／淺色" [ref=e4] [cursor=pointer]
+    - paragraph [ref=e8]: 鎮昌國小 一年三班 · 導師：謝懿雯
+    - heading "今日課表" [level=1] [ref=e9]
+    - generic [ref=e10]: 2026 / 09 / 01 週二
+  - status [ref=e12]:
+    - generic [ref=e13]: 下課休息中
+    - generic [ref=e14]: 下一節國語
+    - generic [ref=e15]: 09:30–10:10
+    - generic [ref=e16]: 再 6 分鐘開始
+  - generic [ref=e17]:
+    - generic [ref=e18]: 語文
+    - generic [ref=e20]: 數學
+    - generic [ref=e22]: 健體
+    - generic [ref=e24]: 生活
+  - generic [ref=e26]:
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - text: 07:50
+        - generic [ref=e32]: 08:15
+      - generic [ref=e33]: 教師晨會
+    - generic [ref=e37]:
+      - generic [ref=e38]:
+        - text: 08:15
+        - generic [ref=e39]: 08:35
+      - generic [ref=e40]: 導師時間
+    - generic [ref=e44]:
+      - generic [ref=e45]:
+        - text: 08:40
+        - generic [ref=e46]: 09:20
+      - generic [ref=e47]: 數學
+      - generic [ref=e48]: 數學
+    - generic [ref=e52]:
+      - generic [ref=e53]: 09:24
+      - generic [ref=e54]: 現在
+    - generic [ref=e59]:
+      - generic [ref=e60]:
+        - text: 09:30
+        - generic [ref=e61]: 10:10
+      - generic [ref=e62]: 國語
+      - generic [ref=e63]: 語文
+    - generic [ref=e67]:
+      - generic [ref=e68]:
+        - text: 10:10
+        - generic [ref=e69]: 10:30
+      - generic [ref=e70]: 課間活動
+    - generic [ref=e74]:
+      - generic [ref=e75]:
+        - text: 10:30
+        - generic [ref=e76]: 11:10
+      - generic [ref=e77]: 國語
+      - generic [ref=e78]: 語文
+    - generic [ref=e82]:
+      - generic [ref=e83]:
+        - text: 11:20
+        - generic [ref=e84]: 12:00
+      - generic [ref=e85]: 生活
+      - generic [ref=e86]: 生活
+    - generic [ref=e90]:
+      - generic [ref=e91]:
+        - text: 12:00
+        - generic [ref=e92]: 12:40
+      - generic [ref=e93]: 午餐時間
+    - generic [ref=e97]:
+      - generic [ref=e98]:
+        - text: 12:40
+        - generic [ref=e99]: 13:20
+      - generic [ref=e100]: 午休時間
+    - generic [ref=e104]:
+      - generic [ref=e105]:
+        - text: 13:30
+        - generic [ref=e106]: 14:10
+      - generic [ref=e107]: 彈性
+      - generic [ref=e108]: 彈性
+    - generic [ref=e112]:
+      - generic [ref=e113]:
+        - text: 14:20
+        - generic [ref=e114]: 15:00
+      - generic [ref=e115]: 生活
+      - generic [ref=e116]: 生活
+    - generic [ref=e120]:
+      - generic [ref=e121]:
+        - text: 15:00
+        - generic [ref=e122]: 15:15
+      - generic [ref=e123]: 打掃活動
+    - generic [ref=e127]:
+      - generic [ref=e128]:
+        - text: 15:15
+        - generic [ref=e129]: 15:55
+      - generic [ref=e130]: 台語曾晉祥 · 311
+      - generic [ref=e131]: 本土語
+    - generic [ref=e135]:
+      - generic [ref=e136]:
+        - text: 15:55
+        - generic [ref=e137]: 18:00
+      - generic [ref=e138]: 課後輔導班
+  - group [ref=e139]:
+    - generic "完整一週課表" [ref=e140] [cursor=pointer]
+  - generic [ref=e143]:
+    - generic [ref=e144]:
+      - heading "接下來一週" [level=2] [ref=e145]
+      - generic [ref=e146]: 09/01 – 09/07
+      - link "全部行事曆 →" [ref=e147] [cursor=pointer]:
+        - /url: calendar.html
+    - paragraph [ref=e148]: 鎮昌國小 115 學年度第 1 學期行事曆
+    - generic [ref=e150]:
+      - generic [ref=e151]:
+        - generic [ref=e152]: "7"
+        - generic [ref=e153]: 週一
+        - generic [ref=e154]: 09/07–09/18
+      - generic [ref=e155]: 身高體重、視力及頭蝨檢查
+  - link "校園資訊" [ref=e156] [cursor=pointer]:
+    - /url: school.html
+  - contentinfo [ref=e163]:
+    - text: 資料來源：鎮昌國小 115 學年度一年三班課表 ＋ 第 1 學期行事曆 週二上到 15:55，其餘四天午休後放學；放學後到課後輔導班，18:00 接回。
+    - link "8、9 月點心表 →" [ref=e164] [cursor=pointer]:
+      - /url: snack.html
