@@ -3,35 +3,42 @@
 // 唯一「過時」情境是程式碼更新，下一次載入就會拿到新版，學期制的課表完全可以接受。
 
 const CACHE = 'tt-v1';
-// 只快取同源的頁面與腳本；CDN 資源（Google Fonts、GSAP）靠瀏覽器自己的 HTTP cache
-self.addEventListener('fetch', e => {
-  const u = e.request.url;
-  if (!u.startsWith(self.location.origin)) return;            // 跨域不攔
-  const dest = e.request.destination;
-  if (dest !== 'document' && dest !== 'script') return;       // 只管 HTML + JS
+const PRECACHE = ['./', 'index.html', 'events.js', 'calendar.html'];
 
-  e.respondWith(
-    caches.open(CACHE).then(cache =>
-      cache.match(e.request).then(cached => {
-        // 不管有沒有快取都發網路請求更新
-        const fresh = fetch(e.request).then(res => {
-          if (res.ok) cache.put(e.request, res.clone());
-          return res;
-        }).catch(() => cached);                                // 離線 fallback
-        return cached || fresh;                                // 有快取→秒回；沒有→等網路
-      })
-    )
-  );
+// 安裝時預快取關鍵檔案，避免長時間閒置被瀏覽器回收後 reload 無東西可回
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(PRECACHE)).catch(() => {}));
+  self.skipWaiting();
 });
 
-// 新 SW 裝好直接接管，不等舊頁面關閉
-self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => {
-  // 清掉舊版快取（改 CACHE 名稱時生效）
   e.waitUntil(
     caches.keys().then(ks => Promise.all(
       ks.filter(k => k !== CACHE).map(k => caches.delete(k))
     )).then(() => self.clients.claim())
+  );
+});
+
+// 只快取同源的頁面與腳本；CDN 資源（Google Fonts、GSAP）靠瀏覽器自己的 HTTP cache
+self.addEventListener('fetch', e => {
+  const u = e.request.url;
+  if (!u.startsWith(self.location.origin)) return;
+  const d = e.request.destination;
+  if (d !== 'document' && d !== 'script') return;
+
+  // 立刻發網路請求（不等開快取），拿到就更新快取
+  const net = fetch(e.request).then(async r => {
+    if (r.ok) { const c = await caches.open(CACHE); await c.put(e.request, r.clone()); }
+    return r;
+  });
+  e.waitUntil(net.catch(() => {}));   // 讓 SW 活到快取寫完
+
+  e.respondWith(
+    caches.open(CACHE).then(c => c.match(e.request)).then(hit =>
+      hit || net.catch(() =>          // 快取空＋網路掛→給離線提示而非 undefined
+        new Response('<!doctype html><meta charset=utf-8><title>離線</title><p style="text-align:center;margin-top:40vh;font-family:sans-serif">無法連線，請重新整理</p>',
+          {headers:{'Content-Type':'text/html;charset=utf-8'}}))
+    )
   );
 });
 
