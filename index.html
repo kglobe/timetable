@@ -5,10 +5,10 @@
 <meta name="theme-color" content="#fbf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#24211d" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="noindex, nofollow">
-<title>梓琪的課表</title>
+<title>一年三班課表</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <script>try{var _t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.dataset.theme=_t;}catch(e){document.documentElement.dataset.theme='light';}</script>
 <script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('preanim')</script>
 <style>
@@ -72,7 +72,6 @@
   .eyebrow{font-size:12px;font-weight:600;letter-spacing:.18em;
     color:var(--accent);margin:0 0 8px}
   h1{font-size:29px;font-weight:700;margin:0;letter-spacing:.01em;text-wrap:balance}
-  h1 .who{color:var(--accent)}
   .datebar{display:flex;align-items:center;gap:9px;margin-top:8px;color:var(--muted);font-size:15px}
   .datebar .num{font-size:16px}
   .schoolink{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:8px 13px;
@@ -235,7 +234,7 @@
         stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
     </button>
     <p class="eyebrow reveal">鎮昌國小 一年三班 · 導師：謝懿雯</p>
-    <h1 class="reveal"><span class="who">梓琪</span>的今日課表</h1>
+    <h1 class="reveal">今日課表</h1>
     <div class="datebar reveal">
       <span class="num" id="today"></span>
     </div>
@@ -285,7 +284,6 @@
   </footer>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="events.js"></script>
 <script>
 // ---- 課程資料 ----
@@ -334,16 +332,13 @@ const dow = now.getDay();
 const nowMin = now.getHours()*60 + now.getMinutes();
 const isWeekday = dow>=1 && dow<=5;
 const root = document.documentElement;
-const canAnim = !!window.gsap && matchMedia("(prefers-reduced-motion: no-preference)").matches;
-// 跨節 reload 不重播進場（一天跨節十幾次，每次都播就變成高頻動畫）
-let skipIntro=false;
-try{ skipIntro = sessionStorage.getItem("nointro")==="1"; sessionStorage.removeItem("nointro"); }catch(e){}
+let canAnim = false; // 改由 GSAP async 載入後設定
 
-// 平日 19:00 前顯示當天（即時狀態）；之後或週末改預覽下個上課日
+// 平日 19:00 前顯示當天；放假、晚上或週末預覽下一個上課日
 const PREVIEW_AFTER = 19*60;
-const live = isWeekday && nowMin < PREVIEW_AFTER;
-const disp = new Date(now);
-if(!live){ do{ disp.setDate(disp.getDate()+1); }while(disp.getDay()===0||disp.getDay()===6); }
+const holidayEvent=holidayEventOn(now);
+const live = isWeekday && !holidayEvent && nowMin < PREVIEW_AFTER;
+const disp = live ? new Date(now) : nextSchoolDay(now);
 const dispDow = disp.getDay();
 const hd = live ? now : disp;
 
@@ -673,6 +668,11 @@ if(current){
     // 捲出視窗時不重啟；捲回來時 startRunner 自然會抓當下的 phase
     if(canAnim && rn && !_runnerOff && pose==='run'){ const ph=runnerPhase(); if(rn.dataset.phase!==ph) loopRunner(ph); }
   },30000);
+}else if(holidayEvent){
+  statusEl.className = "status rest reveal";
+  statusEl.innerHTML = `<div class="k">今天放假</div>
+    <div class="v">${holidayEvent[2]}</div>
+    <div class="t num">下一個上課日 ${md(disp)}（週${WL[dispDow]}），${items[0].t} 開始</div>`;
 }else if(!live){
   const diff = Math.round((new Date(disp.getFullYear(),disp.getMonth(),disp.getDate())
     - new Date(now.getFullYear(),now.getMonth(),now.getDate()))/86400000);
@@ -703,8 +703,8 @@ const schedKey = m => { const c=items.find(it=>{const[s,e]=range(it.t);return m>
   return c?c.t:(m<dayStart?'before':m>=dayEnd?'after':'break'); };
 function stateKey(){
   const d=new Date(), dw=d.getDay(), m=d.getHours()*60+d.getMinutes();
-  const lv = dw>=1&&dw<=5 && m<PREVIEW_AFTER;
-  if(!lv){ const t=new Date(d); do{t.setDate(t.getDate()+1);}while(t.getDay()===0||t.getDay()===6);
+  const lv = dw>=1&&dw<=5 && !holidayEventOn(d) && m<PREVIEW_AFTER;
+  if(!lv){ const t=nextSchoolDay(d);
     return 'P'+t.getFullYear()+pad(t.getMonth()+1)+pad(t.getDate()); }
   return 'L'+dw+':'+schedKey(m);
 }
@@ -723,12 +723,12 @@ setInterval(()=>{
 
 // ---- 完整週課表 ----
 let g = "<tr><th></th>" + WEEK.map((w,i)=>
-  `<th class="${isWeekday&&i===dow-1?'today':''}">${w}</th>`).join("") + "</tr>";
+  `<th class="${i===dispDow-1?'today':''}">${w}</th>`).join("") + "</tr>";
 ROWS.forEach(([t,cells])=>{
   g += `<tr><td class="time-c num">${t}</td>`;
   if(Array.isArray(cells)){
     g += cells.map((c,i)=>{
-      const today = isWeekday&&i===dow-1 ? "today":"";
+      const today = i===dispDow-1 ? "today":"";
       return `<td class="${today}" style="${catStyle(c&&catOf(c))}">${c||""}</td>`;
     }).join("");
   }else{
@@ -762,33 +762,28 @@ if(within.length){
     (nx ? `<div class="next reveal">下一個活動　<b class="num">${md(parse(nx[0]))}</b>　${nx[2]}</div>` : "");
 }
 
-// ---- 動畫（GSAP 失敗或偏好減少動態時，內容照樣完整顯示）----
-if(canAnim){
-  const runner = document.querySelector(".node.now .nowrunner");
-  if(skipIntro){
-    gsap.set(".reveal, #nowline",{autoAlpha:1,y:0});
-  }else{
-    gsap.set(".reveal",{autoAlpha:0,y:14});
-    gsap.set("#nowline",{autoAlpha:0,y:0});
-    // 首屏外的區塊不排進場：滾到時早就播完了，只是白佔 0.7 秒
-    gsap.set(".more, .cal, .cal .next, .schoolink",{autoAlpha:1,y:0});
-    const t = gsap.timeline({defaults:{ease:"power2.out"}});
-    t.to("header .reveal",{autoAlpha:1,y:0,duration:.22,stagger:.03})
-     .to(".status, .legend",{autoAlpha:1,y:0,duration:.22,stagger:.04},"-=.15")
-     .to(".node",{autoAlpha:1,y:0,duration:.22,stagger:.03},"-=.06")
-     .to("#nowline",{autoAlpha:1,duration:.2},"-=.3")
-     .set(".reveal, #nowline",{autoAlpha:1,y:0}); // 保底：任何漏網 reveal 都顯示
-    const rule = document.getElementById("nlrule");
-    if(rule){
-      t.from("#nowline .nl-rail span",{scale:.7,autoAlpha:0,duration:.3,ease:"back.out(2)"},"-=.3")
-       .from(rule,{scaleX:0,duration:.35,ease:"power3.out"},"-=.25");
-    }
-    if(runner) gsap.from(runner,{autoAlpha:0,scale:.85,transformOrigin:"50% 100%",duration:.35,delay:.25,ease:"back.out(1.7)"});
-  }
+// ---- 行事曆捲動進場（純 CSS transition，不需 GSAP）----
+if("IntersectionObserver" in window){
+  const evs=document.querySelectorAll(".cal .ev");
+  evs.forEach(el=>el.classList.add("io-hidden"));
+  const io=new IntersectionObserver((ents)=>{
+    ents.forEach(e=>{ if(e.isIntersecting){ e.target.classList.remove("io-hidden");
+      e.target.classList.add("io-in"); io.unobserve(e.target); } });
+  },{rootMargin:"0px 0px -8% 0px"});
+  evs.forEach(el=>io.observe(el));
+}
+// 內容已就緒，立刻顯示（不等 GSAP）
+root.classList.remove("preanim");
+
+// ---- GSAP 載入後才跑的動畫（async，不擋內容）----
+function _onGsap(){
+  if(!matchMedia("(prefers-reduced-motion: no-preference)").matches) return;
+  canAnim = true;
   // now-line 呼吸光暈
   gsap.fromTo(".nl-rail span b",{scale:.6,autoAlpha:.5},
     {scale:2.4,autoAlpha:0,duration:1.8,ease:"sine.out",repeat:-1,repeatDelay:.3,delay:.6});
-  // 跑步的馬尾小女孩：擺動交給 loopRunner（隨狀態換速度），捲出視窗就停
+  // 跑步的馬尾小女孩
+  const runner = document.querySelector(".node.now .nowrunner");
   if(runner){
     startRunner();
     const card=runner.closest(".card");
@@ -797,18 +792,7 @@ if(canAnim){
         {rootMargin:"80px 0px"}).observe(card);
     }
   }
-  // 行事曆捲動進場
-  if("IntersectionObserver" in window){
-    const evs=document.querySelectorAll(".cal .ev");
-    evs.forEach(el=>el.classList.add("io-hidden"));
-    const io=new IntersectionObserver((ents)=>{
-      ents.forEach(e=>{ if(e.isIntersecting){ e.target.classList.remove("io-hidden");
-        e.target.classList.add("io-in"); io.unobserve(e.target); } });
-    },{rootMargin:"0px 0px -8% 0px"});
-    evs.forEach(el=>io.observe(el));
-  }
 }
-root.classList.remove("preanim");
 
 // ---- 深淺色切換（未點過＝跟隨系統，點過記到 localStorage）----
 document.getElementById("themetog").addEventListener("click",()=>{
@@ -817,3 +801,4 @@ document.getElementById("themetog").addEventListener("click",()=>{
   try{ localStorage.setItem("theme", next); }catch(e){}
 });
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" async crossorigin onload="_onGsap()"></script>

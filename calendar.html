@@ -8,7 +8,7 @@
 <title>115 學年度第 1 學期行事曆</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <script>try{var _t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.dataset.theme=_t;}catch(e){document.documentElement.dataset.theme='light';}</script>
 <script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('preanim')</script>
 <style>
@@ -147,11 +147,9 @@
   </footer>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="events.js"></script>
 <script>
 const root=document.documentElement;
-const canAnim=!!window.gsap && matchMedia("(prefers-reduced-motion: no-preference)").matches;
 const WL=["日","一","二","三","四","五","六"];
 const MO=["一","二","三","四","五","六","七","八","九","十","十一","十二"];
 const pad=n=>String(n).padStart(2,"0");
@@ -210,10 +208,6 @@ function render(){
   });
   out+="</section>";
   box.innerHTML=out;
-  if(canAnim){
-    gsap.set("#list .reveal",{autoAlpha:0,y:10});
-    gsap.to("#list .reveal",{autoAlpha:1,y:0,duration:.4,stagger:.02,ease:"power2.out"});
-  }
 }
 render();
 
@@ -231,11 +225,6 @@ toggle(document.getElementById("f-hol"),v=>onlyHoliday=v);
 const first=document.querySelector(".ev.today, .ev.future");
 if(first) first.scrollIntoView({block:"center"});
 
-if(canAnim){
-  gsap.set("header .reveal",{autoAlpha:0,y:14});
-  gsap.to("header .reveal",{autoAlpha:1,y:0,duration:.5,stagger:.07,ease:"power2.out"});
-  gsap.from(".todayline .rule",{scaleX:0,duration:.7,delay:.3,ease:"power3.out"});
-}
 root.classList.remove("preanim");
 
 document.getElementById("themetog").addEventListener("click",()=>{

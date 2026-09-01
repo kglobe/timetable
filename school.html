@@ -8,7 +8,7 @@
 <title>校園資訊</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <script>try{var _t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.dataset.theme=_t;}catch(e){document.documentElement.dataset.theme='light';}</script>
 <script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('preanim')</script>
 <style>
@@ -23,7 +23,9 @@
     --shadow:0 1px 2px rgba(75,70,65,.04),0 8px 22px rgba(75,70,65,.07);
     --shadow-lift:0 2px 8px rgba(64,91,85,.18),0 14px 30px rgba(75,70,65,.13);
   }
+  :root[data-theme="light"]{color-scheme:light}
   :root[data-theme="dark"]{
+      color-scheme:dark;
       --paper:#24211d; --card:#2c2823; --ink:#ece5d9; --muted:#a89f92;
       --line:#39332c; --rail:#463f37; --accent:#86b0a5; --accent-weak:#2b3733;
       --holiday:#d97b79; --holiday-weak:#3a2523;
@@ -52,7 +54,7 @@
     display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:50%;
     background:var(--card);color:var(--muted);cursor:pointer;box-shadow:var(--shadow);
     -webkit-tap-highlight-color:transparent;transition:background .2s,color .2s}
-  .themetog:hover{color:var(--accent)}
+  @media(hover:hover)and(pointer:fine){.themetog:hover{color:var(--accent)}}
   .themetog:active{color:var(--accent);background:var(--accent-weak)}
   .themetog .ic{width:22px;height:22px}
   .themetog .ic-moon{display:none}
@@ -199,7 +201,7 @@
 
   <section class="reveal">
     <h2>上學與放學</h2>
-    <p class="sub">學務處宣導單。梓琪走<b>第四路線（玄關）</b>。</p>
+    <p class="sub">學務處宣導單。放學走<b>第四路線（玄關）</b>。</p>
     <div class="cls" style="margin-bottom:14px">
       <div><div class="k">上學時間</div><div class="v num">7:30<span class="u">–</span>7:50</div></div>
       <div><div class="k">放學路線</div><div class="v">④ 玄關</div></div>
@@ -208,7 +210,7 @@
 
     <div class="mapcard">
       <svg class="map" viewBox="0 0 340 250" role="img"
-        aria-label="家長接送區位置圖：梓琪走第四路線，在玄關等候接送">
+        aria-label="家長接送區位置圖：第四路線在玄關等候接送">
         <defs>
           <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
             <path d="M0 0 L10 5 L0 10 z" fill="var(--rail)"/>
@@ -274,7 +276,7 @@
         <span><b>①</b> 大門</span>
         <span><b>②</b> 南側門</span>
         <span><b>③</b> 後門</span>
-        <span class="on">④ 玄關（梓琪）</span>
+        <span class="on">④ 玄關</span>
       </div>
     </div>
     <div class="week">
@@ -351,10 +353,8 @@
   </footer>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script>
 const root=document.documentElement;
-const canAnim=!!window.gsap && matchMedia("(prefers-reduced-motion: no-preference)").matches;
 
 // ---- 開學倒數 ----
 const OPEN=new Date(2026,7,31); // 2026-08-31
@@ -379,88 +379,6 @@ if(days>0){
   cd.remove();
 }
 
-// ---- 進場動畫（與 index.html 同節奏；女孩原地小跑步）----
-if(canAnim){
-  gsap.set(".reveal",{autoAlpha:0,y:14});
-  gsap.timeline({defaults:{ease:"power2.out"}})
-    .to("header .reveal",{autoAlpha:1,y:0,duration:.5,stagger:.07})
-    .to(".count",{autoAlpha:1,y:0,duration:.5,stagger:.09},"-=.25")
-    .to("section.reveal",{autoAlpha:1,y:0,duration:.5,stagger:.09},"-=.2")
-    .set(".reveal",{autoAlpha:1,y:0});
-  const dd=document.getElementById("dd");
-  if(dd){
-    const n=+dd.textContent, o={v:0};
-    gsap.to(o,{v:n,duration:1.1,delay:.35,ease:"power2.out",onUpdate:()=>dd.textContent=Math.round(o.v)});
-  }
-  const g=".count .girl";
-  if(document.querySelector(g)){
-    const parts=[g,`${g} .leg-f`,`${g} .leg-b`,`${g} .arm-f`,`${g} .arm-b`,`${g} .pony`,`${g} .tie`,`${g} .shadow`];
-    const sw=16,d=.26,bob=2.5;
-    const L={duration:d,ease:"sine.inOut",repeat:-1,yoyo:true};
-    const startRun=()=>{
-      gsap.to(g,{rotation:2,svgOrigin:"20 40",duration:.4,ease:"power2.out"});
-      gsap.fromTo(`${g} .leg-f`,{rotation:-sw},{rotation:sw*.85,svgOrigin:"19 29",...L});
-      gsap.fromTo(`${g} .leg-b`,{rotation:sw*.85},{rotation:-sw,svgOrigin:"19 29",...L});
-      gsap.fromTo(`${g} .arm-f`,{rotation:sw+2},{rotation:-sw-2,svgOrigin:"20 18",...L});
-      gsap.fromTo(`${g} .arm-b`,{rotation:-sw-2},{rotation:sw+2,svgOrigin:"20 18",...L});
-      gsap.to(g,{y:-bob,...L});
-      gsap.fromTo(`${g} .pony, ${g} .tie`,{rotation:-10},{rotation:18,svgOrigin:"15 8",...L,duration:d*1.3});
-      gsap.fromTo(`${g} .shadow`,{scaleX:.7,opacity:.10},{scaleX:1,opacity:.22,svgOrigin:"20 43",...L});
-    };
-    // 體操旋轉跳：passé 抬腳 → 逐格轉一圈 → bounce 落地
-    const PIRO=[
-      // 0: 正面 passé（單腳站、另腳提膝、雙手上舉）
-      `<ellipse cx="20" cy="43" rx="5" ry="1.2" fill="var(--accent)" stroke="none" opacity=".10"/>
-       <path d="M15 8 C 11 5,8 10,10 16"/><line x1="20" y1="14" x2="20" y2="29"/>
-       <path d="M20 29 L20 41"/><path d="M20 29 L27 25"/>
-       <path d="M20 18 L14 10"/><path d="M20 18 L26 10"/>
-       <circle cx="20" cy="9" r="6.2" fill="var(--accent)" stroke="none"/>
-       <circle cx="15" cy="8" r="1.5" fill="#f0c050" stroke="none"/>`,
-      // 1: 側面（身體窄）
-      `<ellipse cx="20" cy="43" rx="3" ry="1" fill="var(--accent)" stroke="none" opacity=".06"/>
-       <line x1="20" y1="14" x2="20" y2="29"/><path d="M20 29 L20 41"/><path d="M20 29 L23 26"/>
-       <path d="M20 18 L20 10"/>
-       <circle cx="20" cy="9" r="5.4" fill="var(--accent)" stroke="none"/>`,
-      // 2: 背面（馬尾反向）
-      `<ellipse cx="20" cy="43" rx="5" ry="1.2" fill="var(--accent)" stroke="none" opacity=".10"/>
-       <path d="M25 8 C 29 5,32 10,30 16"/><line x1="20" y1="14" x2="20" y2="29"/>
-       <path d="M20 29 L20 41"/><path d="M20 29 L13 25"/>
-       <path d="M20 18 L26 10"/><path d="M20 18 L14 10"/>
-       <circle cx="20" cy="9" r="6.2" fill="var(--accent)" stroke="none"/>
-       <circle cx="25" cy="8" r="1.5" fill="#f0c050" stroke="none"/>`,
-      // 3: 另一側
-      `<ellipse cx="20" cy="43" rx="3" ry="1" fill="var(--accent)" stroke="none" opacity=".06"/>
-       <line x1="20" y1="14" x2="20" y2="29"/><path d="M20 29 L20 41"/><path d="M20 29 L17 26"/>
-       <path d="M20 18 L20 10"/>
-       <circle cx="20" cy="9" r="5.4" fill="var(--accent)" stroke="none"/>`,
-    ];
-    const doJump=()=>{
-      gsap.killTweensOf(parts);
-      const sv=document.querySelector(g); if(!sv) return;
-      const orig=sv.innerHTML;
-      gsap.timeline({onComplete(){sv.innerHTML=orig;gsap.set(g,{y:0,rotation:2,scaleX:1,svgOrigin:"20 40"});startRun();gsap.delayedCall(3.5+Math.random()*2,doJump);}})
-        // 收腿蓄力
-        .to(`${g} .leg-f`,{rotation:80,svgOrigin:"19 29",duration:.18},0)
-        .to(`${g} .leg-b`,{rotation:2,svgOrigin:"19 29",duration:.18},0)
-        .to(`${g} .arm-f`,{rotation:-75,svgOrigin:"20 18",duration:.18},0)
-        .to(`${g} .arm-b`,{rotation:70,svgOrigin:"20 18",duration:.18},0)
-        .to(`${g} .pony, ${g} .tie`,{rotation:20,svgOrigin:"15 8",duration:.18},0)
-        .to(`${g} .shadow`,{scaleX:.4,opacity:.06,svgOrigin:"20 43",duration:.18},0)
-        // 跳起 + 逐格轉圈（正→側→背→側→正）
-        .call(()=>{sv.innerHTML=PIRO[0];},[],0.20)
-        .to(g,{y:-20,rotation:0,svgOrigin:"20 40",duration:.25,ease:"sine.out"},.20)
-        .call(()=>{sv.innerHTML=PIRO[1];},[],0.33)
-        .call(()=>{sv.innerHTML=PIRO[2];},[],0.46)
-        .call(()=>{sv.innerHTML=PIRO[3];},[],0.59)
-        .call(()=>{sv.innerHTML=PIRO[0];},[],0.72)
-        .to(g,{y:-16,duration:.35,ease:"sine.inOut"},.45)
-        // 落地
-        .to(g,{y:0,duration:.22,ease:"bounce.out"},.80);
-    };
-    startRun();
-    gsap.delayedCall(3.5+Math.random()*2,doJump);
-  }
-}
 root.classList.remove("preanim");
 
 // ---- 深淺色切換 ----
@@ -469,4 +387,5 @@ document.getElementById("themetog").addEventListener("click",()=>{
   root.dataset.theme=next;
   try{ localStorage.setItem("theme",next); }catch(e){}
 });
+
 </script>

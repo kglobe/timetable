@@ -32,3 +32,20 @@ const EVENTS = [
   ["2027-01-19",null,"跳蚤市場（資源回收及理財教育）",false],
   ["2027-01-20",null,"第一學期課程結束",false],
 ];
+
+const schoolDateKey=date=>{
+  const y=date.getFullYear(),m=String(date.getMonth()+1).padStart(2,"0"),d=String(date.getDate()).padStart(2,"0");
+  return `${y}-${m}-${d}`;
+};
+
+function holidayEventOn(date){
+  const key=schoolDateKey(date);
+  return EVENTS.find(ev=>ev[3]&&ev[0]<=key&&(ev[1]||ev[0])>=key)||null;
+}
+
+function nextSchoolDay(date){
+  const next=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+  do{ next.setDate(next.getDate()+1); }
+  while(next.getDay()===0||next.getDay()===6||holidayEventOn(next));
+  return next;
+}

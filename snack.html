@@ -8,7 +8,7 @@
 <title>課後班點心表</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <script>try{var _t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.dataset.theme=_t;}catch(e){document.documentElement.dataset.theme='light';}</script>
 <script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('preanim')</script>
 <style>
@@ -211,10 +211,9 @@
   </footer>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script>
 const root=document.documentElement;
-const canAnim=!!window.gsap && matchMedia("(prefers-reduced-motion: no-preference)").matches;
+let canAnim=false;
 const WL=["日","一","二","三","四","五","六"];
 const MO=["一","二","三","四","五","六","七","八","九","十","十一","十二"];
 
@@ -333,23 +332,32 @@ document.getElementById("f-up").addEventListener("click",e=>{
   onlyUpcoming=on; render();
 });
 
-if(canAnim){
-  gsap.set("header .reveal",{autoAlpha:0,y:14});
-  gsap.to("header .reveal",{autoAlpha:1,y:0,duration:.5,stagger:.07,ease:"power2.out"});
-  gsap.from(".todayline .rule",{scaleX:0,duration:.7,delay:.3,ease:"power3.out"});
+root.classList.remove("preanim");
 
+function _onGsap(){
+  canAnim=matchMedia("(prefers-reduced-motion: no-preference)").matches;
+  if(!canAnim) return;
+  const heroTweens=[];
   // hero 裝飾：慢轉環 + 浮動圓 + 閃點
-  gsap.to(".art-ring",{rotation:360,duration:60,ease:"none",repeat:-1,transformOrigin:"50% 50%"});
+  heroTweens.push(gsap.to(".art-ring",{rotation:360,duration:60,ease:"none",repeat:-1,transformOrigin:"50% 50%"}));
   gsap.utils.toArray(".art-float").forEach((el,i)=>{
-    gsap.to(el,{y:"random(-7,7)",x:"random(-5,5)",duration:"random(3,5)",
-      ease:"sine.inOut",repeat:-1,yoyo:true,delay:i*.35});
+    heroTweens.push(gsap.to(el,{y:"random(-7,7)",x:"random(-5,5)",duration:"random(3,5)",
+      ease:"sine.inOut",repeat:-1,yoyo:true,delay:i*.35}));
   });
   gsap.utils.toArray(".art-spark").forEach((el,i)=>{
-    gsap.to(el,{opacity:"random(.15,.6)",scale:"random(.7,1.3)",duration:"random(1.5,3)",
-      ease:"sine.inOut",repeat:-1,yoyo:true,delay:i*.25,transformOrigin:"50% 50%"});
+    heroTweens.push(gsap.to(el,{opacity:"random(.15,.6)",scale:"random(.7,1.3)",duration:"random(1.5,3)",
+      ease:"sine.inOut",repeat:-1,yoyo:true,delay:i*.25,transformOrigin:"50% 50%"}));
   });
+  let heroVisible=true;
+  const syncHeroMotion=()=>heroTweens.forEach(t=>t.paused(document.hidden||!heroVisible));
+  document.addEventListener("visibilitychange",syncHeroMotion);
+  if("IntersectionObserver" in window){
+    new IntersectionObserver(([entry])=>{
+      heroVisible=entry.isIntersecting;
+      syncHeroMotion();
+    },{rootMargin:"80px 0px"}).observe(document.getElementById("hero"));
+  }
 }
-root.classList.remove("preanim");
 
 document.getElementById("themetog").addEventListener("click",()=>{
   const t=root.dataset.theme==="dark"?"light":"dark";
@@ -357,3 +365,4 @@ document.getElementById("themetog").addEventListener("click",()=>{
   try{ localStorage.setItem("theme",t); }catch(e){}
 });
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" async crossorigin onload="_onGsap()"></script>
