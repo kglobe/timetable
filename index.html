@@ -432,22 +432,23 @@ const ACTIONS=[
 let _runnerOff=false;
 let _actionTs=0; // actionLoop 心跳：每次 step 更新，30s interval 偵測斷鏈重啟
 let _runTs=0;    // loopRunner 心跳：startRun / doJump 更新，偵測跳躍鏈斷裂
+let _actionTL=null; // actionLoop 的 timeline，killRunner 要直接 .kill() 才不會殘留 onComplete
 function actionLoop(){
   const S=".node.now .runner", wrap=document.querySelector(".node.now .nowrunner");
   if(!wrap) return;
   const sv=wrap.querySelector(".runner"); if(!sv) return;
   let i=0;
-  // 星形跳→高踢→弓步→深蹲：每動「彈起→呼吸→下沉蓄力」，下沉即為下一動的起跳，動作才接得起來
   const step=()=>{
-    if(_runnerOff || !document.querySelector(".node.now .runner")) return; // 捲出視窗或換節後就停
+    if(_runnerOff || !document.querySelector(".node.now .runner")) return;
     _actionTs=Date.now();
+    if(_actionTL){ _actionTL.kill(); _actionTL=null; }
     gsap.killTweensOf(S);
     setFrame(sv,ACTIONS[i]); i=(i+1)%ACTIONS.length;
-    gsap.timeline({onComplete:step})
+    _actionTL=gsap.timeline({onComplete:step})
       .fromTo(sv,{scale:.62,y:9,rotation:-6,transformOrigin:"50% 92%"},
-                 {scale:1,y:0,rotation:0,duration:.5,ease:"back.out(2.2)"})   // 從上一動的下蹲彈起落地
-      .to(S,{y:-2.5,duration:.55,ease:"sine.inOut",yoyo:true,repeat:2})       // 原地呼吸幾下
-      .to(S,{scale:.9,y:4,duration:.3,ease:"power2.in"});                     // 再次下沉蓄力→交棒下一動
+                 {scale:1,y:0,rotation:0,duration:.5,ease:"back.out(2.2)"})
+      .to(S,{y:-2.5,duration:.55,ease:"sine.inOut",yoyo:true,repeat:2})
+      .to(S,{scale:.9,y:4,duration:.3,ease:"power2.in"});
   };
   step();
 }
@@ -632,6 +633,7 @@ function loopRunner(phase){
 function killRunner(){
   if(_jumpTimer){ _jumpTimer.kill(); _jumpTimer=null; }
   if(_jumpTL){ _jumpTL.kill(); _jumpTL=null; }
+  if(_actionTL){ _actionTL.kill(); _actionTL=null; }
   gsap.killTweensOf(".node.now .runner");
   gsap.killTweensOf(".node.now .runner *");
 }
