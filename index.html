@@ -431,6 +431,7 @@ const ACTIONS=[
 // 捲出視窗時設 true：自我排程的迴圈（actionLoop / doJump）看到就停手，不再續排
 let _runnerOff=false;
 let _actionTs=0; // actionLoop 心跳：每次 step 更新，30s interval 偵測斷鏈重啟
+let _runTs=0;    // loopRunner 心跳：startRun / doJump 更新，偵測跳躍鏈斷裂
 function actionLoop(){
   const S=".node.now .runner", wrap=document.querySelector(".node.now .nowrunner");
   if(!wrap) return;
@@ -545,6 +546,7 @@ function loopRunner(phase){
   const lean = phase==='sprint'?7   : phase==='warm'?-2  : 2;    // 前傾/後仰（度）
   const jInt = phase==='sprint'?2.5 : phase==='warm'?5   : 3.5;  // 跳躍間隔（秒）
   function startRun(){
+    _runTs=Date.now();
     const L={duration:d,ease:"sine.inOut",repeat:-1,yoyo:true};
     gsap.to(S,{rotation:lean,svgOrigin:"20 40",duration:.5,ease:"power2.out"});
     gsap.fromTo(`${S} .leg-f`,{rotation:-sw},{rotation:sw*.85,svgOrigin:"19 29",...L});
@@ -594,9 +596,10 @@ function loopRunner(phase){
   ];
   function doJump(){
     if(_runnerOff || !document.querySelector(".node.now .runner")) return;
+    _runTs=Date.now();
     gsap.killTweensOf(parts);
     const sv=document.querySelector(S); if(!sv) return;
-    _jumpTL=gsap.timeline({onComplete(){_jumpTL=null;setFrame(sv,RUNNER_INNER);gsap.set(S,{y:0,rotation:lean,scaleX:1,svgOrigin:"20 40"});startRun();_jumpTimer=gsap.delayedCall(jInt+Math.random()*1.5,doJump);}});
+    _jumpTL=gsap.timeline({onComplete(){_jumpTL=null;_runTs=Date.now();setFrame(sv,RUNNER_INNER);gsap.set(S,{y:0,rotation:lean,scaleX:1,svgOrigin:"20 40"});startRun();_jumpTimer=gsap.delayedCall(jInt+Math.random()*1.5,doJump);}});
     const tl=_jumpTL;
     // 準備：四肢收進 passé 姿勢
     tl.to(S,{y:-3,rotation:0,svgOrigin:"20 40",duration:.2,ease:"power2.out"},0)
@@ -686,7 +689,8 @@ if(current){
     }
     // 捲出視窗時不重啟；捲回來時 startRunner 自然會抓當下的 phase
     if(canAnim && rn && !_runnerOff){
-      if(pose==='run'){ const ph=runnerPhase(); if(rn.dataset.phase!==ph) loopRunner(ph); }
+      if(pose==='run'){ const ph=runnerPhase();
+        if(rn.dataset.phase!==ph || Date.now()-_runTs>10000) loopRunner(ph); } // phase 變或鏈斷→重啟
       else if(Date.now()-_actionTs>5000) POSES[pose].loop(); // 非 run 姿勢斷鏈→重啟
     }
   },30000);
