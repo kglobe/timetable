@@ -158,6 +158,19 @@
     box-shadow:0 1px 5px rgba(59,121,96,.28),0 0 0 1px var(--accent-weak)}
 
   /* ---- weekly grid ---- */
+  /* ---- lunch ---- */
+  .lunch{margin:22px 0 0;padding:16px 18px;border-radius:9px;background:var(--card);
+    box-shadow:var(--shadow);border:1px solid var(--line)}
+  .lunch .lh{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .lunch .lh .ico{font-size:18px;line-height:1}
+  .lunch .lh h3{font-size:15px;font-weight:700;margin:0}
+  .lunch .lh .kcal{margin-left:auto;font-size:13px;color:var(--muted);font-weight:500}
+  .lunch .menu{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .lunch .menu span{font-size:14px;font-weight:500;padding:3px 10px;border-radius:999px;
+    background:var(--accent-weak);color:var(--ink);text-align:center}
+  .lunch .linfo{margin-top:10px;font-size:13px;color:var(--muted);line-height:1.7}
+  .lunch.empty{text-align:center;color:var(--muted);font-size:14px;padding:14px 18px}
+
   .more{margin-top:26px;border-top:1px solid var(--line);padding-top:6px}
   summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;
     padding:10px 2px;font-size:15px;font-weight:600;color:var(--ink);user-select:none}
@@ -266,6 +279,8 @@
   </div>
 
   <div class="tl" id="timeline"></div>
+
+  <section class="lunch reveal" id="lunch" hidden></section>
 
   <details class="more reveal">
     <summary>
@@ -787,6 +802,24 @@ document.addEventListener('visibilitychange',()=>{
     try{sessionStorage.setItem("nointro","1");}catch(e){} location.reload(); return; }
   if(canAnim && document.querySelector(".node.now .nowrunner")) startRunner();
 });
+
+// ---- 午餐菜單 ----
+// ponytail: 讀同源 lunch.json（GitHub Action 每天更新），零 CORS 問題
+{
+  const lunchDate = `${disp.getFullYear()}-${pad(disp.getMonth()+1)}-${pad(disp.getDate())}`;
+  const lunchEl = document.getElementById('lunch');
+  fetch('lunch.json').then(r=>r.ok?r.json():null).then(data=>{
+    if(!data) return;
+    const m = data[lunchDate];
+    if(m===undefined) return; // 日期不在 JSON 裡，靜默
+    if(!m){ lunchEl.className='lunch empty reveal'; lunchEl.hidden=false;
+      lunchEl.textContent='今天沒有供餐'; return; }
+    lunchEl.innerHTML=`<div class="lh"><span class="ico">🍱</span><h3>午餐</h3>${m.calories?`<span class="kcal num">${m.calories} kcal</span>`:''}</div>
+      <div class="menu">${m.dishes.map(d=>`<span>${d}</span>`).join('')}</div>
+      ${m.supplier?`<div class="linfo">${m.supplier}　營養師：${m.dietitian||''}</div>`:''}`;
+    lunchEl.hidden=false;
+  }).catch(()=>{});
+}
 
 // ---- 完整週課表 ----
 let g = "<tr><th></th>" + WEEK.map((w,i)=>
