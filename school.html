@@ -10,7 +10,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <script>try{var _t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.dataset.theme=_t;}catch(e){document.documentElement.dataset.theme='light';}</script>
-<script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('preanim')</script>
 <style>
   :root{
     --paper:#fbf7f0; --card:#ffffff; --ink:#413b34; --muted:#7a7067;
@@ -48,16 +47,15 @@
   ::view-transition-group(root){animation-duration:.2s}
   .num{font-family:"Space Grotesk",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
   .wrap{max-width:520px;margin:0 auto;padding:26px 18px 56px}
-  .preanim .reveal{opacity:0}
 
   /* ---- header ---- */
   header{position:relative}
   .themetog{position:absolute;top:-2px;right:-2px;width:35px;height:35px;
     display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:50%;
     background:var(--card);color:var(--muted);cursor:pointer;box-shadow:var(--shadow);
-    -webkit-tap-highlight-color:transparent;transition:background .2s,color .2s}
-  @media(hover:hover)and(pointer:fine){.themetog:hover{color:var(--accent)}}
-  .themetog:active{color:var(--accent);background:var(--accent-weak)}
+    -webkit-tap-highlight-color:transparent;transition:background .2s,color .2s,transform .16s cubic-bezier(.23,1,.32,1)}
+  @media (hover:hover) and (pointer:fine){.themetog:hover{color:var(--accent)}}
+  .themetog:active{color:var(--accent);background:var(--accent-weak);transform:scale(.96)}
   .themetog .ic{width:22px;height:22px}
   .themetog .ic-moon{display:none}
   :root[data-theme="dark"] .themetog .ic-sun{display:none}
@@ -65,7 +63,7 @@
   .back{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
     color:var(--muted);text-decoration:none;margin-bottom:10px;letter-spacing:.04em;
     transition:color .2s}
-  .back:hover{color:var(--accent)}
+  @media (hover:hover) and (pointer:fine){.back:hover{color:var(--accent)}}
   .back svg{width:14px;height:14px}
   .eyebrow{font-size:12px;font-weight:600;letter-spacing:.18em;color:var(--accent);margin:0 0 8px}
   h1{font-size:29px;font-weight:700;margin:0;letter-spacing:.01em;text-wrap:balance}
@@ -161,6 +159,10 @@
   summary::after{content:"+";color:var(--muted);font-size:17px;font-weight:400;line-height:1}
   details[open] summary::after{content:"−"}
   details .a{padding:0 14px 13px;font-size:14px;color:var(--muted);line-height:1.7}
+  /* 展開時答案淡入；收合維持瞬間 */
+  details[open] .a{animation:dopen .22s cubic-bezier(.23,1,.32,1)}
+  @keyframes dopen{from{opacity:0;transform:translateY(-4px)}}
+  @media(prefers-reduced-motion:reduce){@keyframes dopen{from{opacity:0}}}
   details .a b{color:var(--ink)}
 
   footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);
@@ -179,17 +181,17 @@
       <svg class="ic ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
         stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
     </button>
-    <a class="back reveal" href="index.html">
+    <a class="back" href="index.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
         stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>回課表
     </a>
-    <p class="eyebrow reveal">鎮昌國小 · 115 學年度</p>
-    <h1 class="reveal">校園資訊</h1>
+    <p class="eyebrow">鎮昌國小 · 115 學年度</p>
+    <h1>校園資訊</h1>
   </header>
 
-  <div class="count reveal" id="count"></div>
+  <div class="count" id="count"></div>
 
-  <section class="reveal">
+  <section>
     <h2>一年級教科書版本</h2>
     <p class="sub">115 學年度上學期，學校公告的選用版本。</p>
     <div class="books">
@@ -201,7 +203,7 @@
     </div>
   </section>
 
-  <section class="reveal">
+  <section>
     <h2>上學與放學</h2>
     <p class="sub">學務處宣導單。放學走<b>第四路線（玄關）</b>。</p>
     <div class="cls" style="margin-bottom:14px">
@@ -299,7 +301,7 @@
     </ul>
   </section>
 
-  <section class="reveal">
+  <section>
     <h2>課後照顧班</h2>
     <p class="sub">放學後到 18:00，1A 班在<b>北棟 111 教室</b>。</p>
     <div class="cls">
@@ -310,7 +312,7 @@
     </div>
   </section>
 
-  <section class="reveal">
+  <section>
     <h2>每天要帶的東西</h2>
     <p class="sub">班親會級務報告。</p>
     <ul class="list">
@@ -323,7 +325,7 @@
     </ul>
   </section>
 
-  <section class="reveal">
+  <section>
     <h2>班級規定</h2>
     <p class="sub">導師報告與級務報告重點。</p>
     <ul class="list">
@@ -335,7 +337,7 @@
     </ul>
   </section>
 
-  <section class="reveal">
+  <section>
     <h2>親師交流</h2>
     <p class="sub">班親會當天老師的解答。</p>
     <details>
@@ -391,8 +393,6 @@ if(days>0){
 }else{
   cd.remove();
 }
-
-root.classList.remove("preanim");
 
 // ---- 深淺色切換 ----
 document.getElementById("themetog").addEventListener("click",()=>{

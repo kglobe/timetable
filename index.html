@@ -10,7 +10,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <script>try{var _t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.dataset.theme=_t;}catch(e){document.documentElement.dataset.theme='light';}</script>
-<script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('preanim')</script>
 <style>
   :root{
     --paper:#fbf7f0; --card:#ffffff; --ink:#413b34; --muted:#7a7067;
@@ -51,7 +50,6 @@
   ::view-transition-group(root){animation-duration:.2s}
   .num{font-family:"Space Grotesk",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
   .wrap{max-width:520px;margin:0 auto;padding:26px 18px 56px}
-  .preanim .reveal{opacity:0}
   /* 骨架佔位：JS 注入內容前先撐開版位，避免整頁下推（CLS 0.57 -> 0）*/
   #status:empty{min-height:115px}
   #timeline:empty{min-height:1008px}
@@ -66,7 +64,7 @@
   /* 右上角整塊都能按：把可點範圍往外撐到約 55×55，視覺仍是 35px 圓鈕 */
   .themetog::after{content:"";position:absolute;inset:-10px;border-radius:50%}
   .themetog:active{color:var(--accent);background:var(--accent-weak);transform:scale(.96)}
-  @media(hover:hover)and(pointer:fine){.themetog:hover{color:var(--accent)}}
+  @media (hover:hover) and (pointer:fine){.themetog:hover{color:var(--accent)}}
   .themetog .ic{width:22px;height:22px}
   .themetog .ic-moon{display:none}
   :root[data-theme="dark"] .themetog .ic-sun{display:none}
@@ -77,7 +75,7 @@
     -webkit-tap-highlight-color:transparent;transition:background .2s,color .2s,transform .16s cubic-bezier(.23,1,.32,1)}
   .notifytog::after{content:"";position:absolute;inset:-10px;border-radius:50%}
   .notifytog:active{color:var(--accent);background:var(--accent-weak);transform:scale(.96)}
-  @media(hover:hover)and(pointer:fine){.notifytog:hover{color:var(--accent)}}
+  @media (hover:hover) and (pointer:fine){.notifytog:hover{color:var(--accent)}}
   .notifytog .ic{width:20px;height:20px}
   .notifytog.on{color:var(--accent)}
   .notifytog.on .ndot{position:absolute;top:6px;right:7px;width:7px;height:7px;
@@ -90,8 +88,9 @@
   .schoolink{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:8px 13px;
     border-radius:999px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
     font-size:13.5px;font-weight:600;color:var(--ink);text-decoration:none;
-    -webkit-tap-highlight-color:transparent;transition:box-shadow .2s,color .2s}
-  @media(hover:hover)and(pointer:fine){.schoolink:hover{color:var(--accent);box-shadow:var(--shadow-lift)}}
+    -webkit-tap-highlight-color:transparent;transition:box-shadow .2s,color .2s,transform .16s cubic-bezier(.23,1,.32,1)}
+  .schoolink:active{transform:scale(.97)}
+  @media (hover:hover) and (pointer:fine){.schoolink:hover{color:var(--accent);box-shadow:var(--shadow-lift)}}
   .schoolink svg{width:15px;height:15px;color:var(--accent)}
   .schoolink .arw{width:13px;height:13px;color:var(--muted)}
   .schoolink b{color:var(--accent)}
@@ -179,6 +178,10 @@
   summary::-webkit-details-marker{display:none}
   .chev{width:16px;height:16px;color:var(--accent);transition:transform .25s cubic-bezier(.23,1,.32,1)}
   details[open] .chev{transform:rotate(90deg)}
+  /* 展開時內容淡入；收合維持瞬間 */
+  .more[open]>:not(summary){animation:dopen .22s cubic-bezier(.23,1,.32,1)}
+  @keyframes dopen{from{opacity:0;transform:translateY(-4px)}}
+  @media(prefers-reduced-motion:reduce){@keyframes dopen{from{opacity:0}}}
   .grid-note{font-size:13px;color:var(--muted);margin:6px 0 12px}
   .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -18px;padding:0 18px}
   table{border-collapse:separate;border-spacing:0;font-size:13px;min-width:500px;width:100%}
@@ -198,7 +201,7 @@
   .cal-head .rng{font-size:13px;color:var(--muted)}
   .cal-head .all{margin-left:auto;font-size:13px;font-weight:600;color:var(--accent);
     text-decoration:none;white-space:nowrap;transition:opacity .2s}
-  @media(hover:hover)and(pointer:fine){.cal-head .all:hover{opacity:.72}}
+  @media (hover:hover) and (pointer:fine){.cal-head .all:hover{opacity:.72}}
   .cal-sub{font-size:14px;color:var(--muted);margin:0 0 14px}
   .ev{display:grid;grid-template-columns:52px 1fr;gap:16px;padding:13px 0;border-top:1px solid var(--line)}
   .ev:first-of-type{border-top:none}
@@ -264,16 +267,16 @@
       <svg class="ic ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
         stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
     </button>
-    <p class="eyebrow reveal">鎮昌國小 一年三班 · 導師：謝懿雯</p>
-    <h1 class="reveal">今日課表</h1>
-    <div class="datebar reveal">
+    <p class="eyebrow">鎮昌國小 一年三班 · 導師：謝懿雯</p>
+    <h1>今日課表</h1>
+    <div class="datebar">
       <span class="num" id="today"></span>
     </div>
   </header>
 
-  <section class="status reveal" id="status" role="status"></section>
+  <section class="status" id="status" role="status"></section>
 
-  <div class="legend reveal">
+  <div class="legend">
     <span><i style="background:var(--c-lang)"></i>語文</span>
     <span><i style="background:var(--c-math)"></i>數學</span>
     <span><i style="background:var(--c-nat)"></i>健體</span>
@@ -282,9 +285,9 @@
 
   <div class="tl" id="timeline"></div>
 
-  <section class="lunch reveal" id="lunch" hidden></section>
+  <section class="lunch" id="lunch" hidden></section>
 
-  <details class="more reveal">
+  <details class="more">
     <summary>
       <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
         stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
@@ -294,14 +297,14 @@
     <div class="scroll"><table id="grid"></table></div>
   </details>
 
-  <section class="cal reveal">
+  <section class="cal">
     <div class="cal-head"><h2>接下來一週</h2><span class="rng" id="calrange"></span>
       <a class="all" href="calendar.html">全部行事曆 →</a></div>
     <p class="cal-sub">鎮昌國小 115 學年度第 1 學期行事曆</p>
     <div id="calendar"></div>
   </section>
 
-  <a class="schoolink reveal" href="school.html">
+  <a class="schoolink" href="school.html">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
       stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
@@ -415,7 +418,7 @@ const insertBefore = items.findIndex(it=> range(it.t)[0] > nowMin);
 
 const pct = (s,e)=> Math.min(100,Math.max(0,(nowMin-s)/(e-s)*100));
 
-const nowLineHTML = `<div class="nowline reveal" id="nowline">
+const nowLineHTML = `<div class="nowline" id="nowline">
   <div class="nl-rail"><span><b></b></span></div>
   <div class="nl-body"><span class="nl-time num">${pad(now.getHours())}:${pad(now.getMinutes())}</span>
   <span class="nl-label">現在</span><span class="nl-rule" id="nlrule"></span></div></div>`;
@@ -676,7 +679,7 @@ items.forEach((it,idx)=>{
       <span class="rtime num">${pad(now.getHours())}:${pad(now.getMinutes())}</span>
       ${pose==='run'?RUNNER_SVG:POSES[pose].svg}</div>` : "";
   const prog = on ? `<div class="prog"><i style="transform:scaleX(${(pct(cs,ce)/100).toFixed(4)})"></i></div>${runner}` : "";
-  out += `<div class="node reveal ${it.fixed?'fixed':''} ${on?'now':''}" style="${catStyle(cat)}">
+  out += `<div class="node ${it.fixed?'fixed':''} ${on?'now':''}" style="${catStyle(cat)}">
     <div class="rail"><span class="dot"></span></div>
     <div class="card">
       <div class="time num">${start}<span class="sub">${end}</span></div>
@@ -719,14 +722,14 @@ if(current){
     }
   },30000);
 }else if(holidayEvent){
-  statusEl.className = "status rest reveal";
+  statusEl.className = "status rest";
   statusEl.innerHTML = `<div class="k">今天放假</div>
     <div class="v">${holidayEvent[2]}</div>
     <div class="t num">下一個上課日 ${md(disp)}（週${WL[dispDow]}），${items[0].t} 開始</div>`;
 }else if(!live){
   const diff = Math.round((new Date(disp.getFullYear(),disp.getMonth(),disp.getDate())
     - new Date(now.getFullYear(),now.getMonth(),now.getDate()))/86400000);
-  statusEl.className = "status rest reveal";
+  statusEl.className = "status rest";
   // 有體育課（週一、週四）要提醒穿運動服
   const pe = items.some(it=>it.a==="體育");
   statusEl.innerHTML = `<div class="k">${diff===1?'明天課表':'週'+WL[dispDow]+'課表'}</div>
@@ -737,11 +740,11 @@ if(current){
     <div class="v">${items[0].a.replace("＊","")}</div><div class="t num">${items[0].t} 開始</div>
     <div class="rem">再 <b class="num">${dayStart-nowMin}</b> 分鐘開始</div>`;
 }else if(nowMin >= dayEnd){
-  statusEl.className = "status rest reveal";
+  statusEl.className = "status rest";
   statusEl.innerHTML = `<div class="k">今天</div><div class="v">課程都結束囉</div>`;
 }else{
   const up = items.find(it=> range(it.t)[0] > nowMin);
-  statusEl.className = "status rest reveal";
+  statusEl.className = "status rest";
   statusEl.innerHTML = `<div class="k">下課休息中</div>
     <div class="v"><span class="next-lbl">下一節</span>${up.a.replace("＊","")}</div><div class="t num">${up.t}</div>
     <div class="rem">再 <b class="num">${range(up.t)[0]-nowMin}</b> 分鐘開始</div>`;
@@ -783,7 +786,7 @@ setInterval(()=>{
   const d=new Date(), m=d.getHours()*60+d.getMinutes();
   if(stateKey()!==sig0){
     if(current) sendNotif('下課了！',current.a.replace('＊','')+'　下課了');
-    try{sessionStorage.setItem("nointro","1");}catch(e){} location.reload(); return; }
+    location.reload(); return; }
   // 16:30 接小孩
   if(m>=990&&!_pickup16){ _pickup16=true; try{sessionStorage.setItem(_p16k,'1')}catch(e){} sendNotif('該接小孩了','16:30 到了，準備出發！'); }
   const tstr=pad(d.getHours())+":"+pad(d.getMinutes());
@@ -800,7 +803,7 @@ document.addEventListener('visibilitychange',()=>{
   if(document.hidden){ if(canAnim) stopRunner(); return; }
   if(stateKey()!==sig0){
     if(current) sendNotif('下課了！',current.a.replace('＊','')+'　下課了');
-    try{sessionStorage.setItem("nointro","1");}catch(e){} location.reload(); return; }
+    location.reload(); return; }
   if(canAnim && document.querySelector(".node.now .nowrunner")) startRunner();
 });
 
@@ -813,7 +816,7 @@ document.addEventListener('visibilitychange',()=>{
     if(!data) return;
     const m = data[lunchDate];
     if(m===undefined) return; // 日期不在 JSON 裡，靜默
-    if(!m){ lunchEl.className='lunch empty reveal'; lunchEl.hidden=false;
+    if(!m){ lunchEl.className='lunch empty'; lunchEl.hidden=false;
       lunchEl.textContent='今天沒有供餐'; return; }
     lunchEl.innerHTML=`<div class="lh"><span class="ico">🍱</span><h3>午餐</h3>${m.calories?`<span class="kcal num">${m.calories} kcal</span>`:''}</div>
       <div class="menu">${m.dishes.map(d=>`<span>${d}</span>`).join('')}</div>
@@ -859,7 +862,7 @@ if(within.length){
 }else{
   const nx = EVENTS.find(ev=> (ev[1]?parse(ev[1]):parse(ev[0]))>=mid);
   cal.innerHTML = `<div class="empty">這一週沒有排定的行事曆活動。</div>` +
-    (nx ? `<div class="next reveal">下一個活動　<b class="num">${md(parse(nx[0]))}</b>　${nx[2]}</div>` : "");
+    (nx ? `<div class="next">下一個活動　<b class="num">${md(parse(nx[0]))}</b>　${nx[2]}</div>` : "");
 }
 
 // ---- 行事曆捲動進場（純 CSS transition，不需 GSAP）----
@@ -872,8 +875,6 @@ if("IntersectionObserver" in window){
   },{rootMargin:"0px 0px -8% 0px"});
   evs.forEach(el=>io.observe(el));
 }
-// 內容已就緒，立刻顯示（不等 GSAP）
-root.classList.remove("preanim");
 
 // ---- GSAP 載入後才跑的動畫（async，不擋內容）----
 function _onGsap(){

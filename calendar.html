@@ -10,7 +10,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <script>try{var _t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.dataset.theme=_t;}catch(e){document.documentElement.dataset.theme='light';}</script>
-<script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('preanim')</script>
 <style>
   :root{
     --paper:#fbf7f0; --card:#ffffff; --ink:#413b34; --muted:#7a7067;
@@ -42,7 +41,6 @@
   ::view-transition-group(root){animation-duration:.2s}
   .num{font-family:"Space Grotesk",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
   .wrap{max-width:520px;margin:0 auto;padding:26px 18px 56px}
-  .preanim .reveal{opacity:0}
   /* 骨架佔位：JS 注入內容前先撐開版位，避免整頁下推（CLS 0.57 -> 0）*/
   #list:empty{min-height:3030px}
 
@@ -53,14 +51,14 @@
     background:var(--card);color:var(--muted);cursor:pointer;box-shadow:var(--shadow);
     -webkit-tap-highlight-color:transparent;transition:background .2s,color .2s,transform .16s cubic-bezier(.23,1,.32,1)}
   .themetog:active{color:var(--accent);background:var(--accent-weak);transform:scale(.93)}
-  @media(hover:hover)and(pointer:fine){.themetog:hover{color:var(--accent)}}
+  @media (hover:hover) and (pointer:fine){.themetog:hover{color:var(--accent)}}
   .themetog .ic{width:22px;height:22px}
   .themetog .ic-moon{display:none}
   :root[data-theme="dark"] .themetog .ic-sun{display:none}
   :root[data-theme="dark"] .themetog .ic-moon{display:block}
   .back{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
     color:var(--muted);text-decoration:none;margin-bottom:10px;letter-spacing:.04em;transition:color .2s}
-  .back:hover{color:var(--accent)}
+  @media (hover:hover) and (pointer:fine){.back:hover{color:var(--accent)}}
   .back svg{width:14px;height:14px}
   .eyebrow{font-size:12px;font-weight:600;letter-spacing:.18em;color:var(--accent);margin:0 0 8px}
   h1{font-size:27px;font-weight:700;margin:0;letter-spacing:.01em;text-wrap:balance}
@@ -74,7 +72,7 @@
     transition:color .2s,background .2s,border-color .2s,transform .16s cubic-bezier(.23,1,.32,1)}
   .fb:active{transform:scale(.95)}
   .fb[aria-pressed="true"]{color:var(--accent);background:var(--accent-weak);border-color:var(--accent-weak)}
-  @media(hover:hover)and(pointer:fine){.fb:hover{color:var(--accent)}}
+  @media (hover:hover) and (pointer:fine){.fb:hover{color:var(--accent)}}
 
   /* ---- 月份 ---- */
   .mo{margin-top:26px}
@@ -128,14 +126,14 @@
       <svg class="ic ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
         stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
     </button>
-    <a class="back reveal" href="index.html">
+    <a class="back" href="index.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
         stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>回課表
     </a>
-    <p class="eyebrow reveal">鎮昌國小 · 115 學年度第 1 學期</p>
-    <h1 class="reveal">完整行事曆</h1>
-    <p class="lede reveal" id="lede" role="status"></p>
-    <div class="filters reveal">
+    <p class="eyebrow">鎮昌國小 · 115 學年度第 1 學期</p>
+    <h1>完整行事曆</h1>
+    <p class="lede" id="lede" role="status"></p>
+    <div class="filters">
       <button class="fb" id="f-up" type="button" aria-pressed="false">只看之後</button>
       <button class="fb" id="f-hol" type="button" aria-pressed="false">只看放假</button>
     </div>
@@ -190,7 +188,7 @@ function render(){
       if(mo) out+="</section>";
       mo=key;
       const n=list.filter(x=>x.s.getFullYear()+"-"+x.s.getMonth()===key).length;
-      out+=`<section class="mo reveal"><div class="mo-h">
+      out+=`<section class="mo"><div class="mo-h">
         <span class="m">${MO[i.s.getMonth()]}月</span>
         <span class="y num">${i.s.getFullYear()}</span>
         <span class="n num">${n} 項</span></div>`;
@@ -198,10 +196,10 @@ function render(){
     // 第一個「尚未發生」的項目前插入今天的分隔線
     if(!ruled && i.state!=="past" && !onlyUpcoming){
       ruled=true;
-      out+=`<div class="todayline reveal"><span class="lbl">今天</span><span class="rule"></span></div>`;
+      out+=`<div class="todayline"><span class="lbl">今天</span><span class="rule"></span></div>`;
     }
     const rng=i.e>i.s?`${md(i.s)}–${md(i.e)}`:"";
-    out+=`<div class="ev reveal ${i.state} ${i.holiday?'holiday':''} ${i.tone}">
+    out+=`<div class="ev ${i.state} ${i.holiday?'holiday':''} ${i.tone}">
       <div class="d"><div class="dd num">${i.s.getDate()}</div>
         <div class="wl">週${WL[i.s.getDay()]}</div>
         ${rng?`<div class="rng2 num">${rng}</div>`:""}</div>
@@ -227,8 +225,6 @@ toggle(document.getElementById("f-hol"),v=>onlyHoliday=v);
 // 開啟時捲到今天（過去的項目太多會蓋掉重點）
 const first=document.querySelector(".ev.today, .ev.future");
 if(first) first.scrollIntoView({block:"center"});
-
-root.classList.remove("preanim");
 
 document.getElementById("themetog").addEventListener("click",()=>{
   const next=root.dataset.theme==="dark"?"light":"dark";
