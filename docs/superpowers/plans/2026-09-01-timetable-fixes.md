@@ -1,5 +1,7 @@
 # Timetable bug and loading fixes implementation plan
 
+> 2026-09-30 補註：`snack.html` 已於 fe78a8e 整頁移除，下文提到點心表的項目僅留作當時紀錄。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 修正審查項目 1 至 4，並消除 9df9640 之後外部 GSAP 讓內容長時間隱藏的載入回歸。

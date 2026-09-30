@@ -1,5 +1,7 @@
 # Timetable bug and loading fixes design
 
+> 2026-09-30 補註：`snack.html` 已於 fe78a8e 整頁移除，下文提到點心表的項目僅留作當時紀錄。
+
 ## Goal
 
 修正假日仍顯示一般課表、失效的對比檢查、學生姓名外露，以及外部動畫套件造成的首次載入等待。
