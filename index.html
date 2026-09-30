@@ -149,10 +149,15 @@
   .nl-label{font-size:12px;font-weight:600;letter-spacing:.14em;color:var(--accent)}
   .nl-rule{flex:1;height:2px;background:linear-gradient(90deg,var(--accent),transparent);
     transform-origin:left center}
-  /* 跑步的馬尾小女孩：站在進度條尖端＝「現在」，頭上小膠囊顯示現在時間 */
+  /* 麻糬兔：站在進度條尖端＝「現在」，頭上小膠囊顯示現在時間 */
   .node.now .nowrunner{position:absolute;bottom:8px;margin-left:-12px;z-index:3;pointer-events:none}
   /* 不加 filter：四肢每幀轉動，drop-shadow 會每幀重算；SVG 內已有 .shadow 假影子 */
   .node.now .nowrunner .runner{display:block;width:24px;height:auto;overflow:visible}
+  /* 麻糬兔眨眼：純 CSS，不佔 GSAP 迴圈 */
+  @media (prefers-reduced-motion:no-preference){
+    .runner .eyes{transform-box:fill-box;transform-origin:center;animation:blink 3.4s infinite}
+    @keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.12)}}
+  }
   .node.now .rtime{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
     margin-bottom:2px;white-space:nowrap;font-size:10.5px;font-weight:700;color:var(--accent);
     background:var(--card);padding:1px 6px;border-radius:999px;
@@ -423,16 +428,37 @@ const nowLineHTML = `<div class="nowline" id="nowline">
   <div class="nl-body"><span class="nl-time num">${pad(now.getHours())}:${pad(now.getMinutes())}</span>
   <span class="nl-label">現在</span><span class="nl-rule" id="nlrule"></span></div></div>`;
 
-// 小女孩火柴人骨架（＋腳下影子）。動作全交給 loopRunner，這裡只有形狀。
+// 麻糬兔（角落生物風）骨架＋腳下影子。動作全交給 loopRunner，這裡只有形狀。
+// 外層 <svg> 的 stroke=accent 4.6 會被繼承，所以圖形都包在 MG（細咖啡外框）裡
+const MO="#5b4636", MW="#fffdf8", MP="#f4a3b4", ME="#3d2f25"; // 外框、麻糬白、腮紅、眼睛
+const MG=`<g stroke="${MO}" stroke-width="1.4" stroke-linejoin="round">`;
+const MOCHI=`<path class="body" d="M20 12.5 C 28.5 12.5,33 21,33 29.5 C 33 36.5,27.5 40,20 40 C 12.5 40,7 36.5,7 29.5 C 7 21,11.5 12.5,20 12.5 Z" fill="${MW}"/>`;
+const ear=(x,deg,pink)=>`<ellipse cx="${x}" cy="7.5" rx="3.2" ry="6.8" transform="rotate(${deg} ${x} 7.5)" fill="${MW}"/>`
+  +(pink?`<ellipse cx="${x}" cy="8.5" rx="1.3" ry="4.2" transform="rotate(${deg} ${x} 7.5)" fill="${MP}" stroke="none" opacity=".7"/>`:"");
+// 臉：x＝兩眼中點；shut 給數字時眼睛改成弧線（1＝睡著 ‿，-1.1＝開心 ∩）
+const face=(x,y=25.5,shut)=>(shut
+  ?`<path d="M${x-4.6} ${y}q1.1 ${shut} 2.2 0M${x+2.4} ${y}q1.1 ${shut} 2.2 0" stroke="${ME}" stroke-width="1"/>`
+  :`<g class="eyes" fill="${ME}" stroke="none"><circle cx="${x-3.5}" cy="${y}" r="1.3"/><circle cx="${x+3.5}" cy="${y}" r="1.3"/></g>`)
+  +`<g fill="${MP}" stroke="none" opacity=".85"><ellipse cx="${x-6.2}" cy="${y+3.1}" rx="2" ry="1.2"/><ellipse cx="${x+6.3}" cy="${y+3.1}" rx="2" ry="1.2"/></g>`
+  +`<path d="M${x-.8} ${y+2.4}q.8 .8 1.6 0" stroke="${ME}" stroke-width=".9"/>`;
+const FEET=`<ellipse cx="15.5" cy="39.5" rx="3.2" ry="2.2" fill="${MW}"/><ellipse cx="24.5" cy="39.5" rx="3.2" ry="2.2" fill="${MW}"/>`;
+const TIE=`<circle class="tie" cx="14.8" cy="14" r="1.9" fill="#f0c050" stroke-width="1.1"/>`;
+// 正面舉雙手：跳躍轉圈的第一格，也是輪播動作的第一格
+const FRONT=`<ellipse class="shadow" cx="20" cy="42.5" rx="7" ry="1.4" fill="var(--accent)" stroke="none" opacity=".14"/>
+  ${MG}${ear(15,-10,1)}${ear(25,10,1)}
+  <ellipse cx="7" cy="19.5" rx="2.3" ry="3.1" transform="rotate(-35 7 19.5)" fill="${MW}"/>
+  <ellipse cx="33" cy="19.5" rx="2.3" ry="3.1" transform="rotate(35 33 19.5)" fill="${MW}"/>
+  <ellipse cx="16" cy="39.5" rx="3" ry="2.1" fill="${MW}"/><ellipse cx="24" cy="39.5" rx="3" ry="2.1" fill="${MW}"/>
+  ${MOCHI}${face(20)}${TIE}</g>`;
 const RUNNER_SVG = `<svg class="runner" viewBox="0 0 40 44" fill="none" stroke="var(--accent)"
   stroke-width="4.6" stroke-linecap="round" aria-hidden="true">
-  <ellipse class="shadow" cx="20" cy="43" rx="9" ry="1.5" fill="var(--accent)" stroke="none" opacity=".16"/>
-  <path class="pony" d="M15 8 C 11 5,8 10,10 17"/>
-  <path class="leg-b" d="M19 29 L12 41"/><path class="arm-b" d="M20 18 L12 23"/>
-  <line class="body" x1="21" y1="14" x2="19" y2="29"/>
-  <circle class="head" cx="21" cy="9" r="6.4" fill="var(--accent)" stroke="none"/>
-  <circle class="tie" cx="15" cy="8" r="1.5" fill="#f0c050" stroke="none"/>
-  <path class="arm-f" d="M20 18 L28 22"/><path class="leg-f" d="M19 29 L27 40"/></svg>`;
+  <ellipse class="shadow" cx="20" cy="42.5" rx="9" ry="1.6" fill="var(--accent)" stroke="none" opacity=".16"/>
+  ${MG}<g class="pony">${ear(15,-16)}${ear(24.5,14,1)}</g>
+  <rect class="bag" x="2.5" y="21.5" width="9" height="12" rx="3.2" fill="#9fd6bd"/>
+  <ellipse class="leg-b" cx="15.5" cy="39.5" rx="3.2" ry="2.2" fill="${MW}"/>
+  <ellipse class="leg-f" cx="24.5" cy="39.5" rx="3.2" ry="2.2" fill="${MW}"/>
+  ${MOCHI}${face(22.5)}${TIE}
+  <ellipse class="arm-f" cx="31.6" cy="30" rx="2.3" ry="3.1" fill="${MW}"/></g></svg>`;
 
 const RUNNER_INNER=RUNNER_SVG.replace(/^<svg[^>]*>/,'').replace(/<\/svg>$/,'');
 // 影格只 parse 一次，之後換姿勢只搬節點：innerHTML 每次都是 parse→建 DOM→recalc→layout→paint
@@ -447,10 +473,25 @@ const O=`<svg class="runner" viewBox="0 0 40 44" fill="none" stroke="var(--accen
 const A={ease:"sine.inOut",repeat:-1,yoyo:true};
 // 「其餘」課別的動感姿勢，每隔幾秒輪播一個（只換 <svg> 內容，外框沿用）
 const ACTIONS=[
-  `<ellipse class="shadow" cx="20" cy="43" rx="8" ry="1.4" fill="var(--accent)" stroke="none" opacity=".16"/><path class="pony" d="M15 8 C 11 5,8 10,10 15"/><path d="M20 30 L11 41"/><path d="M20 30 L29 41"/><line x1="20" y1="15" x2="20" y2="30"/><path d="M20 19 L11 11"/><path d="M20 19 L29 11"/><circle class="head" cx="20" cy="10" r="6.2" fill="var(--accent)" stroke="none"/><circle class="tie" cx="15" cy="8" r="1.5" fill="#f0c050" stroke="none"/>`,
-  `<ellipse class="shadow" cx="16" cy="43" rx="7" ry="1.3" fill="var(--accent)" stroke="none" opacity=".16"/><path class="pony" d="M12 8 C 8 5,6 10,8 16"/><path d="M18 29 L15 42"/><path d="M18 29 L34 21"/><line x1="17" y1="15" x2="18" y2="29"/><path d="M18 19 L11 24"/><path d="M18 19 L27 15"/><circle class="head" cx="16" cy="10" r="6.2" fill="var(--accent)" stroke="none"/><circle class="tie" cx="12" cy="8" r="1.5" fill="#f0c050" stroke="none"/>`,
-  `<ellipse class="shadow" cx="19" cy="43" rx="10" ry="1.4" fill="var(--accent)" stroke="none" opacity=".16"/><path class="pony" d="M11 9 C 7 6,5 11,7 17"/><line x1="16" y1="15" x2="18" y2="28"/><path d="M18 28 L27 34 L27 42"/><path d="M18 28 L10 42"/><path d="M17 19 L10 16"/><path d="M17 19 L25 15"/><circle class="head" cx="15" cy="10" r="6.2" fill="var(--accent)" stroke="none"/><circle class="tie" cx="11" cy="9" r="1.5" fill="#f0c050" stroke="none"/>`,
-  `<ellipse class="shadow" cx="20" cy="43" rx="9" ry="1.4" fill="var(--accent)" stroke="none" opacity=".16"/><path class="pony" d="M15 12 C 11 9,8 14,10 19"/><line x1="20" y1="18" x2="20" y2="27"/><path d="M20 27 L13 31 L13 40"/><path d="M20 27 L27 31 L27 40"/><path d="M20 20 L13 24"/><path d="M20 20 L27 24"/><circle class="head" cx="20" cy="13" r="6" fill="var(--accent)" stroke="none"/><circle class="tie" cx="15" cy="12" r="1.5" fill="#f0c050" stroke="none"/>`,
+  // 舉手歡呼
+  FRONT,
+  // 揮手
+  `<ellipse class="shadow" cx="20" cy="42.5" rx="9" ry="1.6" fill="var(--accent)" stroke="none" opacity=".16"/>
+   ${MG}${ear(15,-12)}${ear(24.5,16,1)}${FEET}${MOCHI}${face(22.5)}${TIE}
+   <ellipse cx="33" cy="18.5" rx="2.3" ry="3.1" transform="rotate(25 33 18.5)" fill="${MW}"/>
+   <path d="M36.5 12.5q1.6 1.8 0 3.8M38.8 11q2.2 2.8 0 6" stroke-width="1"/></g>`,
+  // 蹦跳（騰空、開心瞇眼、手腳張開）
+  `<ellipse class="shadow" cx="20" cy="42.5" rx="6" ry="1.2" fill="var(--accent)" stroke="none" opacity=".1"/>
+   ${MG}<g transform="translate(0 -4)">${ear(14.5,-6,1)}${ear(25.5,6,1)}
+   <ellipse cx="13" cy="38.5" rx="3" ry="2.1" transform="rotate(-25 13 38.5)" fill="${MW}"/><ellipse cx="27" cy="38.5" rx="3" ry="2.1" transform="rotate(25 27 38.5)" fill="${MW}"/>
+   ${MOCHI}${face(20,25.5,-1.1)}${TIE}
+   <ellipse cx="6.5" cy="26" rx="2.3" ry="3.1" transform="rotate(-60 6.5 26)" fill="${MW}"/><ellipse cx="33.5" cy="26" rx="2.3" ry="3.1" transform="rotate(60 33.5 26)" fill="${MW}"/></g></g>`,
+  // 蹲下（壓扁的麻糬）
+  `<ellipse class="shadow" cx="20" cy="42.5" rx="11" ry="1.7" fill="var(--accent)" stroke="none" opacity=".18"/>
+   ${MG}<g transform="translate(0 7)">${ear(14.5,-22)}${ear(25.5,22,1)}</g>
+   <ellipse cx="11" cy="40" rx="3.2" ry="2" fill="${MW}"/><ellipse cx="29" cy="40" rx="3.2" ry="2" fill="${MW}"/>
+   <path d="M20 19.5 C 30.5 19.5,35.5 27,35.5 32.5 C 35.5 38.5,28.5 40.5,20 40.5 C 11.5 40.5,4.5 38.5,4.5 32.5 C 4.5 27,9.5 19.5,20 19.5 Z" fill="${MW}"/>
+   ${face(20,30)}<circle cx="14.8" cy="21" r="1.9" fill="#f0c050" stroke-width="1.1"/></g>`,
 ];
 // 捲出視窗時設 true：自我排程的迴圈（actionLoop / doJump）看到就停手，不再續排
 let _runnerOff=false;
@@ -478,58 +519,51 @@ function actionLoop(){
 }
 const POSES={
   eat:{svg:O+`
-    <ellipse class="shadow" cx="20" cy="43" rx="10" ry="1.5" fill="var(--accent)" stroke="none" opacity=".16"/>
-    <path class="pony" d="M15 8 C 11 5,8 10,10 16"/>
-    <path class="leg-b" d="M19 28 L28 30 L29 40"/><path class="arm-b" d="M20 19 L13 29"/>
-    <line class="body" x1="20" y1="14" x2="19" y2="28"/>
-    <circle class="head" cx="20" cy="9" r="6.2" fill="var(--accent)" stroke="none"/>
-    <circle class="tie" cx="15" cy="8.5" r="1.5" fill="#f0c050" stroke="none"/>
-    <ellipse cx="30" cy="34" rx="4.2" ry="1.9" fill="var(--accent)" stroke="none" opacity=".85"/>
-    <path class="arm-f" d="M20 19 L27 15"/></svg>`,
+    <ellipse class="shadow" cx="20" cy="42.5" rx="10" ry="1.6" fill="var(--accent)" stroke="none" opacity=".16"/>
+    ${MG}${ear(15,-18)}${ear(24.5,16,1)}${FEET}${MOCHI}${face(22.5)}${TIE}
+    <g class="arm-f"><path d="M30.5 22.5c1 0 5 6.5 5 8c0 1-1 1.3-5 1.3s-5-.3-5-1.3c0-1.5 4-8 5-8z" fill="#fff"/>
+    <rect x="28.3" y="27.6" width="4.4" height="4.1" fill="#3d4a3f" stroke="none"/>
+    <ellipse cx="34.5" cy="32.5" rx="2.3" ry="3.1" fill="${MW}"/></g></g></svg>`,
     loop(){const S=".node.now .runner";
-      gsap.fromTo(`${S} .arm-f`,{rotation:-40},{rotation:16,svgOrigin:"20 19",duration:.55,...A});
+      // 飯糰送到嘴邊再放下
+      gsap.fromTo(`${S} .arm-f`,{x:0},{x:-3.8,duration:.55,...A});
       gsap.to(S,{y:-1,duration:1.1,...A});}},
   read:{svg:O+`
-    <ellipse class="shadow" cx="20" cy="43" rx="10" ry="1.5" fill="var(--accent)" stroke="none" opacity=".16"/>
-    <path class="pony" d="M15 8 C 11 5,8 10,10 16"/>
-    <path class="leg-b" d="M19 28 L29 29 L30 40"/>
-    <path class="leg-f" d="M19 28 L28 30 L29 41"/>
-    <line class="body" x1="20" y1="14" x2="20" y2="28"/>
-    <path class="arm-b" d="M20 19 L26 23"/><path class="arm-f" d="M20 19 L27 24"/>
-    <rect class="page" x="24" y="17" width="10" height="9" rx="1" fill="var(--accent)" stroke="none" opacity=".2"/>
-    <circle class="head" cx="20" cy="9" r="6.2" fill="var(--accent)" stroke="none"/>
-    <circle class="tie" cx="15" cy="8.5" r="1.5" fill="#f0c050" stroke="none"/></svg>`,
+    <ellipse class="shadow" cx="20" cy="42.5" rx="10" ry="1.6" fill="var(--accent)" stroke="none" opacity=".16"/>
+    ${MG}${ear(15,-10)}${ear(25,10,1)}
+    <ellipse class="leg-b" cx="15.5" cy="39.5" rx="3.2" ry="2.2" fill="${MW}"/>
+    <ellipse class="leg-f" cx="24.5" cy="39.5" rx="3.2" ry="2.2" fill="${MW}"/>
+    ${MOCHI}${face(20,26)}${TIE}
+    <rect x="10.5" y="31" width="19" height="8" rx="1.5" fill="#9fd6bd"/>
+    <rect x="12" y="30" width="8" height="7.5" rx="1" fill="#fff"/><rect class="page" x="20" y="30" width="8" height="7.5" rx="1" fill="#fff"/>
+    <ellipse cx="10.5" cy="34" rx="2.3" ry="3.1" fill="${MW}"/><ellipse cx="29.5" cy="34" rx="2.3" ry="3.1" fill="${MW}"/></g></svg>`,
     loop(){const S=".node.now .runner";
-      gsap.fromTo(`${S} .head`,{rotation:-3},{rotation:7,svgOrigin:"20 9",duration:1.5,...A});
-      gsap.fromTo(`${S} .page`,{scaleX:.8},{scaleX:1,svgOrigin:"29 22",duration:1.9,...A});
-      gsap.fromTo(`${S} .leg-f`,{rotation:-12},{rotation:12,svgOrigin:"19 28",duration:.7,...A});
-      gsap.fromTo(`${S} .leg-b`,{rotation:10},{rotation:-10,svgOrigin:"19 28",duration:.7,...A});}},
+      gsap.fromTo(S,{rotation:-3},{rotation:4,transformOrigin:"50% 95%",duration:1.5,...A});
+      gsap.fromTo(`${S} .page`,{scaleX:1},{scaleX:.7,svgOrigin:"20 33.75",duration:1.9,...A});
+      gsap.fromTo(`${S} .leg-f`,{rotation:-12},{rotation:12,svgOrigin:"24.5 34",duration:.7,...A});
+      gsap.fromTo(`${S} .leg-b`,{rotation:10},{rotation:-10,svgOrigin:"15.5 34",duration:.7,...A});}},
   paint:{svg:O+`
-    <ellipse class="shadow" cx="18" cy="43" rx="8.5" ry="1.5" fill="var(--accent)" stroke="none" opacity=".16"/>
-    <rect x="27" y="9" width="10" height="14" rx="1" fill="var(--accent)" stroke="none" opacity=".14"/>
-    <path class="pony" d="M13 8 C 9 5,7 10,9 17"/>
-    <path class="leg-b" d="M17 30 L13 42"/><path class="leg-f" d="M17 30 L21 42"/>
-    <line class="body" x1="18" y1="14" x2="17" y2="30"/>
-    <path class="arm-b" d="M17 19 L11 26"/>
-    <circle class="head" cx="18" cy="9" r="6.2" fill="var(--accent)" stroke="none"/>
-    <circle class="tie" cx="13" cy="8.5" r="1.5" fill="#f0c050" stroke="none"/>
-    <path class="arm-f" d="M17 19 L26 19"/></svg>`,
+    <ellipse class="shadow" cx="18" cy="42.5" rx="10" ry="1.6" fill="var(--accent)" stroke="none" opacity=".16"/>
+    ${MG}<path d="M32 24L30.5 41M37 24L38.5 41" stroke-width="1.2"/>
+    <rect x="29" y="11" width="10" height="14" rx="1" fill="#fff"/>
+    <g stroke="none"><circle cx="32" cy="15" r="1.6" fill="${MP}"/><circle cx="35.5" cy="18" r="1.4" fill="#f0c050"/><circle cx="32.5" cy="21.2" r="1.3" fill="#9fd6bd"/></g>
+    <g transform="translate(-4 0)">${ear(15,-16)}${ear(24.5,14,1)}${FEET}${MOCHI}${face(22.5)}${TIE}</g>
+    <g class="arm-f"><path d="M28.5 28L32.5 20.5" stroke-width="1.2"/><circle cx="32.7" cy="20" r="1.1" fill="#e0902d" stroke="none"/>
+    <ellipse cx="27.6" cy="30" rx="2.3" ry="3.1" fill="${MW}"/></g></g></svg>`,
     loop(){const S=".node.now .runner";
-      gsap.fromTo(`${S} .arm-f`,{rotation:-15},{rotation:13,svgOrigin:"17 19",duration:.5,...A});
+      gsap.fromTo(`${S} .arm-f`,{rotation:-15},{rotation:13,svgOrigin:"27.6 30",duration:.5,...A});
       gsap.to(S,{y:-1.3,duration:.9,...A});}},
   sleep:{svg:O+`
-    <rect x="1" y="32" width="38" height="9" rx="2" fill="var(--accent)" stroke="none" opacity=".18"/>
-    <line x1="2.5" y1="25" x2="2.5" y2="41" stroke-width="3.4" opacity=".55"/>
-    <rect class="pillow" x="4" y="27" width="11" height="5.5" rx="2.5" fill="var(--accent)" stroke="none" opacity=".3"/>
-    <path class="pony" d="M7 25 C 4 23,3 27,5 30"/>
-    <line class="body" x1="14" y1="31" x2="32" y2="31"/>
-    <path class="leg-f" d="M32 31 L35 33"/>
-    <circle class="head" cx="10" cy="28" r="5.4" fill="var(--accent)" stroke="none"/>
-    <circle class="tie" cx="7" cy="25" r="1.4" fill="#f0c050" stroke="none"/>
-    <rect class="quilt" x="15" y="27.5" width="21" height="6" rx="2" fill="var(--accent)" stroke="none" opacity=".32"/>
-    <text class="zzz" x="22" y="20" font-size="10" font-weight="700" fill="var(--accent)" stroke="none" text-anchor="middle">z</text></svg>`,
+    <rect x="1" y="34" width="38" height="7" rx="2" fill="var(--accent)" stroke="none" opacity=".18"/>
+    ${MG}<rect x="1.5" y="26" width="12" height="7" rx="3.5" fill="#fff"/>
+    <ellipse cx="4.5" cy="25.5" rx="2.5" ry="5.5" transform="rotate(-80 4.5 25.5)" fill="${MW}"/>
+    <ellipse cx="5" cy="28.5" rx="2.5" ry="5.5" transform="rotate(-100 5 28.5)" fill="${MW}"/>
+    <path d="M6 33 C 6 26,11 23,18 23 C 27 23,34 27,34 32 C 34 36,29 37,20 37 C 11 37,6 36.5,6 33 Z" fill="${MW}"/>
+    ${face(14,29,1)}<circle cx="10" cy="25" r="1.8" fill="#f0c050" stroke-width="1.1"/>
+    <rect class="quilt" x="20" y="27" width="17" height="10.5" rx="3.5" fill="#9fd6bd"/></g>
+    <text class="zzz" x="27" y="20" font-size="10" font-weight="700" fill="var(--accent)" stroke="none" text-anchor="middle">z</text></svg>`,
     loop(){const S=".node.now .runner";
-      gsap.fromTo(`${S} .quilt`,{scaleY:1},{scaleY:1.13,svgOrigin:"25 33.5",duration:1.9,...A});
+      gsap.fromTo(`${S} .quilt`,{scaleY:1},{scaleY:1.1,svgOrigin:"28.5 37.5",duration:1.9,...A});
       gsap.fromTo(`${S} .zzz`,{y:2},{y:-9,duration:2,ease:"sine.out",repeat:-1});
       // opacity 分開跑 yoyo，才會淡出而不是停在 .75 硬切回 0
       gsap.fromTo(`${S} .zzz`,{opacity:0},{opacity:.75,duration:1,ease:"none",repeat:-1,yoyo:true});}},
@@ -555,13 +589,13 @@ console.assert(phaseOf(0,50)==='warm'&&phaseOf(20,30)==='run'&&phaseOf(46,4)==='
 function runnerPhase(){ if(!current) return 'run'; const [cs,ce]=range(current.t);
   const d=new Date(),m=d.getHours()*60+d.getMinutes(); return phaseOf(m-cs,ce-m); }
 
-// 依狀態調速度與幅度＝手感旋鈕；四肢反相擺動＋上下彈＋馬尾甩＋前傾＋影子踩踏
+// 依狀態調速度與幅度＝手感旋鈕；四肢反相擺動＋上下彈（軟Q壓扁）＋耳朵甩＋前傾＋影子踩踏
 // 每隔幾秒跳起空中轉一圈再落地繼續跑
 let _jumpTimer=null, _jumpTL=null;
 function loopRunner(phase){
   if(_jumpTimer){ _jumpTimer.kill(); _jumpTimer=null; }
   if(_jumpTL){ _jumpTL.kill(); _jumpTL=null; }
-  const S=".node.now .runner", parts=[S,`${S} .leg-f`,`${S} .leg-b`,`${S} .arm-f`,`${S} .arm-b`,`${S} .pony`,`${S} .tie`,`${S} .shadow`];
+  const S=".node.now .runner", parts=[S,`${S} .leg-f`,`${S} .leg-b`,`${S} .arm-f`,`${S} .bag`,`${S} .pony`,`${S} .tie`,`${S} .shadow`];
   gsap.killTweensOf(parts);
   const sv=document.querySelector(S);
   if(sv){ setFrame(sv,RUNNER_INNER); gsap.set(S,{clearProps:"transform"}); }
@@ -575,78 +609,65 @@ function loopRunner(phase){
     _runTs=Date.now();
     const L={duration:d,ease:"sine.inOut",repeat:-1,yoyo:true};
     gsap.to(S,{rotation:lean,svgOrigin:"20 40",duration:.5,ease:"power2.out"});
-    gsap.fromTo(`${S} .leg-f`,{rotation:-sw},{rotation:sw*.85,svgOrigin:"19 29",...L});
-    gsap.fromTo(`${S} .leg-b`,{rotation:sw*.85},{rotation:-sw,svgOrigin:"19 29",...L});
-    gsap.fromTo(`${S} .arm-f`,{rotation:sw+2},{rotation:-sw-2,svgOrigin:"20 18",...L});
-    gsap.fromTo(`${S} .arm-b`,{rotation:-sw-2},{rotation:sw+2,svgOrigin:"20 18",...L});
-    gsap.to(S,{y:-bob,...L});
-    gsap.fromTo(`${S} .pony, ${S} .tie`,{rotation:-10},{rotation:18,svgOrigin:"15 8",...L,duration:d*1.3});
-    gsap.fromTo(`${S} .shadow`,{scaleX:.7,opacity:.10},{scaleX:1,opacity:.22,svgOrigin:"20 43",...L});
+    gsap.fromTo(`${S} .leg-f`,{rotation:-sw},{rotation:sw*.85,svgOrigin:"24.5 33",...L});
+    gsap.fromTo(`${S} .leg-b`,{rotation:sw*.85},{rotation:-sw,svgOrigin:"15.5 33",...L});
+    gsap.fromTo(`${S} .arm-f`,{rotation:sw+2},{rotation:-sw-2,svgOrigin:"30 27",...L});
+    gsap.fromTo(`${S} .bag`,{rotation:-4},{rotation:6,svgOrigin:"9 22",...L});
+    // 上彈時拉長、落腳時壓扁＝麻糬的軟 Q 感
+    gsap.fromTo(S,{scaleX:1.04,scaleY:.95},{y:-bob,scaleX:.98,scaleY:1.03,transformOrigin:"50% 95%",...L});
+    gsap.fromTo(`${S} .pony, ${S} .tie`,{rotation:-14},{rotation:4,svgOrigin:"20 14",...L,duration:d*1.3});
+    gsap.fromTo(`${S} .shadow`,{scaleX:.7,opacity:.10},{scaleX:1,opacity:.22,svgOrigin:"20 42.5",...L});
   }
-  // pirouette 四格逐格動畫：正面 passé → 側面 → 背面 → 側面 → 正面 → 落地
+  // pirouette 四格逐格動畫：正面舉手 → 側面 → 背面（書包＋尾巴）→ 側面 → 正面 → 落地
+  const SIDE=`<ellipse cx="20" cy="42.5" rx="3" ry="1" fill="var(--accent)" stroke="none" opacity=".06"/>
+     ${MG}${ear(18,-12)}${ear(21.5,4)}
+     <rect x="7.5" y="21.5" width="6" height="12" rx="2.5" fill="#9fd6bd"/>
+     <ellipse cx="20" cy="39.8" rx="3" ry="2.1" fill="${MW}"/>
+     <path d="M20 12.5 C 26 12.5,29 21,29 29.5 C 29 36.5,25 40,20 40 C 15 40,11 36.5,11 29.5 C 11 21,14 12.5,20 12.5 Z" fill="${MW}"/>
+     <circle cx="25.8" cy="25.5" r="1.3" fill="${ME}" stroke="none"/>
+     <ellipse cx="26.6" cy="28.6" rx="1.5" ry="1.1" fill="${MP}" stroke="none" opacity=".85"/></g>`;
   const PIRO=[
-    // 0: 正面 passé（單腳站、另腳提膝、雙手上舉）
-    `<ellipse cx="20" cy="43" rx="5" ry="1.2" fill="var(--accent)" stroke="none" opacity=".10"/>
-     <path d="M15 8 C 11 5,8 10,10 16" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
-     <line x1="20" y1="14" x2="20" y2="29" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round"/>
-     <path d="M20 29 L20 41" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
-     <path d="M20 29 L27 25" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
-     <path d="M20 18 L14 10" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
-     <path d="M20 18 L26 10" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
-     <circle cx="20" cy="9" r="6.2" fill="var(--accent)" stroke="none"/>
-     <circle cx="15" cy="8" r="1.5" fill="#f0c050" stroke="none"/>`,
-    // 1: 側面（身體窄、四肢重疊）
-    `<ellipse cx="20" cy="43" rx="3" ry="1" fill="var(--accent)" stroke="none" opacity=".06"/>
-     <line x1="20" y1="14" x2="20" y2="29" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round"/>
-     <path d="M20 29 L20 41" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
-     <path d="M20 29 L23 26" stroke="var(--accent)" stroke-width="3.6" stroke-linecap="round" fill="none"/>
-     <path d="M20 18 L20 10" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
-     <circle cx="20" cy="9" r="5.4" fill="var(--accent)" stroke="none"/>`,
-    // 2: 背面（馬尾反向、提腳反側）
-    `<ellipse cx="20" cy="43" rx="5" ry="1.2" fill="var(--accent)" stroke="none" opacity=".10"/>
-     <path d="M25 8 C 29 5,32 10,30 16" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
-     <line x1="20" y1="14" x2="20" y2="29" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round"/>
-     <path d="M20 29 L20 41" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
-     <path d="M20 29 L13 25" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
-     <path d="M20 18 L26 10" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
-     <path d="M20 18 L14 10" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
-     <circle cx="20" cy="9" r="6.2" fill="var(--accent)" stroke="none"/>
-     <circle cx="25" cy="8" r="1.5" fill="#f0c050" stroke="none"/>`,
-    // 3: 側面（另一側）
-    `<ellipse cx="20" cy="43" rx="3" ry="1" fill="var(--accent)" stroke="none" opacity=".06"/>
-     <line x1="20" y1="14" x2="20" y2="29" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round"/>
-     <path d="M20 29 L20 41" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
-     <path d="M20 29 L17 26" stroke="var(--accent)" stroke-width="3.6" stroke-linecap="round" fill="none"/>
-     <path d="M20 18 L20 10" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" fill="none"/>
-     <circle cx="20" cy="9" r="5.4" fill="var(--accent)" stroke="none"/>`,
+    // 0: 正面，雙手舉高
+    FRONT,
+    // 1: 側面（身體變窄、兩耳疊在一起，臉朝右）
+    SIDE,
+    // 2: 背面（沒有臉，看得到書包和圓尾巴）
+    `<ellipse cx="20" cy="42.5" rx="5" ry="1.2" fill="var(--accent)" stroke="none" opacity=".10"/>
+     ${MG}${ear(15,-10)}${ear(25,10)}
+     <ellipse cx="16" cy="39.5" rx="3" ry="2.1" fill="${MW}"/><ellipse cx="24" cy="39.5" rx="3" ry="2.1" fill="${MW}"/>
+     ${MOCHI}
+     <rect x="13" y="20" width="14" height="12.5" rx="4" fill="#9fd6bd"/><path d="M13.3 24.5 H26.7"/>
+     <circle cx="20" cy="36.3" r="2.5" fill="${MW}"/>
+     <circle cx="25.8" cy="13.8" r="1.9" fill="#f0c050" stroke-width="1.1"/></g>`,
+    // 3: 側面（另一側）＝ 1 左右鏡像
+    `<g transform="matrix(-1 0 0 1 40 0)">${SIDE}</g>`,
   ];
   function doJump(){
     if(_runnerOff || !document.querySelector(".node.now .runner")) return;
     _runTs=Date.now();
     gsap.killTweensOf(parts);
     const sv=document.querySelector(S); if(!sv) return;
-    _jumpTL=gsap.timeline({onComplete(){_jumpTL=null;_runTs=Date.now();setFrame(sv,RUNNER_INNER);gsap.set(S,{y:0,rotation:lean,scaleX:1,svgOrigin:"20 40"});startRun();_jumpTimer=gsap.delayedCall(jInt+Math.random()*1.5,doJump);}});
+    _jumpTL=gsap.timeline({onComplete(){_jumpTL=null;_runTs=Date.now();setFrame(sv,RUNNER_INNER);gsap.set(S,{y:0,rotation:lean,scaleX:1,scaleY:1,svgOrigin:"20 40"});startRun();_jumpTimer=gsap.delayedCall(jInt+Math.random()*1.5,doJump);}});
     const tl=_jumpTL;
-    // 準備：四肢收進 passé 姿勢
-    tl.to(S,{y:-3,rotation:0,svgOrigin:"20 40",duration:.2,ease:"power2.out"},0)
-      .to(`${S} .leg-f`,{rotation:80,svgOrigin:"19 29",duration:.2},0)
-      .to(`${S} .leg-b`,{rotation:2,svgOrigin:"19 29",duration:.2},0)
-      .to(`${S} .arm-f`,{rotation:-75,svgOrigin:"20 18",duration:.2},0)
-      .to(`${S} .arm-b`,{rotation:70,svgOrigin:"20 18",duration:.2},0)
-      .to(`${S} .pony, ${S} .tie`,{rotation:20,svgOrigin:"15 8",duration:.2},0)
-      .to(`${S} .shadow`,{scaleX:.4,opacity:.06,svgOrigin:"20 43",duration:.2},0)
-    // 跳起 + 逐格轉圈（正→側→背→側→正）
+    // 準備：蹲低蓄力（麻糬壓扁），腳併攏、手舉起、耳朵往後倒
+    tl.to(S,{y:2,rotation:0,scaleX:1.12,scaleY:.86,transformOrigin:"50% 95%",duration:.2,ease:"power2.out"},0)
+      .to(`${S} .leg-f, ${S} .leg-b`,{rotation:0,duration:.2},0)
+      .to(`${S} .arm-f`,{rotation:-70,svgOrigin:"30 27",duration:.2},0)
+      .to(`${S} .pony, ${S} .tie`,{rotation:-18,svgOrigin:"20 14",duration:.2},0)
+      .to(`${S} .shadow`,{scaleX:1.1,opacity:.22,svgOrigin:"20 42.5",duration:.2},0)
+    // 跳起拉長 + 逐格轉圈（正→側→背→側→正）
       .call(()=>{setFrame(sv,PIRO[0]);},[],0.22)
-      .to(S,{y:-20,duration:.25,ease:"sine.out"},.22)
+      .to(S,{y:-20,scaleX:.94,scaleY:1.08,duration:.25,ease:"sine.out"},.22)
       .call(()=>{setFrame(sv,PIRO[1]);},[],0.35)
       .call(()=>{setFrame(sv,PIRO[2]);},[],0.48)
       .call(()=>{setFrame(sv,PIRO[3]);},[],0.61)
       .call(()=>{setFrame(sv,PIRO[0]);},[],0.74)
-      .to(S,{y:-16,duration:.35,ease:"sine.inOut"},.47)
-    // 落地：下墜要加速（重力），觸地後小回彈，不要用 bounce.out 一路減速飄下來
+      .to(S,{y:-16,scaleX:1,scaleY:1,duration:.35,ease:"sine.inOut"},.47)
+    // 落地：下墜要加速（重力），觸地壓扁再回彈，不要用 bounce.out 一路減速飄下來
       .to(S,{y:0,duration:.18,ease:"power2.in"},.82)
-      .to(S,{y:-3,duration:.1,ease:"power2.out"})
-      .to(S,{y:0,duration:.14,ease:"power2.in"})
+      .to(S,{scaleX:1.14,scaleY:.84,duration:.07,ease:"power2.out"})
+      .to(S,{y:-3,scaleX:.97,scaleY:1.04,duration:.12,ease:"power2.out"})
+      .to(S,{y:0,scaleX:1,scaleY:1,duration:.14,ease:"power2.in"})
       .set(S,{rotation:lean,svgOrigin:"20 40"});
   }
   startRun();
@@ -883,7 +904,7 @@ function _onGsap(){
   // now-line 呼吸光暈
   gsap.fromTo(".nl-rail span b",{scale:.6,autoAlpha:.5},
     {scale:2.4,autoAlpha:0,duration:1.8,ease:"sine.out",repeat:-1,repeatDelay:.3,delay:.6});
-  // 跑步的馬尾小女孩
+  // 麻糬兔
   const runner = document.querySelector(".node.now .nowrunner");
   if(runner){
     startRunner();
