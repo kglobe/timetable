@@ -45,8 +45,10 @@
   body{background:var(--paper);color:var(--ink);
     font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,sans-serif;
     line-height:1.5;-webkit-text-size-adjust:100%;
-    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
-    transition:background-color .3s cubic-bezier(.23,1,.32,1),color .3s cubic-bezier(.23,1,.32,1)}
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  /* 換頁、換主題整頁一起淡換（不支援的瀏覽器照舊瞬切）*/
+  @view-transition{navigation:auto}
+  ::view-transition-group(root){animation-duration:.2s}
   .num{font-family:"Space Grotesk",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
   .wrap{max-width:520px;margin:0 auto;padding:26px 18px 56px}
   .preanim .reveal{opacity:0}
@@ -895,7 +897,8 @@ function _onGsap(){
 // ---- 深淺色切換（未點過＝跟隨系統，點過記到 localStorage）----
 document.getElementById("themetog").addEventListener("click",()=>{
   const next = root.dataset.theme==="dark" ? "light" : "dark";
-  root.dataset.theme = next;
+  const apply = ()=>{ root.dataset.theme = next; };
+  document.startViewTransition ? document.startViewTransition(apply) : apply();
   try{ localStorage.setItem("theme", next); }catch(e){}
 });
 </script>
