@@ -40,13 +40,13 @@ test("contrast checker succeeds for every current page", () => {
 
 test("deployable pages do not contain the student name", () => {
   const privateName = "\u6893\u742a";
-  for (const page of ["index.html", "calendar.html", "school.html", "snack.html"]) {
+  for (const page of ["index.html", "calendar.html", "school.html"]) {
     assert.equal(read(page).includes(privateName), false, page);
   }
 });
 
 test("GSAP is optional and never preloaded ahead of page content", () => {
-  const pages = ["index.html", "calendar.html", "school.html", "snack.html"];
+  const pages = ["index.html", "calendar.html", "school.html"];
   for (const page of pages) {
     assert.doesNotMatch(read(page), /<link[^>]+rel="preload"[^>]+gsap/i, page);
   }
@@ -55,7 +55,7 @@ test("GSAP is optional and never preloaded ahead of page content", () => {
     assert.doesNotMatch(read(page), /\bgsap\b/i, page);
   }
 
-  for (const page of ["index.html", "snack.html"]) {
+  for (const page of ["index.html"]) {
     const tag = read(page).match(/<script[^>]+src="[^"]*gsap[^>]*>/i)?.[0] ?? "";
     assert.match(tag, /\basync\b/i, page);
   }

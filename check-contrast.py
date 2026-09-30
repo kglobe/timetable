@@ -30,10 +30,7 @@ CHECKS={
  'school.html':[('--muted','--paper',4.5,'sub-text'),('--muted','--card',4.5,'card sub-text'),
    ('--accent','--card',4.5,'accent text')],
  'calendar.html':[('--muted','--paper',4.5,'sub-text'),('--muted','--card',4.5,'card sub-text'),
-   ('--holiday','--holiday-weak',4.5,'holiday tag'),('--accent','--accent-weak',4.5,'tag')],
- 'snack.html':[('--muted','--paper',4.5,'sub-text'),('--muted','--card',4.5,'card sub-text'),
-   ('--accent','--accent-weak',4.5,'tag')],
-}
+   ('--holiday','--holiday-weak',4.5,'holiday tag'),('--accent','--accent-weak',4.5,'tag')],}
 bad=0
 for f,checks in CHECKS.items():
     light,dark=tokens(f)
