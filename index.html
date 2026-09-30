@@ -150,9 +150,9 @@
   .nl-rule{flex:1;height:2px;background:linear-gradient(90deg,var(--accent),transparent);
     transform-origin:left center}
   /* 麻糬兔：站在進度條尖端＝「現在」，頭上小膠囊顯示現在時間 */
-  .node.now .nowrunner{position:absolute;bottom:8px;margin-left:-12px;z-index:3;pointer-events:none}
+  .node.now .nowrunner{position:absolute;bottom:8px;margin-left:-15px;z-index:3;pointer-events:none}
   /* 不加 filter：四肢每幀轉動，drop-shadow 會每幀重算；SVG 內已有 .shadow 假影子 */
-  .node.now .nowrunner .runner{display:block;width:24px;height:auto;overflow:visible}
+  .node.now .nowrunner .runner{display:block;width:30px;height:auto;overflow:visible}
   /* 麻糬兔眨眼：純 CSS，不佔 GSAP 迴圈 */
   @media (prefers-reduced-motion:no-preference){
     .runner .eyes{transform-box:fill-box;transform-origin:center;animation:blink 3.4s infinite}
