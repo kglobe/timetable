@@ -157,7 +157,13 @@
   @media (prefers-reduced-motion:no-preference){
     .runner .eyes{transform-box:fill-box;transform-origin:center;animation:blink 3.4s infinite}
     @keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.12)}}
+    /* 連點長大：.bun 只給 CSS 縮放，GSAP 不碰它，才不會跟跑步迴圈搶 transform；padding 撐大點擊範圍 */
+    .bun{pointer-events:auto;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+      padding:8px;margin:-8px;transform-origin:50% calc(100% - 8px);transition:transform .32s cubic-bezier(.34,1.9,.5,1)}
   }
+  .bun{display:block}
+  .zoomies{position:fixed;z-index:50;pointer-events:none}
+  .zoomies .runner{display:block;width:120px;height:auto;overflow:visible}
   .node.now .rtime{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
     margin-bottom:2px;white-space:nowrap;font-size:10.5px;font-weight:700;color:var(--accent);
     background:var(--card);padding:1px 6px;border-radius:999px;
@@ -687,6 +693,59 @@ function startRunner(){ killRunner(); _runnerOff=false;   // killRunner 讓重�
   if(pose==='run') loopRunner(runnerPhase()); else POSES[pose].loop(); }
 function stopRunner(){ _runnerOff=true; killRunner(); }
 
+// ---- 連點麻糬兔：每點一下長大一點，點滿就跳出卡片，往右蹦出畫面、再從左邊跳回來 ----
+const ZOOM_TAPS=5;  // 手感旋鈕：點幾下跳出來
+let _taps=0, _tapTimer=0, _zoom=false;
+tl.addEventListener("click",e=>{
+  const bun=e.target.closest(".bun");
+  if(!bun || !canAnim || _zoom) return;
+  clearTimeout(_tapTimer);
+  if(++_taps<ZOOM_TAPS){
+    bun.style.transform=`scale(${1+_taps*.18})`;
+    _tapTimer=setTimeout(()=>{ _taps=0; bun.style.transform=""; },1500); // 停手就縮回去
+    return;
+  }
+  _taps=0; _zoom=true; zoomies(bun);
+});
+// ponytail: 大兔子是 position:fixed，表演中捲動頁面，最後縮回的位置會跟卡片裡的兔子對不上；要修就改成每跳重算 rect
+function zoomies(bun){
+  const sv0=bun.querySelector(".runner"), r=sv0.getBoundingClientRect();
+  const W=120, H=W*44/40, cx=r.left+r.width/2, base=parseFloat(getComputedStyle(sv0).width)/W;
+  const z=document.createElement("div"); z.className="zoomies"; z.innerHTML=RUNNER_SVG;
+  z.style.left=cx-W/2+"px"; z.style.top=r.bottom-H+"px";
+  document.body.append(z);
+  bun.style.visibility="hidden"; bun.style.transform="";
+  const sv=z.firstElementChild, q=gsap.utils.selector(z), parts=q(".leg-f,.leg-b,.arm-f,.pony,.bag");
+  // 全程四肢快速擺動＝一直在跑
+  const L={duration:.13,ease:"sine.inOut",repeat:-1,yoyo:true};
+  gsap.fromTo(q(".leg-f"),{rotation:-26},{rotation:22,svgOrigin:"24.5 33",...L});
+  gsap.fromTo(q(".leg-b"),{rotation:22},{rotation:-26,svgOrigin:"15.5 33",...L});
+  gsap.fromTo(q(".arm-f"),{rotation:28},{rotation:-28,svgOrigin:"30 27",...L});
+  gsap.fromTo(q(".bag"),{rotation:-6},{rotation:8,svgOrigin:"9 22",...L});
+  gsap.fromTo(q(".pony"),{rotation:-18},{rotation:6,svgOrigin:"20 14",...L,duration:.18});
+  const dy=Math.max(0,H+100-r.bottom);         // 太靠近畫面頂端就往下挪，空翻跳最高（95）頭也不出界
+  const step=Math.max(110,innerWidth/7), off=W/2+20;
+  const zt=gsap.timeline({onComplete(){ gsap.killTweensOf(parts); z.remove(); bun.style.visibility=""; _zoom=false; }});
+  // 從卡片裡蹦出來變大
+  zt.fromTo(sv,{scale:r.width/W,transformOrigin:"50% 100%"},{scale:1,duration:.45,ease:"back.out(2.4)"})
+    .to(z,{y:dy-36,duration:.22,ease:"power2.out"},0).to(z,{y:dy,duration:.2,ease:"power2.in"},.22);
+  // 一跳＝前進＋拋物線＋落地壓扁；flip 跳高一點順便空翻（轉 z，中心在身體中間）
+  const hop=(x,flip)=>{ const t=zt.duration();
+    zt.to(z,{x,duration:.4,ease:"none"},t)
+      .to(z,{y:dy-(flip?95:46),duration:.2,ease:"power2.out"},t)
+      .to(z,{y:dy,duration:.2,ease:"power2.in"},t+.2)
+      .to(sv,{scaleX:1.14,scaleY:.86,duration:.07,ease:"power2.out"},t+.4)
+      .to(sv,{scaleX:1,scaleY:1,duration:.12,ease:"power2.out"},t+.47);
+    if(flip) zt.to(z,{rotation:"+=360",duration:.4,ease:"power1.inOut"},t);
+  };
+  const hops=(from,to,flipAt)=>{ const n=Math.ceil(Math.abs(to-from)/step);
+    for(let i=1;i<=n;i++) hop(from+(to-from)*i/n,i===flipAt); };
+  hops(0,innerWidth+off-cx,2);
+  zt.set(z,{x:-cx-off});
+  hops(-cx-off,0);
+  zt.to(sv,{scale:base,duration:.3,ease:"back.in(2)"});
+}
+
 let out = "";
 items.forEach((it,idx)=>{
   if(inSession && !current && idx===insertBefore) out += nowLineHTML;
@@ -698,7 +757,7 @@ items.forEach((it,idx)=>{
   const [cs,ce]=range(it.t);
   const runner = on ? `<div class="nowrunner" data-pose="${pose}" style="left:${pct(cs,ce)}%">
       <span class="rtime num">${pad(now.getHours())}:${pad(now.getMinutes())}</span>
-      ${pose==='run'?RUNNER_SVG:POSES[pose].svg}</div>` : "";
+      <span class="bun">${pose==='run'?RUNNER_SVG:POSES[pose].svg}</span></div>` : "";
   const prog = on ? `<div class="prog"><i style="transform:scaleX(${(pct(cs,ce)/100).toFixed(4)})"></i></div>${runner}` : "";
   out += `<div class="node ${it.fixed?'fixed':''} ${on?'now':''}" style="${catStyle(cat)}">
     <div class="rail"><span class="dot"></span></div>
