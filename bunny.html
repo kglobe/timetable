@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fbf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#24211d" media="(prefers-color-scheme: dark)">
+<meta name="robots" content="noindex, nofollow">
+<title>麻糬兔小劇場</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&display=swap">
+<script>try{var _t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.dataset.theme=_t;}catch(e){document.documentElement.dataset.theme='light';}</script>
+<style>
+/* 上：草地舞台＋對話泡泡；下：4×2 動作按鈕（按鈕圖示就是該動作的小兔子）。顏色沿用課表的木賊綠＋米白紙 */
+:root{
+  --paper:#fbf7f0; --card:#ffffff; --ink:#413b34; --muted:#7a7067; --line:#ece5db;
+  --accent:#39755d; --accent-weak:#e3ede9; --sky:#e6f2ed; --grass:#cfe5d6; --grass-2:#b2d4bf;
+  --cloud:#ffffff; --heart:#ec7f98;
+  --round:"Huninn","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#24211d; --card:#2c2823; --ink:#ece5d9; --muted:#a89f92; --line:#39332c;
+  --accent:#86b0a5; --accent-weak:#2b3733; --sky:#27302c; --grass:#32453a; --grass-2:#3f5749;
+  --cloud:#38403c; --heart:#f09aae; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#24211d; --card:#2c2823; --ink:#ece5d9; --muted:#a89f92; --line:#39332c;
+  --accent:#86b0a5; --accent-weak:#2b3733; --sky:#27302c; --grass:#32453a; --grass-2:#3f5749;
+  --cloud:#38403c; --heart:#f09aae; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font-family:var(--round)}
+.wrap{max-width:620px;margin:0 auto;padding:18px 16px 28px;display:grid;gap:14px}
+h1{margin:0;font-size:30px;font-weight:400;letter-spacing:.04em;text-wrap:balance}
+.sub{margin:2px 0 0;color:var(--muted);font-size:15px}
+.back{display:inline-flex;align-items:center;gap:5px;font-size:14px;color:var(--muted);
+  text-decoration:none;margin-bottom:8px;letter-spacing:.04em}
+.back svg{width:14px;height:14px}
+
+.stage{--w:clamp(160px,46vw,230px);position:relative;overflow:hidden;border-radius:26px;
+  background:var(--sky);height:calc(var(--w)*1.76 + 56px)}
+.cloud{position:absolute;width:74px;height:22px;border-radius:20px;background:var(--cloud)}
+.cloud::before{content:"";position:absolute;left:14px;top:-15px;width:34px;height:30px;border-radius:50%;background:inherit}
+.c1{top:44px;left:7%}
+.c2{top:96px;right:6%;transform:scale(.75)}
+.ground{position:absolute;left:-10%;right:-10%;bottom:0;height:70px;background:var(--grass);
+  border-radius:50% 50% 0 0/30px 30px 0 0}
+.ground::before{content:"";position:absolute;left:0;right:0;top:26px;height:5px;border-radius:3px;
+  background:repeating-linear-gradient(90deg,var(--grass-2) 0 18px,transparent 18px 46px)}
+#pop{position:absolute;left:50%;bottom:42px;width:var(--w);margin-left:calc(var(--w) / -2)}
+#tap{display:block;width:100%;padding:0;border:0;background:none;cursor:pointer;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;border-radius:30px}
+#tap:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+#bun{display:block;width:100%;height:auto;overflow:visible}
+.bubble{position:absolute;top:18px;left:calc(50% + var(--w) * .26);margin:0;white-space:nowrap;
+  background:var(--card);color:var(--ink);font-size:19px;padding:7px 14px 8px;border-radius:18px;
+  box-shadow:0 0 0 2px var(--line)}
+.bubble::after{content:"";position:absolute;left:16px;bottom:-6px;width:12px;height:12px;
+  background:inherit;transform:rotate(45deg);border-radius:2px;box-shadow:2px 2px 0 0 var(--line)}
+.heart{position:absolute;font-size:30px;line-height:1;color:var(--heart);pointer-events:none}
+
+.moves{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.moves button{font:inherit;font-size:16px;color:var(--ink);background:var(--card);
+  border:2px solid var(--line);border-radius:18px;padding:8px 2px 9px;display:grid;justify-items:center;gap:2px;
+  cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+  transition:transform .12s,border-color .2s,background-color .2s}
+.moves button svg{width:50px;height:auto;overflow:visible}
+.moves button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-weak)}
+.moves button:active{transform:scale(.93)}
+.moves button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* 眨眼：純 CSS，跟課表一樣 */
+@media (prefers-reduced-motion:no-preference){
+  .eyes{transform-box:fill-box;transform-origin:center;animation:blink 3.4s infinite}
+  @keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.12)}}
+  /* 跑步時草地往後捲，看起來真的在前進 */
+  .stage[data-pose="run"] .ground::before{animation:scroll .45s linear infinite}
+  @keyframes scroll{to{background-position:-46px 0}}
+}
+</style>
+
+<main class="wrap">
+  <header>
+    <a class="back" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>回課表
+    </a>
+    <h1>麻糬兔</h1>
+    <p class="sub">按下面的按鈕叫牠做動作，摸摸牠會冒愛心</p>
+  </header>
+  <section class="stage" data-pose="wave">
+    <div class="cloud c1"></div><div class="cloud c2"></div>
+    <div class="ground"></div>
+    <p class="bubble" id="say" aria-live="polite">嗨嗨！</p>
+    <div id="pop"><button id="tap" type="button" aria-label="摸摸麻糬兔">
+      <svg id="bun" viewBox="0 0 40 44" fill="none" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" role="img" aria-label="麻糬兔"></svg>
+    </button></div>
+  </section>
+  <nav class="moves" id="moves" aria-label="麻糬兔的動作"></nav>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+// 麻糬兔圖形照搬課表 index.html，只把動作搬到大舞台上播
+const MO="#5b4636", MW="#fffdf8", MP="#f4a3b4", ME="#3d2f25"; // 外框、麻糬白、腮紅、眼睛
+const MG=`<g stroke="${MO}" stroke-width="1.2" stroke-linejoin="round">`; // 放大顯示，外框比課表（1.4）細一點
+const MOCHI=`<path class="body" d="M20 12.5 C 28.5 12.5,33 21,33 29.5 C 33 36.5,27.5 40,20 40 C 12.5 40,7 36.5,7 29.5 C 7 21,11.5 12.5,20 12.5 Z" fill="${MW}"/>`;
+const ear=(x,deg,pink)=>`<ellipse cx="${x}" cy="7.5" rx="3.2" ry="6.8" transform="rotate(${deg} ${x} 7.5)" fill="${MW}"/>`
+  +(pink?`<ellipse cx="${x}" cy="8.5" rx="1.3" ry="4.2" transform="rotate(${deg} ${x} 7.5)" fill="${MP}" stroke="none" opacity=".7"/>`:"");
+const face=(x,y=25.5,shut)=>(shut
+  ?`<path d="M${x-4.6} ${y}q1.1 ${shut} 2.2 0M${x+2.4} ${y}q1.1 ${shut} 2.2 0" stroke="${ME}" stroke-width="1"/>`
+  :`<g class="eyes" fill="${ME}" stroke="none"><circle cx="${x-3.5}" cy="${y}" r="1.3"/><circle cx="${x+3.5}" cy="${y}" r="1.3"/></g>`)
+  +`<g fill="${MP}" stroke="none" opacity=".85"><ellipse cx="${x-6.2}" cy="${y+3.1}" rx="2" ry="1.2"/><ellipse cx="${x+6.3}" cy="${y+3.1}" rx="2" ry="1.2"/></g>`
+  +`<path d="M${x-.8} ${y+2.4}q.8 .8 1.6 0" stroke="${ME}" stroke-width=".9"/>`;
+const FEET=`<ellipse cx="15.5" cy="39.5" rx="3.2" ry="2.2" fill="${MW}"/><ellipse cx="24.5" cy="39.5" rx="3.2" ry="2.2" fill="${MW}"/>`;
+const TIE=`<circle class="tie" cx="14.8" cy="14" r="1.9" fill="#f0c050" stroke-width="1.1"/>`;
+const SH=(rx,op,cx=20)=>`<ellipse class="shadow" cx="${cx}" cy="42.5" rx="${rx}" ry="1.6" fill="var(--accent)" stroke="none" opacity="${op}"/>`;
+
+// 轉圈四格：正面 → 側面 → 背面 → 側面（鏡像）
+const FRONT=`${SH(7,.14)}${MG}${ear(15,-10,1)}${ear(25,10,1)}
+  <ellipse cx="7" cy="19.5" rx="2.3" ry="3.1" transform="rotate(-35 7 19.5)" fill="${MW}"/>
+  <ellipse cx="33" cy="19.5" rx="2.3" ry="3.1" transform="rotate(35 33 19.5)" fill="${MW}"/>
+  <ellipse cx="16" cy="39.5" rx="3" ry="2.1" fill="${MW}"/><ellipse cx="24" cy="39.5" rx="3" ry="2.1" fill="${MW}"/>
+  ${MOCHI}${face(20)}${TIE}</g>`;
+const SIDE=`<ellipse cx="20" cy="42.5" rx="3" ry="1" fill="var(--accent)" stroke="none" opacity=".06"/>
+  ${MG}${ear(18,-12)}${ear(21.5,4)}
+  <ellipse cx="20" cy="39.8" rx="3" ry="2.1" fill="${MW}"/>
+  <path d="M20 12.5 C 26 12.5,29 21,29 29.5 C 29 36.5,25 40,20 40 C 15 40,11 36.5,11 29.5 C 11 21,14 12.5,20 12.5 Z" fill="${MW}"/>
+  <circle cx="25.8" cy="25.5" r="1.3" fill="${ME}" stroke="none"/>
+  <ellipse cx="26.6" cy="28.6" rx="1.5" ry="1.1" fill="${MP}" stroke="none" opacity=".85"/></g>`;
+const BACK=`<ellipse cx="20" cy="42.5" rx="5" ry="1.2" fill="var(--accent)" stroke="none" opacity=".10"/>
+  ${MG}${ear(15,-10)}${ear(25,10)}
+  <ellipse cx="16" cy="39.5" rx="3" ry="2.1" fill="${MW}"/><ellipse cx="24" cy="39.5" rx="3" ry="2.1" fill="${MW}"/>
+  ${MOCHI}<circle cx="20" cy="36.3" r="2.5" fill="${MW}"/>
+  <circle cx="25.8" cy="13.8" r="1.9" fill="#f0c050" stroke-width="1.1"/></g>`;
+const PIRO=[FRONT,SIDE,BACK,`<g transform="matrix(-1 0 0 1 40 0)">${SIDE}</g>`];
+// 騰空開心瞇眼：只當「轉圈圈」按鈕的圖示
+const HOP=`${SH(6,.1)}${MG}<g transform="translate(0 -4)">${ear(14.5,-6,1)}${ear(25.5,6,1)}
+  <ellipse cx="13" cy="38.5" rx="3" ry="2.1" transform="rotate(-25 13 38.5)" fill="${MW}"/><ellipse cx="27" cy="38.5" rx="3" ry="2.1" transform="rotate(25 27 38.5)" fill="${MW}"/>
+  ${MOCHI}${face(20,25.5,-1.1)}${TIE}
+  <ellipse cx="6.5" cy="26" rx="2.3" ry="3.1" transform="rotate(-60 6.5 26)" fill="${MW}"/><ellipse cx="33.5" cy="26" rx="2.3" ry="3.1" transform="rotate(60 33.5 26)" fill="${MW}"/></g></g>`;
+
+// y 用 yPercent（相對兔子自己的高度），兔子放多大動作幅度都一樣
+const A={ease:"sine.inOut",repeat:-1,yoyo:true};
+const POSES={
+  wave:{label:"揮手",say:"嗨嗨！",svg:`${SH(9,.16)}
+    ${MG}${ear(15,-12)}${ear(24.5,16,1)}${FEET}${MOCHI}${face(22.5)}${TIE}
+    <ellipse cx="9.5" cy="31" rx="2.3" ry="3.1" transform="rotate(15 9.5 31)" fill="${MW}"/>
+    <g class="arm"><ellipse cx="33" cy="18.5" rx="2.3" ry="3.1" transform="rotate(25 33 18.5)" fill="${MW}"/></g>
+    <path class="wv" d="M36.5 12.5q1.6 1.8 0 3.8M38.8 11q2.2 2.8 0 6" stroke-width="1"/></g>`,
+    loop(q,sv){
+      gsap.fromTo(q(".arm"),{rotation:-18},{rotation:14,svgOrigin:"30.5 22.5",duration:.28,...A});
+      gsap.fromTo(q(".wv"),{opacity:.15},{opacity:1,duration:.28,...A});
+      gsap.fromTo(sv,{rotation:-2},{rotation:2,transformOrigin:"50% 95%",duration:.56,...A});}},
+  sit:{label:"坐下",say:"乖乖坐好",svg:`${SH(11,.18)}
+    ${MG}<g transform="translate(0 6)"><g class="ears">${ear(14.5,-14,1)}${ear(25.5,14,1)}</g></g>
+    <path d="M20 19.5 C 30.5 19.5,35.5 27,35.5 32.5 C 35.5 38.5,28.5 40.5,20 40.5 C 11.5 40.5,4.5 38.5,4.5 32.5 C 4.5 27,9.5 19.5,20 19.5 Z" fill="${MW}"/>
+    ${face(20,29.5)}<circle cx="14.8" cy="21" r="1.9" fill="#f0c050" stroke-width="1.1"/>
+    <ellipse cx="15" cy="35.6" rx="2.2" ry="2.7" fill="${MW}"/><ellipse cx="25" cy="35.6" rx="2.2" ry="2.7" fill="${MW}"/>
+    <ellipse cx="11.5" cy="40.4" rx="3.6" ry="2.5" fill="${MW}"/><ellipse cx="28.5" cy="40.4" rx="3.6" ry="2.5" fill="${MW}"/>
+    <g fill="${MP}" stroke="none" opacity=".8"><circle cx="11.5" cy="40.7" r="1.1"/><circle cx="28.5" cy="40.7" r="1.1"/></g></g>`,
+    loop(q,sv){
+      gsap.to(sv,{scaleY:1.035,scaleX:.985,transformOrigin:"50% 95%",duration:1.3,...A});
+      // 耳朵每隔兩秒抖一下
+      gsap.timeline({repeat:-1,repeatDelay:2})
+        .to(q(".ears"),{rotation:7,svgOrigin:"20 14",duration:.09,yoyo:true,repeat:3,ease:"sine.inOut"});}},
+  eat:{label:"吃紅蘿蔔",say:"咔滋咔滋",svg:`${SH(10,.16)}
+    ${MG}${ear(15,-18)}${ear(24.5,16,1)}${FEET}${MOCHI}${face(22.5)}${TIE}
+    <ellipse cx="9.5" cy="31" rx="2.3" ry="3.1" transform="rotate(15 9.5 31)" fill="${MW}"/>
+    <g class="arm-f"><path d="M26.2 28.2 L31.4 20.6 Q34.6 20.2 35.6 23.4 Z" fill="#f29a4a"/>
+    <path d="M28.3 25.2l1 1.15M29.8 22.9l1 1.15" stroke-width=".8"/>
+    <path d="M33.6 21.8q-.4-3.4-2.4-4.6M33.8 21.7q1.4-3.2 3.8-3.4M34.3 22.2q2.6-.6 3.9 1" stroke="#6fbf8e" stroke-width="1.4"/>
+    <ellipse cx="34.4" cy="26.6" rx="2.3" ry="3.1" fill="${MW}"/></g></g>`,
+    loop(q,sv){
+      // 紅蘿蔔送到嘴邊再放下
+      gsap.fromTo(q(".arm-f"),{x:0},{x:-3.8,duration:.45,...A});
+      gsap.to(sv,{yPercent:-3,duration:.9,...A});}},
+  sleep:{label:"睡覺",say:"呼嚕呼嚕",svg:`
+    <rect x="1" y="34" width="38" height="7" rx="2" fill="var(--accent)" stroke="none" opacity=".18"/>
+    ${MG}<rect x="1.5" y="26" width="12" height="7" rx="3.5" fill="#fff"/>
+    <ellipse cx="4.5" cy="25.5" rx="2.5" ry="5.5" transform="rotate(-80 4.5 25.5)" fill="${MW}"/>
+    <ellipse cx="5" cy="28.5" rx="2.5" ry="5.5" transform="rotate(-100 5 28.5)" fill="${MW}"/>
+    <path d="M6 33 C 6 26,11 23,18 23 C 27 23,34 27,34 32 C 34 36,29 37,20 37 C 11 37,6 36.5,6 33 Z" fill="${MW}"/>
+    ${face(14,29,1)}<circle cx="10" cy="25" r="1.8" fill="#f0c050" stroke-width="1.1"/>
+    <rect class="quilt" x="20" y="27" width="17" height="10.5" rx="3.5" fill="#9fd6bd"/></g>
+    <text class="zzz" x="27" y="20" font-size="10" font-weight="700" fill="var(--accent)" stroke="none" text-anchor="middle">z</text>`,
+    loop(q){
+      gsap.fromTo(q(".quilt"),{scaleY:1},{scaleY:1.1,svgOrigin:"28.5 37.5",duration:1.9,...A});
+      gsap.fromTo(q(".zzz"),{y:2},{y:-9,duration:2,ease:"sine.out",repeat:-1});
+      gsap.fromTo(q(".zzz"),{opacity:0},{opacity:.75,duration:1,ease:"none",repeat:-1,yoyo:true});}},
+  run:{label:"跑步",say:"衝呀！",svg:`${SH(9,.16)}
+    ${MG}<g class="pony">${ear(15,-16)}${ear(24.5,14,1)}</g>
+    <rect class="bag" x="2.5" y="21.5" width="9" height="12" rx="3.2" fill="#9fd6bd"/>
+    <ellipse class="leg-b" cx="15.5" cy="39.5" rx="3.2" ry="2.2" fill="${MW}"/>
+    <ellipse class="leg-f" cx="24.5" cy="39.5" rx="3.2" ry="2.2" fill="${MW}"/>
+    ${MOCHI}${face(22.5)}${TIE}
+    <ellipse class="arm-b" cx="9" cy="30" rx="2.3" ry="3.1" fill="${MW}"/>
+    <ellipse class="arm-f" cx="31.6" cy="30" rx="2.3" ry="3.1" fill="${MW}"/></g>`,
+    loop(q,sv){
+      // 四肢反相擺動＋上彈拉長、落腳壓扁（麻糬的軟 Q 感）
+      const L={duration:.24,ease:"sine.inOut",repeat:-1,yoyo:true};
+      gsap.set(sv,{rotation:3,transformOrigin:"50% 95%"});
+      gsap.fromTo(sv,{scaleX:1.04,scaleY:.95},{yPercent:-8.5,scaleX:.98,scaleY:1.03,...L});
+      gsap.fromTo(q(".leg-f"),{rotation:-18},{rotation:15,svgOrigin:"24.5 33",...L});
+      gsap.fromTo(q(".leg-b"),{rotation:15},{rotation:-18,svgOrigin:"15.5 33",...L});
+      gsap.fromTo(q(".arm-f"),{rotation:20},{rotation:-20,svgOrigin:"30 27",...L});
+      gsap.fromTo(q(".arm-b"),{rotation:-20},{rotation:20,svgOrigin:"10 27",...L});
+      gsap.fromTo(q(".bag"),{rotation:-4},{rotation:6,svgOrigin:"9 22",...L});
+      gsap.fromTo(q(".pony,.tie"),{rotation:-14},{rotation:4,svgOrigin:"20 14",...L,duration:.31});
+      gsap.fromTo(q(".shadow"),{scaleX:.7,opacity:.1},{scaleX:1,opacity:.22,svgOrigin:"20 42.5",...L});}},
+  jump:{label:"轉圈圈",say:"轉圈圈！",svg:FRONT,thumb:HOP,
+    loop(q,sv){
+      // 蹲低蓄力 → 跳起逐格轉一圈 → 落地壓扁回彈，停一下再跳
+      gsap.timeline({repeat:-1,repeatDelay:.7})
+        .to(sv,{yPercent:6,scaleX:1.12,scaleY:.86,transformOrigin:"50% 95%",duration:.2,ease:"power2.out"},0)
+        .to(sv,{yPercent:-60,scaleX:.94,scaleY:1.08,duration:.25,ease:"sine.out"},.22)
+        .call(()=>{sv.innerHTML=PIRO[1]},[],.35)
+        .call(()=>{sv.innerHTML=PIRO[2]},[],.48)
+        .call(()=>{sv.innerHTML=PIRO[3]},[],.61)
+        .call(()=>{sv.innerHTML=PIRO[0]},[],.74)
+        .to(sv,{yPercent:-48,scaleX:1,scaleY:1,duration:.35,ease:"sine.inOut"},.47)
+        .to(sv,{yPercent:0,duration:.18,ease:"power2.in"},.82)
+        .to(sv,{scaleX:1.14,scaleY:.84,duration:.07,ease:"power2.out"})
+        .to(sv,{yPercent:-9,scaleX:.97,scaleY:1.04,duration:.12,ease:"power2.out"})
+        .to(sv,{yPercent:0,scaleX:1,scaleY:1,duration:.14,ease:"power2.in"});}},
+  read:{label:"看書",say:"看故事書",svg:`${SH(10,.16)}
+    ${MG}${ear(15,-10)}${ear(25,10,1)}
+    <ellipse class="leg-b" cx="15.5" cy="39.5" rx="3.2" ry="2.2" fill="${MW}"/>
+    <ellipse class="leg-f" cx="24.5" cy="39.5" rx="3.2" ry="2.2" fill="${MW}"/>
+    ${MOCHI}${face(20,26)}${TIE}
+    <rect x="10.5" y="31" width="19" height="8" rx="1.5" fill="#9fd6bd"/>
+    <rect x="12" y="30" width="8" height="7.5" rx="1" fill="#fff"/><rect class="page" x="20" y="30" width="8" height="7.5" rx="1" fill="#fff"/>
+    <ellipse cx="10.5" cy="34" rx="2.3" ry="3.1" fill="${MW}"/><ellipse cx="29.5" cy="34" rx="2.3" ry="3.1" fill="${MW}"/></g>`,
+    loop(q,sv){
+      gsap.fromTo(sv,{rotation:-3},{rotation:4,transformOrigin:"50% 95%",duration:1.5,...A});
+      gsap.fromTo(q(".page"),{scaleX:1},{scaleX:.7,svgOrigin:"20 33.75",duration:1.9,...A});
+      gsap.fromTo(q(".leg-f"),{rotation:-12},{rotation:12,svgOrigin:"24.5 34",duration:.7,...A});
+      gsap.fromTo(q(".leg-b"),{rotation:10},{rotation:-10,svgOrigin:"15.5 34",duration:.7,...A});}},
+  paint:{label:"畫畫",say:"畫一張畫",svg:`${SH(10,.16,18)}
+    ${MG}<path d="M32 24L30.5 41M37 24L38.5 41" stroke-width="1.2"/>
+    <rect x="29" y="11" width="10" height="14" rx="1" fill="#fff"/>
+    <g stroke="none"><circle cx="32" cy="15" r="1.6" fill="${MP}"/><circle cx="35.5" cy="18" r="1.4" fill="#f0c050"/><circle cx="32.5" cy="21.2" r="1.3" fill="#9fd6bd"/></g>
+    <g transform="translate(-4 0)">${ear(15,-16)}${ear(24.5,14,1)}${FEET}${MOCHI}${face(22.5)}${TIE}
+      <ellipse cx="9.5" cy="31" rx="2.3" ry="3.1" transform="rotate(15 9.5 31)" fill="${MW}"/></g>
+    <g class="arm-f"><path d="M28.5 28L32.5 20.5" stroke-width="1.2"/><circle cx="32.7" cy="20" r="1.1" fill="#e0902d" stroke="none"/>
+    <ellipse cx="27.6" cy="30" rx="2.3" ry="3.1" fill="${MW}"/></g></g>`,
+    loop(q,sv){
+      gsap.fromTo(q(".arm-f"),{rotation:-15},{rotation:13,svgOrigin:"27.6 30",duration:.5,...A});
+      gsap.to(sv,{yPercent:-4,duration:.9,...A});}},
+};
+
+const still=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const stage=document.querySelector(".stage"), pop=document.getElementById("pop"), tap=document.getElementById("tap"),
+  sv=document.getElementById("bun"), say=document.getElementById("say"), moves=document.getElementById("moves"),
+  q=gsap.utils.selector(sv);
+const O=`<svg viewBox="0 0 40 44" fill="none" stroke="var(--accent)" stroke-width="4.6" stroke-linecap="round" aria-hidden="true">`;
+let ctx;
+
+function play(key){
+  const p=POSES[key];
+  ctx?.revert(); // 收掉上一個動作的所有 tween，transform 也還原
+  sv.innerHTML=p.svg; sv.setAttribute("aria-label","麻糬兔在"+p.label);
+  stage.dataset.pose=key; say.textContent=p.say;
+  for(const b of moves.children) b.setAttribute("aria-pressed",b.dataset.pose===key);
+  if(still) return;
+  ctx=gsap.context(()=>p.loop(q,sv));
+  // 換動作時從地上「啵」一下彈出來
+  gsap.fromTo(pop,{scale:.62,yPercent:20,rotation:-6,transformOrigin:"50% 92%"},
+    {scale:1,yPercent:0,rotation:0,duration:.5,ease:"back.out(2.2)",overwrite:true});
+  gsap.fromTo(say,{scale:.4,opacity:0},{scale:1,opacity:1,transformOrigin:"0% 100%",duration:.4,ease:"back.out(3)",overwrite:true});
+}
+
+for(const [k,p] of Object.entries(POSES)){
+  const b=document.createElement("button");
+  b.type="button"; b.dataset.pose=k;
+  b.innerHTML=`${O}${p.thumb||p.svg}</svg><span>${p.label}</span>`;
+  b.addEventListener("click",()=>play(k));
+  moves.append(b);
+}
+
+// 摸摸：整隻壓扁再 Q 彈回來，頭上冒一顆愛心
+tap.addEventListener("click",()=>{
+  if(still) return;
+  gsap.killTweensOf(tap);
+  gsap.timeline()
+    .to(tap,{scaleX:1.15,scaleY:.85,transformOrigin:"50% 100%",duration:.08,ease:"power2.out"})
+    .to(tap,{scaleX:1,scaleY:1,duration:.7,ease:"elastic.out(1.1,.35)"});
+  const s=stage.getBoundingClientRect(), r=sv.getBoundingClientRect(), h=document.createElement("span");
+  h.className="heart"; h.textContent="♥";
+  h.style.left=r.left-s.left+r.width*(.3+Math.random()*.4)+"px";
+  h.style.top=r.top-s.top+r.height*.25+"px";
+  stage.append(h);
+  gsap.fromTo(h,{xPercent:-50,y:0,scale:.4,opacity:1},
+    {x:(Math.random()-.5)*90,y:-130,scale:1.3,opacity:0,duration:1.2,ease:"power1.out",onComplete:()=>h.remove()});
+});
+
+play("wave");
+</script>

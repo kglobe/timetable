@@ -40,7 +40,7 @@ test("contrast checker succeeds for every current page", () => {
 
 test("deployable pages do not contain the student name", () => {
   const privateName = "\u6893\u742a";
-  for (const page of ["index.html", "calendar.html", "school.html"]) {
+  for (const page of ["index.html", "calendar.html", "school.html", "bunny.html"]) {
     assert.equal(read(page).includes(privateName), false, page);
   }
 });
